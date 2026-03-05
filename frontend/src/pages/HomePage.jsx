@@ -160,7 +160,7 @@ const HomePage = () => {
 
     return (
         <>
-            <div className={`flex h-screen transition-colors duration-300 ${isDark ? 'bg-slate-900' : 'bg-stone-100'}`}>
+            <div className="flex h-screen transition-colors duration-300 bg-stone-100 dark:bg-slate-900">
                 {/* Project Sidebar */}
                 <ProjectSidebar
                     projects={projects}
@@ -174,7 +174,7 @@ const HomePage = () => {
 
                 {/* Requests Panel */}
                 {showRequests && (
-                    <div className={`w-80 border-r ${isDark ? 'border-slate-700' : 'border-stone-200'}`}>
+                    <div className="w-80 border-r border-stone-200 dark:border-slate-700">
                         <RequestsPage
                             onClose={() => setShowRequests(false)}
                             onInviteAccepted={handleInviteAccepted}
@@ -191,13 +191,13 @@ const HomePage = () => {
                         onProjectsUpdated={loadProjects}
                     />
 
-                    <main className={`flex-1 flex justify-evenly py-6 px-[5%] gap-4 overflow-auto ${isDark ? 'bg-slate-950' : 'bg-stone-100'}`}>
+                    <main className="flex-1 flex justify-evenly py-6 px-[5%] gap-4 overflow-auto bg-stone-100 dark:bg-slate-950">
                         {loading ? (
-                            <div className={`flex items-center justify-center w-full ${isDark ? 'text-slate-400' : 'text-stone-500'}`}>
+                            <div className="flex items-center justify-center w-full text-stone-500 dark:text-slate-400">
                                 <p className="text-lg">Loading...</p>
                             </div>
                         ) : !selectedProject ? (
-                            <div className={`flex flex-col items-center justify-center w-full ${isDark ? 'text-slate-400' : 'text-stone-500'}`}>
+                            <div className="flex flex-col items-center justify-center w-full text-stone-500 dark:text-slate-400">
                                 <svg className="w-16 h-16 mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
                                 </svg>

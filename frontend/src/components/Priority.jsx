@@ -8,21 +8,13 @@ const Priority = ({ name }) => {
   const getPriorityStyles = () => {
     switch (name?.toLowerCase()) {
       case 'high':
-        return isDark
-          ? 'bg-red-900/40 text-red-300 border-red-700'
-          : 'bg-red-50 text-red-600 border-red-200';
+        return "bg-red-50 text-red-600 border-red-200 dark:bg-red-900/40 dark:text-red-300 dark:border-red-700";
       case 'medium':
-        return isDark
-          ? 'bg-amber-900/40 text-amber-300 border-amber-700'
-          : 'bg-amber-50 text-amber-600 border-amber-200';
+        return "bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-900/40 dark:text-amber-300 dark:border-amber-700";
       case 'low':
-        return isDark
-          ? 'bg-emerald-900/40 text-emerald-300 border-emerald-700'
-          : 'bg-emerald-50 text-emerald-600 border-emerald-200';
+        return "bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-900/40 dark:text-emerald-300 dark:border-emerald-700";
       default:
-        return isDark
-          ? 'bg-slate-700 text-slate-300 border-slate-600'
-          : 'bg-stone-100 text-stone-600 border-stone-200';
+        return "bg-stone-100 text-stone-600 border-stone-200 dark:bg-slate-700 dark:text-slate-300 dark:border-slate-600";
     }
   };
 

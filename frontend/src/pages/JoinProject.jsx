@@ -63,10 +63,10 @@ const JoinProjectContent = () => {
 
     if (loading) {
         return (
-            <div className={`min-h-screen flex items-center justify-center ${isDark ? 'bg-slate-900' : 'bg-stone-50'}`}>
+            <div className="min-h-screen flex items-center justify-center bg-stone-50 dark:bg-slate-900">
                 <div className="text-center">
                     <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                    <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-stone-500'}`}>Loading invite...</p>
+                    <p className="text-sm text-stone-500 dark:text-slate-400">Loading invite...</p>
                 </div>
             </div>
         );
@@ -74,17 +74,17 @@ const JoinProjectContent = () => {
 
     if (error && !projectInfo) {
         return (
-            <div className={`min-h-screen flex items-center justify-center ${isDark ? 'bg-slate-900' : 'bg-stone-50'}`}>
-                <div className={`max-w-md w-full mx-4 p-8 rounded-2xl shadow-xl ${isDark ? 'bg-slate-800' : 'bg-white'}`}>
-                    <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${isDark ? 'bg-red-900/30' : 'bg-red-50'}`}>
+            <div className="min-h-screen flex items-center justify-center bg-stone-50 dark:bg-slate-900">
+                <div className="max-w-md w-full mx-4 p-8 rounded-2xl shadow-xl bg-white dark:bg-slate-800">
+                    <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-red-50 dark:bg-red-900/30">
                         <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </div>
-                    <h1 className={`text-xl font-semibold text-center mb-2 ${isDark ? 'text-gray-100' : 'text-stone-800'}`}>
+                    <h1 className="text-xl font-semibold text-center mb-2 text-stone-800 dark:text-gray-100">
                         Invalid Invite Link
                     </h1>
-                    <p className={`text-center mb-6 ${isDark ? 'text-slate-400' : 'text-stone-500'}`}>
+                    <p className="text-center mb-6 text-stone-500 dark:text-slate-400">
                         {error}
                     </p>
                     <button
@@ -100,17 +100,17 @@ const JoinProjectContent = () => {
 
     if (success) {
         return (
-            <div className={`min-h-screen flex items-center justify-center ${isDark ? 'bg-slate-900' : 'bg-stone-50'}`}>
-                <div className={`max-w-md w-full mx-4 p-8 rounded-2xl shadow-xl ${isDark ? 'bg-slate-800' : 'bg-white'}`}>
-                    <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${isDark ? 'bg-emerald-900/30' : 'bg-emerald-50'}`}>
+            <div className="min-h-screen flex items-center justify-center bg-stone-50 dark:bg-slate-900">
+                <div className="max-w-md w-full mx-4 p-8 rounded-2xl shadow-xl bg-white dark:bg-slate-800">
+                    <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-emerald-50 dark:bg-emerald-900/30">
                         <svg className="w-8 h-8 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                         </svg>
                     </div>
-                    <h1 className={`text-xl font-semibold text-center mb-2 ${isDark ? 'text-gray-100' : 'text-stone-800'}`}>
+                    <h1 className="text-xl font-semibold text-center mb-2 text-stone-800 dark:text-gray-100">
                         Successfully Joined!
                     </h1>
-                    <p className={`text-center ${isDark ? 'text-slate-400' : 'text-stone-500'}`}>
+                    <p className="text-center text-stone-500 dark:text-slate-400">
                         You have joined <span className="font-medium">{projectInfo?.projectName}</span>. Redirecting...
                     </p>
                 </div>
@@ -119,8 +119,8 @@ const JoinProjectContent = () => {
     }
 
     return (
-        <div className={`min-h-screen flex items-center justify-center ${isDark ? 'bg-slate-900' : 'bg-stone-50'}`}>
-            <div className={`max-w-md w-full mx-4 p-8 rounded-2xl shadow-xl ${isDark ? 'bg-slate-800' : 'bg-white'}`}>
+        <div className="min-h-screen flex items-center justify-center bg-stone-50 dark:bg-slate-900">
+            <div className="max-w-md w-full mx-4 p-8 rounded-2xl shadow-xl bg-white dark:bg-slate-800">
                 {/* Project Icon */}
                 <div
                     className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
@@ -131,26 +131,26 @@ const JoinProjectContent = () => {
                     </svg>
                 </div>
 
-                <h1 className={`text-xl font-semibold text-center mb-2 ${isDark ? 'text-gray-100' : 'text-stone-800'}`}>
+                <h1 className="text-xl font-semibold text-center mb-2 text-stone-800 dark:text-gray-100">
                     Join Project
                 </h1>
 
-                <p className={`text-center mb-2 ${isDark ? 'text-slate-400' : 'text-stone-500'}`}>
+                <p className="text-center mb-2 text-stone-500 dark:text-slate-400">
                     You've been invited to join
                 </p>
 
-                <p className={`text-lg font-semibold text-center mb-1 ${isDark ? 'text-gray-100' : 'text-stone-800'}`}>
+                <p className="text-lg font-semibold text-center mb-1 text-stone-800 dark:text-gray-100">
                     {projectInfo?.projectName}
                 </p>
 
                 {projectInfo?.createdByName && (
-                    <p className={`text-sm text-center mb-6 ${isDark ? 'text-slate-500' : 'text-stone-400'}`}>
+                    <p className="text-sm text-center mb-6 text-stone-400 dark:text-slate-500">
                         Invited by {projectInfo.createdByName}
                     </p>
                 )}
 
                 {error && (
-                    <div className={`p-3 rounded-xl text-sm mb-4 ${isDark ? 'bg-red-900/30 text-red-300' : 'bg-red-50 text-red-700'}`}>
+                    <div className="p-3 rounded-xl text-sm mb-4 bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300">
                         {error}
                     </div>
                 )}
@@ -165,10 +165,7 @@ const JoinProjectContent = () => {
 
                 <button
                     onClick={() => navigate('/')}
-                    className={`w-full py-3 font-medium rounded-xl transition-colors ${isDark
-                        ? 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-                        : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
-                        }`}
+                    className="w-full py-3 font-medium rounded-xl transition-colors bg-stone-100 text-stone-600 hover:bg-stone-200 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600"
                 >
                     Cancel
                 </button>

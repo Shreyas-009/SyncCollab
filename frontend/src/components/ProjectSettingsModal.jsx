@@ -62,25 +62,23 @@ const ProjectSettingsModal = ({ show, onClose, project, onProjectUpdated }) => {
             onClick={onClose}
         >
             <div
-                className={`flex flex-col w-[90%] max-w-md rounded-2xl shadow-xl overflow-hidden ${isDark ? 'bg-slate-800' : 'bg-white'
-                    }`}
+                className="flex flex-col w-[90%] max-w-md rounded-2xl shadow-xl overflow-hidden bg-white dark:bg-slate-800"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}
-                <div className={`flex items-center justify-between px-5 py-4 border-b ${isDark ? 'border-slate-700' : 'border-stone-200'
-                    }`}>
+                <div className="flex items-center justify-between px-5 py-4 border-b border-stone-200 dark:border-slate-700">
                     <div className="flex items-center gap-3">
                         <div
                             className="w-4 h-4 rounded-md"
                             style={{ backgroundColor: project.color || '#8B5CF6' }}
                         />
-                        <h2 className={`text-lg font-semibold ${isDark ? 'text-gray-100' : 'text-stone-800'}`}>
+                        <h2 className="text-lg font-semibold text-stone-800 dark:text-gray-100">
                             Project Settings
                         </h2>
                     </div>
                     <button
                         onClick={onClose}
-                        className={`p-1.5 rounded-lg ${isDark ? 'hover:bg-slate-700 text-slate-400' : 'hover:bg-stone-100 text-stone-400'}`}
+                        className="p-1.5 rounded-lg hover:bg-stone-100 text-stone-400 dark:hover:bg-slate-700 dark:text-slate-400"
                     >
                         <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                             <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' />
@@ -92,11 +90,11 @@ const ProjectSettingsModal = ({ show, onClose, project, onProjectUpdated }) => {
                 <div className="p-5">
                     {/* Owner Info */}
                     <div className="mb-5">
-                        <p className={`text-xs font-medium uppercase tracking-wide mb-2 ${isDark ? 'text-slate-400' : 'text-stone-500'}`}>
+                        <p className="text-xs font-medium uppercase tracking-wide mb-2 text-stone-500 dark:text-slate-400">
                             Owner
                         </p>
                         <div className="flex items-center gap-3">
-                            <div className={`w-10 h-10 rounded-full overflow-hidden ${isDark ? 'bg-purple-700' : 'bg-purple-500'}`}>
+                            <div className="w-10 h-10 rounded-full overflow-hidden bg-purple-500 dark:bg-purple-700">
                                 {project.ownerImage ? (
                                     <img src={project.ownerImage} alt="" className="w-full h-full object-cover" />
                                 ) : (
@@ -106,11 +104,11 @@ const ProjectSettingsModal = ({ show, onClose, project, onProjectUpdated }) => {
                                 )}
                             </div>
                             <div>
-                                <p className={`text-sm font-medium ${isDark ? 'text-gray-100' : 'text-stone-800'}`}>
+                                <p className="text-sm font-medium text-stone-800 dark:text-gray-100">
                                     {project.ownerName || 'Owner'}
                                     {isOwner && <span className="ml-2 text-xs text-purple-500">(You)</span>}
                                 </p>
-                                <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-stone-500'}`}>
+                                <p className="text-xs text-stone-500 dark:text-slate-400">
                                     {project.ownerEmail}
                                 </p>
                             </div>
@@ -119,33 +117,32 @@ const ProjectSettingsModal = ({ show, onClose, project, onProjectUpdated }) => {
 
                     {/* Collaborators */}
                     <div className="mb-5">
-                        <p className={`text-xs font-medium uppercase tracking-wide mb-2 ${isDark ? 'text-slate-400' : 'text-stone-500'}`}>
+                        <p className="text-xs font-medium uppercase tracking-wide mb-2 text-stone-500 dark:text-slate-400">
                             Collaborators ({project.collaborators?.length || 0})
                         </p>
                         {project.collaborators?.length > 0 ? (
-                            <div className={`rounded-xl border ${isDark ? 'border-slate-700' : 'border-stone-200'}`}>
+                            <div className="rounded-xl border border-stone-200 dark:border-slate-700">
                                 {project.collaborators.map((c) => (
                                     <div
                                         key={c.id}
-                                        className={`flex items-center justify-between p-3 border-b last:border-b-0 ${isDark ? 'border-slate-700' : 'border-stone-100'
-                                            }`}
+                                        className="flex items-center justify-between p-3 border-b last:border-b-0 border-stone-100 dark:border-slate-700"
                                     >
                                         <div className="flex items-center gap-3">
-                                            <div className={`w-8 h-8 rounded-full overflow-hidden ${isDark ? 'bg-slate-600' : 'bg-stone-200'}`}>
+                                            <div className="w-8 h-8 rounded-full overflow-hidden bg-stone-200 dark:bg-slate-600">
                                                 {c.image ? (
                                                     <img src={c.image} alt="" className="w-full h-full object-cover" />
                                                 ) : (
-                                                    <div className={`w-full h-full flex items-center justify-center text-sm font-medium ${isDark ? 'text-slate-200' : 'text-stone-600'}`}>
+                                                    <div className="w-full h-full flex items-center justify-center text-sm font-medium text-stone-600 dark:text-slate-200">
                                                         {c.name?.[0] || c.email?.[0]?.toUpperCase() || '?'}
                                                     </div>
                                                 )}
                                             </div>
                                             <div>
-                                                <p className={`text-sm font-medium ${isDark ? 'text-gray-100' : 'text-stone-800'}`}>
+                                                <p className="text-sm font-medium text-stone-800 dark:text-gray-100">
                                                     {c.name || 'User'}
                                                     {c.id === user?.id && <span className="ml-2 text-xs text-purple-500">(You)</span>}
                                                 </p>
-                                                <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-stone-500'}`}>
+                                                <p className="text-xs text-stone-500 dark:text-slate-400">
                                                     {c.email}
                                                 </p>
                                             </div>
@@ -154,10 +151,7 @@ const ProjectSettingsModal = ({ show, onClose, project, onProjectUpdated }) => {
                                             <button
                                                 onClick={() => handleRemoveCollaborator(c.id)}
                                                 disabled={loading === c.id}
-                                                className={`px-2 py-1 text-xs font-medium rounded-lg transition-colors ${isDark
-                                                        ? 'text-red-400 hover:bg-red-900/30'
-                                                        : 'text-red-600 hover:bg-red-50'
-                                                    } disabled:opacity-50`}
+                                                className="px-2 py-1 text-xs font-medium rounded-lg transition-colors text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/30 disabled:opacity-50"
                                             >
                                                 {loading === c.id ? '...' : 'Remove'}
                                             </button>
@@ -166,26 +160,25 @@ const ProjectSettingsModal = ({ show, onClose, project, onProjectUpdated }) => {
                                 ))}
                             </div>
                         ) : (
-                            <p className={`text-sm py-3 ${isDark ? 'text-slate-500' : 'text-stone-400'}`}>
+                            <p className="text-sm py-3 text-stone-400 dark:text-slate-500">
                                 No collaborators yet
                             </p>
                         )}
                     </div>
 
                     {/* Actions */}
-                    <div className={`pt-4 border-t ${isDark ? 'border-slate-700' : 'border-stone-200'}`}>
+                    <div className="pt-4 border-t border-stone-200 dark:border-slate-700">
                         {isOwner ? (
                             // Owner: Delete project
                             confirmDelete ? (
-                                <div className={`p-3 rounded-xl ${isDark ? 'bg-red-900/20' : 'bg-red-50'}`}>
-                                    <p className={`text-sm mb-3 ${isDark ? 'text-red-300' : 'text-red-700'}`}>
+                                <div className="p-3 rounded-xl bg-red-50 dark:bg-red-900/20">
+                                    <p className="text-sm mb-3 text-red-700 dark:text-red-300">
                                         This will permanently delete the project and all its tasks. This cannot be undone.
                                     </p>
                                     <div className="flex gap-2">
                                         <button
                                             onClick={() => setConfirmDelete(false)}
-                                            className={`flex-1 py-2 text-sm font-medium rounded-lg ${isDark ? 'bg-slate-700 text-slate-300' : 'bg-stone-100 text-stone-600'
-                                                }`}
+                                            className="flex-1 py-2 text-sm font-medium rounded-lg bg-stone-100 text-stone-600 dark:bg-slate-700 dark:text-slate-300"
                                         >
                                             Cancel
                                         </button>
@@ -201,10 +194,7 @@ const ProjectSettingsModal = ({ show, onClose, project, onProjectUpdated }) => {
                             ) : (
                                 <button
                                     onClick={() => setConfirmDelete(true)}
-                                    className={`w-full py-2.5 text-sm font-medium rounded-xl transition-colors ${isDark
-                                            ? 'text-red-400 hover:bg-red-900/20'
-                                            : 'text-red-600 hover:bg-red-50'
-                                        }`}
+                                    className="w-full py-2.5 text-sm font-medium rounded-xl transition-colors text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
                                 >
                                     Delete Project
                                 </button>
@@ -214,10 +204,7 @@ const ProjectSettingsModal = ({ show, onClose, project, onProjectUpdated }) => {
                             <button
                                 onClick={handleLeaveProject}
                                 disabled={loading === 'leave'}
-                                className={`w-full py-2.5 text-sm font-medium rounded-xl transition-colors ${isDark
-                                        ? 'text-red-400 hover:bg-red-900/20'
-                                        : 'text-red-600 hover:bg-red-50'
-                                    } disabled:opacity-50`}
+                                className="w-full py-2.5 text-sm font-medium rounded-xl transition-colors text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 disabled:opacity-50"
                             >
                                 {loading === 'leave' ? 'Leaving...' : 'Leave Project'}
                             </button>

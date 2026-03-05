@@ -26,18 +26,15 @@ const TaskForm = ({ show, onClose, onAddTask }) => {
             onClick={onClose}
         >
             <div
-                className={`flex flex-col w-[90%] max-w-md rounded-2xl shadow-xl overflow-hidden transition-colors ${isDark ? 'bg-slate-800 border border-slate-700' : 'bg-white border border-stone-200'
-                    }`}
+                className="flex flex-col w-[90%] max-w-md rounded-2xl shadow-xl overflow-hidden transition-colors bg-white border border-stone-200 dark:bg-slate-800 dark:border dark:border-slate-700"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}
-                <div className={`flex justify-between items-center px-6 py-4 border-b ${isDark ? 'border-slate-700 bg-slate-800' : 'border-stone-100 bg-stone-50'
-                    }`}>
-                    <h2 className={`text-xl font-semibold ${isDark ? 'text-gray-100' : 'text-stone-800'}`}>Add New Task</h2>
+                <div className="flex justify-between items-center px-6 py-4 border-b border-stone-100 bg-stone-50 dark:border-slate-700 dark:bg-slate-800">
+                    <h2 className="text-xl font-semibold text-stone-800 dark:text-gray-100">Add New Task</h2>
                     <button
                         onClick={onClose}
-                        className={`p-2 rounded-lg transition-colors ${isDark ? 'text-slate-400 hover:text-slate-200 hover:bg-slate-700' : 'text-stone-400 hover:text-stone-600 hover:bg-stone-100'
-                            }`}
+                        className="p-2 rounded-lg transition-colors text-stone-400 hover:text-stone-600 hover:bg-stone-100 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-700"
                     >
                         <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                             <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' />
@@ -46,17 +43,14 @@ const TaskForm = ({ show, onClose, onAddTask }) => {
                 </div>
 
                 {/* Form Content */}
-                <form className={`px-6 py-5 space-y-4 max-h-[65vh] overflow-y-auto ${isDark ? '' : 'bg-white'}`}>
+                <form className="px-6 py-5 space-y-4 max-h-[65vh] overflow-y-auto bg-white">
                     <div>
-                        <label className={`block text-sm font-medium mb-2 ${isDark ? 'text-slate-300' : 'text-stone-700'}`}>
+                        <label className="block text-sm font-medium mb-2 text-stone-700 dark:text-slate-300">
                             Task Title
                         </label>
                         <input
                             type="text"
-                            className={`w-full px-4 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all ${isDark
-                                ? 'bg-slate-900 text-gray-100 border-slate-600 placeholder-slate-500'
-                                : 'bg-stone-50 text-stone-800 border-stone-200 placeholder-stone-400'
-                                }`}
+                            className="w-full px-4 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all bg-stone-50 text-stone-800 border-stone-200 placeholder-stone-400 dark:bg-slate-900 dark:text-gray-100 dark:border-slate-600 dark:placeholder-slate-500"
                             placeholder='Enter your task...'
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
@@ -65,14 +59,11 @@ const TaskForm = ({ show, onClose, onAddTask }) => {
                     </div>
 
                     <div>
-                        <label className={`block text-sm font-medium mb-2 ${isDark ? 'text-slate-300' : 'text-stone-700'}`}>
-                            Description <span className={`text-xs font-normal ${isDark ? 'text-slate-500' : 'text-stone-400'}`}>(optional)</span>
+                        <label className="block text-sm font-medium mb-2 text-stone-700 dark:text-slate-300">
+                            Description <span className="text-xs font-normal text-stone-400 dark:text-slate-500">(optional)</span>
                         </label>
                         <textarea
-                            className={`w-full px-4 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none ${isDark
-                                ? 'bg-slate-900 text-gray-100 border-slate-600 placeholder-slate-500'
-                                : 'bg-stone-50 text-stone-800 border-stone-200 placeholder-stone-400'
-                                }`}
+                            className="w-full px-4 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none bg-stone-50 text-stone-800 border-stone-200 placeholder-stone-400 dark:bg-slate-900 dark:text-gray-100 dark:border-slate-600 dark:placeholder-slate-500"
                             placeholder='Add more details...'
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
@@ -82,14 +73,11 @@ const TaskForm = ({ show, onClose, onAddTask }) => {
 
                     <div className='grid grid-cols-2 gap-4'>
                         <div>
-                            <label className={`block text-sm font-medium mb-2 ${isDark ? 'text-slate-300' : 'text-stone-700'}`}>
+                            <label className="block text-sm font-medium mb-2 text-stone-700 dark:text-slate-300">
                                 Priority
                             </label>
                             <select
-                                className={`w-full px-4 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all cursor-pointer ${isDark
-                                    ? 'bg-slate-900 text-gray-100 border-slate-600'
-                                    : 'bg-stone-50 text-stone-700 border-stone-200'
-                                    }`}
+                                className="w-full px-4 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all cursor-pointer bg-stone-50 text-stone-700 border-stone-200 dark:bg-slate-900 dark:text-gray-100 dark:border-slate-600"
                                 value={priority}
                                 onChange={(e) => setPriority(e.target.value)}
                             >
@@ -100,14 +88,11 @@ const TaskForm = ({ show, onClose, onAddTask }) => {
                         </div>
 
                         <div>
-                            <label className={`block text-sm font-medium mb-2 ${isDark ? 'text-slate-300' : 'text-stone-700'}`}>
+                            <label className="block text-sm font-medium mb-2 text-stone-700 dark:text-slate-300">
                                 Status
                             </label>
                             <select
-                                className={`w-full px-4 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all cursor-pointer ${isDark
-                                    ? 'bg-slate-900 text-gray-100 border-slate-600'
-                                    : 'bg-stone-50 text-stone-700 border-stone-200'
-                                    }`}
+                                className="w-full px-4 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all cursor-pointer bg-stone-50 text-stone-700 border-stone-200 dark:bg-slate-900 dark:text-gray-100 dark:border-slate-600"
                                 value={status}
                                 onChange={(e) => setStatus(e.target.value)}
                             >
@@ -120,15 +105,11 @@ const TaskForm = ({ show, onClose, onAddTask }) => {
                 </form>
 
                 {/* Footer */}
-                <div className={`px-6 py-4 border-t flex justify-end gap-3 ${isDark ? 'bg-slate-900/50 border-slate-700' : 'bg-stone-50 border-stone-100'
-                    }`}>
+                <div className="px-6 py-4 border-t flex justify-end gap-3 bg-stone-50 border-stone-100 dark:bg-slate-900/50 dark:border-slate-700">
                     <button
                         type='button'
                         onClick={onClose}
-                        className={`px-4 py-2 text-sm font-medium border rounded-xl transition-colors ${isDark
-                            ? 'text-slate-300 bg-slate-800 border-slate-600 hover:bg-slate-700'
-                            : 'text-stone-600 bg-white border-stone-200 hover:bg-stone-50'
-                            }`}
+                        className="px-4 py-2 text-sm font-medium border rounded-xl transition-colors text-stone-600 bg-white border-stone-200 hover:bg-stone-50 dark:text-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:hover:bg-slate-700"
                     >
                         Cancel
                     </button>

@@ -22,17 +22,13 @@ const TaskColumn = ({ title, img, tasks, onDelete, onUpdate }) => {
     const currentFilterLabel = priorityOptions.find(opt => opt.value === priorityFilter)?.label || 'All Priorities';
 
     return (
-        <section className={`flex-1 max-w-md border rounded-2xl p-5 transition-colors duration-300 ${isDark
-            ? 'bg-slate-800/50 border-slate-700 backdrop-blur-sm'
-            : 'bg-white/80 border-stone-200 shadow-sm'
-            }`}>
+        <section className="flex-1 max-w-md border rounded-2xl p-5 transition-colors duration-300 bg-white/80 border-stone-200 shadow-sm dark:bg-slate-800/50 dark:border-slate-700 dark:backdrop-blur-sm">
             {/* Column Header */}
-            <div className={`flex items-center justify-between mb-4 pb-4 border-b ${isDark ? 'border-slate-700' : 'border-stone-200'}`}>
+            <div className="flex items-center justify-between mb-4 pb-4 border-b border-stone-200 dark:border-slate-700">
                 <div className="flex items-center">
                     <img className='mr-2 w-7 h-7' src={img} alt={title} />
-                    <span className={`font-semibold text-lg ${isDark ? 'text-gray-200' : 'text-stone-700'}`}>{title}</span>
-                    <span className={`ml-2 px-2 py-0.5 text-xs font-medium rounded-full ${isDark ? 'bg-slate-700 text-slate-300' : 'bg-stone-100 text-stone-600'
-                        }`}>
+                    <span className="font-semibold text-lg text-stone-700 dark:text-gray-200">{title}</span>
+                    <span className="ml-2 px-2 py-0.5 text-xs font-medium rounded-full bg-stone-100 text-stone-600 dark:bg-slate-700 dark:text-slate-300">
                         {filteredTasks?.length || 0}
                     </span>
                 </div>
@@ -43,9 +39,7 @@ const TaskColumn = ({ title, img, tasks, onDelete, onUpdate }) => {
                         onClick={() => setShowFilter(!showFilter)}
                         className={`flex items-center gap-1.5 px-2 py-1 text-xs font-medium rounded-lg transition-colors ${priorityFilter !== 'all'
                             ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300'
-                            : isDark
-                                ? 'text-slate-400 hover:bg-slate-700 hover:text-slate-200'
-                                : 'text-stone-500 hover:bg-stone-100 hover:text-stone-700'
+                            : "text-stone-500 hover:bg-stone-100 hover:text-stone-700 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200"
                             }`}
                     >
                         <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -58,10 +52,7 @@ const TaskColumn = ({ title, img, tasks, onDelete, onUpdate }) => {
                     {showFilter && (
                         <>
                             <div className="fixed inset-0 z-10" onClick={() => setShowFilter(false)} />
-                            <div className={`absolute right-0 top-full mt-1 z-20 min-w-[140px] rounded-lg shadow-lg border ${isDark
-                                ? 'bg-slate-800 border-slate-700'
-                                : 'bg-white border-stone-200'
-                                }`}>
+                            <div className="absolute right-0 top-full mt-1 z-20 min-w-[140px] rounded-lg shadow-lg border bg-white border-stone-200 dark:bg-slate-800 dark:border-slate-700">
                                 {priorityOptions.map((option) => (
                                     <button
                                         key={option.value}
@@ -70,12 +61,8 @@ const TaskColumn = ({ title, img, tasks, onDelete, onUpdate }) => {
                                             setShowFilter(false);
                                         }}
                                         className={`w-full text-left px-3 py-2 text-sm first:rounded-t-lg last:rounded-b-lg transition-colors ${priorityFilter === option.value
-                                            ? isDark
-                                                ? 'bg-purple-600 text-white'
-                                                : 'bg-purple-600 text-white'
-                                            : isDark
-                                                ? 'text-slate-300 hover:bg-slate-700'
-                                                : 'text-stone-700 hover:bg-stone-100'
+                                            ? "bg-purple-600 text-white dark:bg-purple-600 dark:text-white"
+                                            : "text-stone-700 hover:bg-stone-100 dark:text-slate-300 dark:hover:bg-slate-700"
                                             }`}
                                     >
                                         {option.label}
@@ -91,7 +78,7 @@ const TaskColumn = ({ title, img, tasks, onDelete, onUpdate }) => {
                 {filteredTasks && filteredTasks.length > 0 ? (
                     filteredTasks.map((task) => <TaskCard key={task._id} task={task} onDelete={onDelete} onUpdate={onUpdate} />)
                 ) : (
-                    <div className={`flex flex-col items-center justify-center py-12 ${isDark ? 'text-slate-500' : 'text-stone-400'}`}>
+                    <div className="flex flex-col items-center justify-center py-12 text-stone-400 dark:text-slate-500">
                         <svg className="w-12 h-12 mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                         </svg>

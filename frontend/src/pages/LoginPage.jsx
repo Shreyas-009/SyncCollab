@@ -6,14 +6,13 @@ const LoginPage = () => {
     const { isDark } = useTheme();
 
     return (
-        <div className={`min-h-screen flex items-center justify-center transition-colors duration-300 ${isDark ? 'bg-slate-950' : 'bg-stone-100'
-            }`}>
+        <div className="min-h-screen flex items-center justify-center transition-colors duration-300 bg-stone-100 dark:bg-slate-950">
             <div className="w-full max-w-md">
                 <div className="text-center mb-8">
-                    <h1 className={`text-3xl font-bold ${isDark ? 'text-white' : 'text-stone-800'}`}>
+                    <h1 className="text-3xl font-bold text-stone-800 dark:text-white">
                         Welcome Back
                     </h1>
-                    <p className={`mt-2 ${isDark ? 'text-slate-400' : 'text-stone-500'}`}>
+                    <p className="mt-2 text-stone-500 dark:text-slate-400">
                         Sign in to manage your tasks
                     </p>
                 </div>
@@ -21,22 +20,16 @@ const LoginPage = () => {
                     appearance={{
                         elements: {
                             rootBox: "mx-auto",
-                            card: isDark
-                                ? "bg-slate-800 border border-slate-700 shadow-xl"
-                                : "bg-white border border-stone-200 shadow-lg",
-                            headerTitle: isDark ? "text-white" : "text-stone-800",
-                            headerSubtitle: isDark ? "text-slate-400" : "text-stone-500",
-                            socialButtonsBlockButton: isDark
-                                ? "bg-slate-700 border-slate-600 text-white hover:bg-slate-600"
-                                : "bg-white border-stone-200 hover:bg-stone-50",
-                            formFieldLabel: isDark ? "text-slate-300" : "text-stone-700",
-                            formFieldInput: isDark
-                                ? "bg-slate-900 border-slate-600 text-white"
-                                : "bg-stone-50 border-stone-200",
+                            card: "bg-white border border-stone-200 shadow-lg dark:bg-slate-800 dark:border dark:border-slate-700 dark:shadow-xl",
+                            headerTitle: "text-stone-800 dark:text-white",
+                            headerSubtitle: "text-stone-500 dark:text-slate-400",
+                            socialButtonsBlockButton: "bg-white border-stone-200 hover:bg-stone-50 dark:bg-slate-700 dark:border-slate-600 dark:text-white dark:hover:bg-slate-600",
+                            formFieldLabel: "text-stone-700 dark:text-slate-300",
+                            formFieldInput: "bg-stone-50 border-stone-200 dark:bg-slate-900 dark:border-slate-600 dark:text-white",
                             formButtonPrimary: "bg-purple-600 hover:bg-purple-700",
                             footerActionLink: "text-purple-500 hover:text-purple-600",
-                            dividerLine: isDark ? "bg-slate-600" : "bg-stone-200",
-                            dividerText: isDark ? "text-slate-400" : "text-stone-400",
+                            dividerLine: "bg-stone-200 dark:bg-slate-600",
+                            dividerText: "text-stone-400 dark:text-slate-400",
                         }
                     }}
                     signUpUrl="/signup"

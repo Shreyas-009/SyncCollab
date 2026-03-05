@@ -134,26 +134,23 @@ const InviteModal = ({ show, onClose, project }) => {
             onClick={handleClose}
         >
             <div
-                className={`flex flex-col w-[90%] max-w-lg rounded-2xl shadow-xl overflow-hidden transition-colors ${isDark ? 'bg-slate-800 border border-slate-700' : 'bg-white border border-stone-200'
-                    }`}
+                className="flex flex-col w-[90%] max-w-lg rounded-2xl shadow-xl overflow-hidden transition-colors bg-white border border-stone-200 dark:bg-slate-800 dark:border dark:border-slate-700"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}
-                <div className={`flex justify-between items-center px-6 py-4 border-b ${isDark ? 'border-slate-700 bg-slate-800' : 'border-stone-100 bg-stone-50'
-                    }`}>
+                <div className="flex justify-between items-center px-6 py-4 border-b border-stone-100 bg-stone-50 dark:border-slate-700 dark:bg-slate-800">
                     <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isDark ? 'bg-purple-900/30' : 'bg-purple-50'
-                            }`}>
+                        <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-purple-50 dark:bg-purple-900/30">
                             <svg className="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                             </svg>
                         </div>
                         <div>
-                            <h2 className={`text-xl font-semibold ${isDark ? 'text-gray-100' : 'text-stone-800'}`}>
+                            <h2 className="text-xl font-semibold text-stone-800 dark:text-gray-100">
                                 Invite to Project
                             </h2>
                             {project && (
-                                <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-stone-500'}`}>
+                                <p className="text-xs text-stone-500 dark:text-slate-400">
                                     <span className="font-medium">{project.name}</span>
                                 </p>
                             )}
@@ -161,8 +158,7 @@ const InviteModal = ({ show, onClose, project }) => {
                     </div>
                     <button
                         onClick={handleClose}
-                        className={`p-2 rounded-lg transition-colors ${isDark ? 'text-slate-400 hover:text-slate-200 hover:bg-slate-700' : 'text-stone-400 hover:text-stone-600 hover:bg-stone-100'
-                            }`}
+                        className="p-2 rounded-lg transition-colors text-stone-400 hover:text-stone-600 hover:bg-stone-100 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-700"
                     >
                         <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                             <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' />
@@ -171,12 +167,12 @@ const InviteModal = ({ show, onClose, project }) => {
                 </div>
 
                 {/* Mode Tabs */}
-                <div className={`flex border-b ${isDark ? 'border-slate-700' : 'border-stone-200'}`}>
+                <div className="flex border-b border-stone-200 dark:border-slate-700">
                     <button
                         onClick={() => setMode('search')}
                         className={`flex-1 py-3 text-sm font-medium transition-colors ${mode === 'search'
-                            ? isDark ? 'text-purple-400 border-b-2 border-purple-400' : 'text-purple-600 border-b-2 border-purple-600'
-                            : isDark ? 'text-slate-400 hover:text-slate-200' : 'text-stone-500 hover:text-stone-700'
+                            ? "text-purple-600 border-b-2 border-purple-600 dark:text-purple-400 dark:border-b-2 dark:border-purple-400"
+                            : "text-stone-500 hover:text-stone-700 dark:text-slate-400 dark:hover:text-slate-200"
                             }`}
                     >
                         Find User
@@ -184,8 +180,8 @@ const InviteModal = ({ show, onClose, project }) => {
                     <button
                         onClick={() => setMode('invite')}
                         className={`flex-1 py-3 text-sm font-medium transition-colors ${mode === 'invite'
-                            ? isDark ? 'text-purple-400 border-b-2 border-purple-400' : 'text-purple-600 border-b-2 border-purple-600'
-                            : isDark ? 'text-slate-400 hover:text-slate-200' : 'text-stone-500 hover:text-stone-700'
+                            ? "text-purple-600 border-b-2 border-purple-600 dark:text-purple-400 dark:border-b-2 dark:border-purple-400"
+                            : "text-stone-500 hover:text-stone-700 dark:text-slate-400 dark:hover:text-slate-200"
                             }`}
                     >
                         Invite New
@@ -193,8 +189,8 @@ const InviteModal = ({ show, onClose, project }) => {
                     <button
                         onClick={() => setMode('link')}
                         className={`flex-1 py-3 text-sm font-medium transition-colors ${mode === 'link'
-                            ? isDark ? 'text-purple-400 border-b-2 border-purple-400' : 'text-purple-600 border-b-2 border-purple-600'
-                            : isDark ? 'text-slate-400 hover:text-slate-200' : 'text-stone-500 hover:text-stone-700'
+                            ? "text-purple-600 border-b-2 border-purple-600 dark:text-purple-400 dark:border-b-2 dark:border-purple-400"
+                            : "text-stone-500 hover:text-stone-700 dark:text-slate-400 dark:hover:text-slate-200"
                             }`}
                     >
                         Invite via Link
@@ -202,20 +198,17 @@ const InviteModal = ({ show, onClose, project }) => {
                 </div>
 
                 {/* Content */}
-                <div className={`px-6 py-5 max-h-[60vh] overflow-y-auto ${isDark ? '' : 'bg-white'}`}>
+                <div className="px-6 py-5 max-h-[60vh] overflow-y-auto bg-white">
                     {mode === 'search' && (
                         <>
-                            <p className={`text-sm mb-4 ${isDark ? 'text-slate-400' : 'text-stone-500'}`}>
+                            <p className="text-sm mb-4 text-stone-500 dark:text-slate-400">
                                 Search for users. They will receive an invite to join this project.
                             </p>
 
                             <div className="flex gap-2 mb-4">
                                 <input
                                     type="email"
-                                    className={`flex-1 px-4 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 ${isDark
-                                        ? 'bg-slate-900 text-gray-100 border-slate-600 placeholder-slate-500'
-                                        : 'bg-stone-50 text-stone-800 border-stone-200 placeholder-stone-400'
-                                        }`}
+                                    className="flex-1 px-4 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 bg-stone-50 text-stone-800 border-stone-200 placeholder-stone-400 dark:bg-slate-900 dark:text-gray-100 dark:border-slate-600 dark:placeholder-slate-500"
                                     placeholder='Search by email...'
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
@@ -232,26 +225,25 @@ const InviteModal = ({ show, onClose, project }) => {
 
                             {/* Search Results */}
                             {searchResults.length > 0 && (
-                                <div className={`rounded-xl border ${isDark ? 'border-slate-700' : 'border-stone-200'}`}>
+                                <div className="rounded-xl border border-stone-200 dark:border-slate-700">
                                     {searchResults.map(resultUser => (
                                         <div
                                             key={resultUser.id}
-                                            className={`flex items-center justify-between p-3 border-b last:border-b-0 ${isDark ? 'border-slate-700 hover:bg-slate-700/50' : 'border-stone-100 hover:bg-stone-50'
-                                                }`}
+                                            className="flex items-center justify-between p-3 border-b last:border-b-0 border-stone-100 hover:bg-stone-50 dark:border-slate-700 dark:hover:bg-slate-700/50"
                                         >
                                             <div className="flex items-center gap-3">
                                                 {resultUser.imageUrl ? (
                                                     <img src={resultUser.imageUrl} alt="" className="w-8 h-8 rounded-full" />
                                                 ) : (
-                                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isDark ? 'bg-slate-600' : 'bg-stone-200'}`}>
+                                                    <div className="w-8 h-8 rounded-full flex items-center justify-center bg-stone-200 dark:bg-slate-600">
                                                         <span className="text-sm font-medium">{resultUser.firstName?.[0] || resultUser.email[0].toUpperCase()}</span>
                                                     </div>
                                                 )}
                                                 <div>
-                                                    <p className={`text-sm font-medium ${isDark ? 'text-gray-100' : 'text-stone-800'}`}>
+                                                    <p className="text-sm font-medium text-stone-800 dark:text-gray-100">
                                                         {resultUser.firstName} {resultUser.lastName}
                                                     </p>
-                                                    <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-stone-500'}`}>
+                                                    <p className="text-xs text-stone-500 dark:text-slate-400">
                                                         {resultUser.email}
                                                     </p>
                                                 </div>
@@ -272,16 +264,13 @@ const InviteModal = ({ show, onClose, project }) => {
 
                     {mode === 'invite' && (
                         <>
-                            <p className={`text-sm mb-4 ${isDark ? 'text-slate-400' : 'text-stone-500'}`}>
+                            <p className="text-sm mb-4 text-stone-500 dark:text-slate-400">
                                 Send an email invitation to someone who doesn't have an account yet.
                             </p>
 
                             <input
                                 type="email"
-                                className={`w-full px-4 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 ${isDark
-                                    ? 'bg-slate-900 text-gray-100 border-slate-600 placeholder-slate-500'
-                                    : 'bg-stone-50 text-stone-800 border-stone-200 placeholder-stone-400'
-                                    }`}
+                                className="w-full px-4 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 bg-stone-50 text-stone-800 border-stone-200 placeholder-stone-400 dark:bg-slate-900 dark:text-gray-100 dark:border-slate-600 dark:placeholder-slate-500"
                                 placeholder='Enter email address...'
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
@@ -291,7 +280,7 @@ const InviteModal = ({ show, onClose, project }) => {
 
                     {mode === 'link' && (
                         <>
-                            <p className={`text-sm mb-4 ${isDark ? 'text-slate-400' : 'text-stone-500'}`}>
+                            <p className="text-sm mb-4 text-stone-500 dark:text-slate-400">
                                 Generate a shareable link that anyone can use to join this project.
                             </p>
 
@@ -299,10 +288,7 @@ const InviteModal = ({ show, onClose, project }) => {
                                 <button
                                     onClick={handleGenerateLink}
                                     disabled={status === 'generating'}
-                                    className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 border-dashed transition-colors ${isDark
-                                        ? 'border-slate-600 hover:border-purple-500 hover:bg-slate-700/50 text-slate-300'
-                                        : 'border-stone-300 hover:border-purple-500 hover:bg-purple-50 text-stone-600'
-                                        } disabled:opacity-50`}
+                                    className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 border-dashed transition-colors border-stone-300 hover:border-purple-500 hover:bg-purple-50 text-stone-600 dark:border-slate-600 dark:hover:border-purple-500 dark:hover:bg-slate-700/50 dark:text-slate-300 disabled:opacity-50"
                                 >
                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
@@ -310,12 +296,12 @@ const InviteModal = ({ show, onClose, project }) => {
                                     {status === 'generating' ? 'Generating...' : 'Generate Invite Link'}
                                 </button>
                             ) : (
-                                <div className={`p-4 rounded-xl border ${isDark ? 'bg-slate-900 border-slate-600' : 'bg-stone-50 border-stone-200'}`}>
+                                <div className="p-4 rounded-xl border bg-stone-50 border-stone-200 dark:bg-slate-900 dark:border-slate-600">
                                     <div className="flex items-center gap-2 mb-3">
                                         <svg className="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                                         </svg>
-                                        <span className={`text-sm font-medium ${isDark ? 'text-gray-100' : 'text-stone-700'}`}>
+                                        <span className="text-sm font-medium text-stone-700 dark:text-gray-100">
                                             Invite Link
                                         </span>
                                     </div>
@@ -324,10 +310,7 @@ const InviteModal = ({ show, onClose, project }) => {
                                             type="text"
                                             readOnly
                                             value={inviteLink}
-                                            className={`flex-1 px-3 py-2 text-sm rounded-lg border ${isDark
-                                                ? 'bg-slate-800 border-slate-700 text-gray-300'
-                                                : 'bg-white border-stone-200 text-stone-600'
-                                                }`}
+                                            className="flex-1 px-3 py-2 text-sm rounded-lg border bg-white border-stone-200 text-stone-600 dark:bg-slate-800 dark:border-slate-700 dark:text-gray-300"
                                         />
                                         <button
                                             onClick={handleCopyLink}
@@ -347,10 +330,10 @@ const InviteModal = ({ show, onClose, project }) => {
                     {/* Status Message */}
                     {message && (
                         <div className={`mt-4 p-3 rounded-xl text-sm ${status === 'success'
-                            ? isDark ? 'bg-emerald-900/30 text-emerald-300' : 'bg-emerald-50 text-emerald-700'
+                            ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300"
                             : status === 'error'
-                                ? isDark ? 'bg-red-900/30 text-red-300' : 'bg-red-50 text-red-700'
-                                : isDark ? 'bg-slate-700 text-slate-300' : 'bg-stone-100 text-stone-600'
+                                ? "bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300"
+                                : "bg-stone-100 text-stone-600 dark:bg-slate-700 dark:text-slate-300"
                             }`}>
                             {message}
                         </div>
@@ -358,14 +341,10 @@ const InviteModal = ({ show, onClose, project }) => {
                 </div>
 
                 {/* Footer */}
-                <div className={`px-6 py-4 border-t flex justify-end gap-3 ${isDark ? 'bg-slate-900/50 border-slate-700' : 'bg-stone-50 border-stone-100'
-                    }`}>
+                <div className="px-6 py-4 border-t flex justify-end gap-3 bg-stone-50 border-stone-100 dark:bg-slate-900/50 dark:border-slate-700">
                     <button
                         onClick={handleClose}
-                        className={`px-4 py-2 text-sm font-medium border rounded-xl transition-colors ${isDark
-                            ? 'text-slate-300 bg-slate-800 border-slate-600 hover:bg-slate-700'
-                            : 'text-stone-600 bg-white border-stone-200 hover:bg-stone-50'
-                            }`}
+                        className="px-4 py-2 text-sm font-medium border rounded-xl transition-colors text-stone-600 bg-white border-stone-200 hover:bg-stone-50 dark:text-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:hover:bg-slate-700"
                     >
                         Cancel
                     </button>
