@@ -40,7 +40,7 @@ const SignupPage = () => {
                         }
                     }}
                     signInUrl="/login"
-                    forceRedirectUrl="/"
+                    forceRedirectUrl="/dashboard"
                 />
             </div>
         </div>

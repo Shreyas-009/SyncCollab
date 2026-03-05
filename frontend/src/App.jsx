@@ -5,6 +5,7 @@ import LoginPage from './pages/LoginPage'
 import SignupPage from './pages/SignupPage'
 import HomePage from './pages/HomePage'
 import JoinProject from './pages/JoinProject'
+import LandingPage from './pages/LandingPage'
 
 const App = () => {
   return (
@@ -12,7 +13,7 @@ const App = () => {
       <Route path="/login" element={
         <>
           <SignedIn>
-            <Navigate to="/" replace />
+            <Navigate to="/dashboard" replace />
           </SignedIn>
           <SignedOut>
             <LoginPage />
@@ -22,7 +23,7 @@ const App = () => {
       <Route path="/signup" element={
         <>
           <SignedIn>
-            <Navigate to="/" replace />
+            <Navigate to="/dashboard" replace />
           </SignedIn>
           <SignedOut>
             <SignupPage />
@@ -30,7 +31,8 @@ const App = () => {
         </>
       } />
       <Route path="/join/:token" element={<JoinProject />} />
-      <Route path="/" element={
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/dashboard" element={
         <>
           <SignedIn>
             <HomePage />
