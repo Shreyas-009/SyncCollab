@@ -4,7 +4,7 @@ import { useTheme } from '../context/useTheme'
 import InviteModal from './InviteModal'
 import ProjectSettingsModal from './ProjectSettingsModal'
 
-const Header = ({ onOpen, onSearch, selectedProject, onProjectsUpdated }) => {
+const Header = ({ onOpen, onSearch, selectedProject, onProjectsUpdated, onOpenChat }) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [showInvite, setShowInvite] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
@@ -127,6 +127,18 @@ const Header = ({ onOpen, onSearch, selectedProject, onProjectsUpdated }) => {
 
                 {/* Right: Actions */}
                 <div className="flex items-center gap-2 shrink-0">
+                    {/* Ask AI Button */}
+                    <button
+                        onClick={onOpenChat}
+                        disabled={!selectedProject}
+                        className='flex items-center gap-2 px-4 py-2 text-sm font-medium text-indigo-700 bg-indigo-100 rounded-lg hover:bg-indigo-200 dark:text-indigo-200 dark:bg-indigo-900/50 dark:hover:bg-indigo-800/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed border border-indigo-200 dark:border-indigo-800'
+                    >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                        Ask AI
+                    </button>
+
                     {/* Add Task Button */}
                     <button
                         onClick={onOpen}

@@ -1,5 +1,6 @@
 import Todo from '../model/todo-model.js';
 import Project from '../model/project-model.js';
+import ActivityLog from '../model/activity-log-model.js';
 
 // Helper to check project access
 const checkProjectAccess = async (projectId, userId) => {
@@ -103,6 +104,15 @@ export const addTask = async (req, res) => {
             createdByImage: createdByImage || ''
         });
 
+        // Log the activity
+        await ActivityLog.create({
+            projectId,
+            userId,
+            userName: createdByName || 'Unknown User',
+            action: 'CREATED_TASK',
+            taskSnapshot: `Task "${title}" created with status "${status || 'pending'}" and priority "${priority || 'medium'}".`
+        });
+
         return res.status(201).json({
             success: true,
             message: 'Task added successfully',
@@ -150,6 +160,21 @@ export const updateTask = async (req, res) => {
             { new: true }
         );
 
+        // Determine action type
+        let action = 'UPDATED_TASK';
+        if (task.status !== status) {
+            action = 'UPDATED_STATUS';
+        }
+
+        // Log the activity
+        await ActivityLog.create({
+            projectId: task.projectId,
+            userId,
+            userName: updatedByName || 'Unknown User',
+            action,
+            taskSnapshot: `Task "${title || task.title}" updated${action === 'UPDATED_STATUS' ? ` from status "${task.status}" to "${status}"` : ''}.`
+        });
+
         return res.status(200).json({
             success: true,
             message: 'Task updated successfully',
@@ -183,6 +208,15 @@ export const deleteTask = async (req, res) => {
         }
 
         await Todo.findByIdAndDelete(id);
+
+        // Log the activity
+        await ActivityLog.create({
+            projectId: task.projectId,
+            userId,
+            userName: 'User', // We don't have the user's name in this request easily without fetching it, so generic User
+            action: 'DELETED_TASK',
+            taskSnapshot: `Task "${task.title}" deleted.`
+        });
 
         return res.status(200).json({
             success: true,

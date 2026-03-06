@@ -8,12 +8,14 @@ import doing from '../assets/doing.png';
 import completed from '../assets/completed.png';
 import Header from '../components/Header';
 import TaskForm from '../components/TaskForm';
+import ChatInterface from '../components/ChatInterface';
 import { fetchTasks, addTask, deleteTask, searchTasks, updateTask, setAuthFunctions, fetchProjects, createProject } from '../utils/api';
 import { useTheme } from '../context/useTheme';
 
 const HomePage = () => {
     const [showForm, setShowForm] = useState(false);
     const [showRequests, setShowRequests] = useState(false);
+    const [showChat, setShowChat] = useState(false);
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const [tasks, setTasks] = useState([]);
     const [projects, setProjects] = useState([]);
@@ -189,6 +191,7 @@ const HomePage = () => {
                         onSearch={handleSearch}
                         selectedProject={selectedProject}
                         onProjectsUpdated={loadProjects}
+                        onOpenChat={() => setShowChat(true)}
                     />
 
                     <main className="flex-1 flex justify-evenly py-6 px-[5%] gap-4 overflow-auto bg-stone-100 dark:bg-slate-950">
@@ -213,6 +216,13 @@ const HomePage = () => {
                         )}
                     </main>
                 </div>
+                
+                {/* Chat Interface acts like a right sidebar/drawer */}
+                <ChatInterface 
+                    isOpen={showChat} 
+                    onClose={() => setShowChat(false)} 
+                    selectedProject={selectedProject}
+                />
             </div>
 
             <TaskForm

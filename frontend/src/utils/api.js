@@ -260,3 +260,14 @@ export const acceptInviteLink = async (token, userData) => {
         throw error;
     }
 };
+
+// Send Chat Message
+export const sendChatMessage = async (projectId, message) => {
+    try {
+        const response = await apiClient.post(`/chat/${projectId}`, { message });
+        return response.data.response; // The backend sends { success: true, response: "markdown text" }
+    } catch (error) {
+        console.error('Error sending chat message:', error);
+        throw error;
+    }
+};

@@ -2,6 +2,7 @@ import express from 'express';
 import connectDB from './connectDb.js';
 import dotenv from 'dotenv';
 import todoRouter from './routes/todo-routes.js'
+import chatRouter from './routes/chat-routes.js'
 import path from 'path';
 import cors from 'cors';
 
@@ -23,6 +24,7 @@ const __dirname = path.resolve();
 const PORT = process.env.PORT || 3000;
 
 app.use('/api', todoRouter);
+app.use('/api', chatRouter);
 
 connectDB();
 

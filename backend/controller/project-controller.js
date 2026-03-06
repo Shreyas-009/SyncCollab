@@ -1,5 +1,6 @@
 import Project from '../model/project-model.js';
 import Todo from '../model/todo-model.js';
+import ActivityLog from '../model/activity-log-model.js';
 
 // Create new project
 export const createProject = async (req, res) => {
@@ -20,6 +21,15 @@ export const createProject = async (req, res) => {
             ownerImage: ownerImage || '',
             color: color || '#8B5CF6',
             collaborators: []
+        });
+
+        // Log the activity
+        await ActivityLog.create({
+            projectId: project._id,
+            userId: ownerId,
+            userName: ownerName || 'Unknown User',
+            action: 'PROJECT_CREATED',
+            taskSnapshot: `Project "${name}" created.`
         });
 
         return res.status(201).json({
