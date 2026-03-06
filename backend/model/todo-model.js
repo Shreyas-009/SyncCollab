@@ -27,6 +27,22 @@ const todoSchema = new Schema({
         required: true,
         index: true
     },
+    assignedTo: {
+        type: String, // User ID of assignee
+        default: ''
+    },
+    assignedToName: {
+        type: String,
+        default: ''
+    },
+    assignedToImage: {
+        type: String,
+        default: ''
+    },
+    assignedToRole: {
+        type: String,
+        default: ''
+    },
     createdBy: {
         type: String,
         required: true

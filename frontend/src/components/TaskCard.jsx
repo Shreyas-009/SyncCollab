@@ -67,9 +67,26 @@ const TaskCard = ({ task, index, onDelete, onEdit, onView }) => {
                 View details
             </button>
             
-            {/* Priority Badge */}
-            <div className="scale-90 origin-right">
-              <Priority name={priority} />
+            <div className="flex items-center gap-2">
+                {/* Assignee Avatar */}
+                {task.assignedTo && (
+                    <div className="flex -space-x-1 overflow-hidden" title={`Assigned to ${task.assignedToName || 'Unknown'}`}>
+                        {task.assignedToImage ? (
+                            <img src={task.assignedToImage} alt={task.assignedToName} className="inline-block h-6 w-6 rounded-full ring-2 ring-white dark:ring-slate-800 object-cover" />
+                        ) : (
+                            <div className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-indigo-100 ring-2 ring-white dark:ring-slate-800 dark:bg-indigo-900">
+                                <span className="text-[10px] font-medium text-indigo-700 dark:text-indigo-300">
+                                    {task.assignedToName ? task.assignedToName.charAt(0).toUpperCase() : '?'}
+                                </span>
+                            </div>
+                        )}
+                    </div>
+                )}
+                
+                {/* Priority Badge */}
+                <div className="scale-90 origin-right">
+                  <Priority name={priority} />
+                </div>
             </div>
           </div>
         </article>

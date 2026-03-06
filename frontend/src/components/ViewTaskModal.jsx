@@ -26,17 +26,46 @@ const ViewTaskModal = ({ show, onClose, task }) => {
 
                 {/* Body */}
                 <div className="p-6 overflow-y-auto custom-scrollbar flex-1 flex flex-col gap-6">
-                    {/* Status & Priority */}
-                    <div className="flex gap-4 items-center">
-                        <div className="flex flex-col gap-1">
+                    {/* Assignments & Status & Priority */}
+                    <div className="flex flex-wrap gap-4 items-center">
+                        <div className="flex flex-col gap-1 pr-4 border-r border-stone-100 dark:border-slate-700/50">
+                            <span className="text-xs font-semibold text-stone-500 uppercase tracking-wider dark:text-slate-400">Assigned To</span>
+                            {task.assignedTo ? (
+                                <div className="flex items-center gap-2">
+                                    {task.assignedToImage ? (
+                                        <img src={task.assignedToImage} alt={task.assignedToName} className="w-6 h-6 rounded-full object-cover border border-stone-200 dark:border-slate-600" />
+                                    ) : (
+                                        <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium bg-indigo-100 text-indigo-600 dark:bg-indigo-900 dark:text-indigo-300">
+                                            {task.assignedToName ? task.assignedToName.charAt(0).toUpperCase() : '?'}
+                                        </div>
+                                    )}
+                                    <span className="text-sm font-medium text-stone-800 dark:text-gray-200 flex items-center gap-1.5">
+                                        {task.assignedToName || 'Unknown User'}
+                                        {task.assignedToRole && (
+                                            <span className="text-[10px] px-1.5 py-0.5 rounded uppercase font-bold tracking-wider bg-stone-100 text-stone-500 dark:bg-slate-700 dark:text-slate-400">
+                                                {task.assignedToRole}
+                                            </span>
+                                        )}
+                                    </span>
+                                </div>
+                            ) : (
+                                <span className="text-sm text-stone-400 italic dark:text-slate-500 flex items-center gap-2 h-6">
+                                    <div className="w-6 h-6 rounded-full border border-dashed border-stone-300 dark:border-slate-600 flex items-center justify-center">
+                                        <i className="bi bi-person text-xs text-stone-300 dark:text-slate-600"></i>
+                                    </div>
+                                    Unassigned
+                                </span>
+                            )}
+                        </div>
+                        <div className="flex flex-col gap-1 pr-4 border-r border-stone-100 dark:border-slate-700/50">
                             <span className="text-xs font-semibold text-stone-500 uppercase tracking-wider dark:text-slate-400">Status</span>
-                            <span className="px-3 py-1 bg-stone-100 dark:bg-slate-700 text-stone-700 dark:text-slate-200 rounded-full text-sm font-medium capitalize">
+                            <span className="px-3 py-1 bg-stone-100 dark:bg-slate-700 text-stone-700 dark:text-slate-200 rounded-full text-sm font-medium capitalize flex max-w-max">
                                 {task.status || 'Pending'}
                             </span>
                         </div>
                         <div className="flex flex-col gap-1">
                             <span className="text-xs font-semibold text-stone-500 uppercase tracking-wider dark:text-slate-400">Priority</span>
-                            <span className={`px-3 py-1 rounded-full text-sm font-medium capitalize ${
+                            <span className={`px-3 py-1 rounded-full text-sm font-medium capitalize max-w-max ${
                                 task.priority === 'high' ? 'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300' :
                                 task.priority === 'medium' ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/50 dark:text-orange-300' :
                                 'bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300'

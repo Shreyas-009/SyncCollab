@@ -33,7 +33,12 @@ const projectSchema = new Schema({
         id: { type: String, required: true },
         email: { type: String, default: '' },
         name: { type: String, default: '' },
-        image: { type: String, default: '' }
+        image: { type: String, default: '' },
+        role: {
+            type: String,
+            enum: ['Team Lead', 'Frontend Developer', 'Backend Developer', 'Tester', 'Designer', 'Member'],
+            default: 'Member'
+        }
     }],
     color: {
         type: String,

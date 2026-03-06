@@ -330,6 +330,7 @@ const HomePage = () => {
                 show={showForm}
                 onClose={() => setShowForm(false)}
                 onAddTask={handleAddTask}
+                project={selectedProject}
             />
 
             {selectedTaskForDelete && (
@@ -347,6 +348,7 @@ const HomePage = () => {
                     onClose={() => setSelectedTaskForEdit(null)}
                     task={selectedTaskForEdit}
                     onUpdate={handleUpdateTask}
+                    project={selectedProject}
                 />
             )}
 

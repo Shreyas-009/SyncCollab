@@ -1,6 +1,6 @@
 import express from 'express';
 import { getAllTasks, addTask, getSignleTasks, updateTask, deleteTask, getTasksBySearch } from '../controller/todo-controller.js';
-import { createProject, getProjects, getProject, updateProject, deleteProject, removeCollaborator, leaveProject } from '../controller/project-controller.js';
+import { createProject, getProjects, getProject, updateProject, deleteProject, removeCollaborator, leaveProject, updateCollaboratorRole } from '../controller/project-controller.js';
 import { sendProjectInvite, getPendingInvites, acceptInvite, declineInvite, createInviteLink, getInviteLinkInfo, acceptInviteLink } from '../controller/project-invite-controller.js';
 import { requireAuth, sendInvitation, searchUsers } from '../middleware/clerk-auth.js';
 
@@ -19,6 +19,7 @@ router.get('/projects/:projectId', getProject);
 router.patch('/projects/:projectId', updateProject);
 router.delete('/projects/:projectId', deleteProject);
 router.delete('/projects/:projectId/collaborators', removeCollaborator);
+router.patch('/projects/:projectId/collaborators/role', updateCollaboratorRole);
 router.post('/projects/:projectId/leave', leaveProject);
 
 // Project invite routes

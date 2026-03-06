@@ -103,6 +103,19 @@ export const removeProjectCollaborator = async (projectId, collaboratorId) => {
     }
 };
 
+export const updateProjectCollaboratorRole = async (projectId, collaboratorId, role) => {
+    try {
+        const response = await apiClient.patch(`/projects/${projectId}/collaborators/role`, {
+            collaboratorId,
+            role
+        });
+        return response.data.data;
+    } catch (error) {
+        console.error("Error updating collaborator role:", error);
+        throw error;
+    }
+};
+
 export const leaveProject = async (projectId) => {
     try {
         const response = await apiClient.post(`/projects/${projectId}/leave`);

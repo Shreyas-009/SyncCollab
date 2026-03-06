@@ -76,7 +76,7 @@ export const getSignleTasks = async (req, res) => {
 // Add task to project
 export const addTask = async (req, res) => {
     try {
-        const { title, description, status, priority, projectId, createdByName, createdByImage } = req.body;
+        const { title, description, status, priority, projectId, createdByName, createdByImage, assignedTo, assignedToName, assignedToImage, assignedToRole } = req.body;
         const userId = req.userId;
 
         if (!title) {
@@ -99,6 +99,10 @@ export const addTask = async (req, res) => {
             status: status || 'pending',
             priority: priority || 'medium',
             projectId,
+            assignedTo: assignedTo || '',
+            assignedToName: assignedToName || '',
+            assignedToImage: assignedToImage || '',
+            assignedToRole: assignedToRole || '',
             createdBy: userId,
             createdByName: createdByName || '',
             createdByImage: createdByImage || ''
@@ -129,7 +133,7 @@ export const updateTask = async (req, res) => {
     try {
         const id = req.params.id;
         const userId = req.userId;
-        const { title, description, status, priority, updatedBy, updatedByName, updatedByImage } = req.body;
+        const { title, description, status, priority, updatedBy, updatedByName, updatedByImage, assignedTo, assignedToName, assignedToImage, assignedToRole } = req.body;
 
         if (!id) {
             return res.status(400).json({ message: 'Please provide a task id' });
@@ -146,17 +150,25 @@ export const updateTask = async (req, res) => {
             return res.status(403).json({ message: 'You do not have access to this task' });
         }
 
+        // Create update object dynamically so we don't clear assignment fields if they are not passed
+        const updateFields = {
+            title,
+            description,
+            status,
+            priority,
+            updatedBy: updatedBy || userId,
+            updatedByName: updatedByName || '',
+            updatedByImage: updatedByImage || ''
+        };
+
+        if (assignedTo !== undefined) updateFields.assignedTo = assignedTo;
+        if (assignedToName !== undefined) updateFields.assignedToName = assignedToName;
+        if (assignedToImage !== undefined) updateFields.assignedToImage = assignedToImage;
+        if (assignedToRole !== undefined) updateFields.assignedToRole = assignedToRole;
+
         const updatedTask = await Todo.findByIdAndUpdate(
             id,
-            {
-                title,
-                description,
-                status,
-                priority,
-                updatedBy: updatedBy || userId,
-                updatedByName: updatedByName || '',
-                updatedByImage: updatedByImage || ''
-            },
+            updateFields,
             { new: true }
         );
 

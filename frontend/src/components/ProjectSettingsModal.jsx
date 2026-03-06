@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useUser } from '@clerk/clerk-react'
 import { useTheme } from '../context/useTheme'
-import { removeProjectCollaborator, leaveProject, deleteProject } from '../utils/api'
+import { removeProjectCollaborator, leaveProject, deleteProject, updateProjectCollaboratorRole } from '../utils/api'
 
 const ProjectSettingsModal = ({ show, onClose, project, onProjectUpdated }) => {
     const [loading, setLoading] = useState(null);
@@ -22,6 +22,18 @@ const ProjectSettingsModal = ({ show, onClose, project, onProjectUpdated }) => {
             if (onProjectUpdated) onProjectUpdated();
         } catch (error) {
             alert(error.response?.data?.message || 'Error removing collaborator');
+        } finally {
+            setLoading(null);
+        }
+    };
+
+    const handleRoleChange = async (collaboratorId, newRole) => {
+        setLoading(`role-${collaboratorId}`);
+        try {
+            await updateProjectCollaboratorRole(project._id, collaboratorId, newRole);
+            if (onProjectUpdated) onProjectUpdated();
+        } catch (error) {
+            alert(error.response?.data?.message || 'Error updating role');
         } finally {
             setLoading(null);
         }
@@ -138,11 +150,30 @@ const ProjectSettingsModal = ({ show, onClose, project, onProjectUpdated }) => {
                                                 )}
                                             </div>
                                             <div>
-                                                <p className="text-sm font-medium text-stone-800 dark:text-gray-100">
+                                                <p className="text-sm font-medium text-stone-800 dark:text-gray-100 flex items-center gap-2">
                                                     {c.name || 'User'}
-                                                    {c.id === user?.id && <span className="ml-2 text-xs text-purple-500">(You)</span>}
+                                                    {c.id === user?.id && <span className="text-xs text-purple-500">(You)</span>}
+                                                    {isOwner ? (
+                                                        <select
+                                                            disabled={loading === `role-${c.id}`}
+                                                            value={c.role || 'Member'}
+                                                            onChange={(e) => handleRoleChange(c.id, e.target.value)}
+                                                            className="text-[10px] uppercase font-bold tracking-wider ml-1 bg-stone-100 text-stone-600 border-none rounded p-1 cursor-pointer focus:ring-1 focus:ring-purple-500 dark:bg-slate-700 dark:text-slate-300 outline-none"
+                                                        >
+                                                            <option value="Team Lead">Team Lead</option>
+                                                            <option value="Frontend Developer">Frontend Developer</option>
+                                                            <option value="Backend Developer">Backend Developer</option>
+                                                            <option value="Tester">Tester</option>
+                                                            <option value="Designer">Designer</option>
+                                                            <option value="Member">Member</option>
+                                                        </select>
+                                                    ) : (
+                                                        <span className="text-[10px] uppercase font-bold tracking-wider text-stone-500 bg-stone-100 px-1.5 py-0.5 rounded dark:bg-slate-700 dark:text-slate-400">
+                                                            {c.role || 'Member'}
+                                                        </span>
+                                                    )}
                                                 </p>
-                                                <p className="text-xs text-stone-500 dark:text-slate-400">
+                                                <p className="text-xs text-stone-500 dark:text-slate-400 mt-0.5">
                                                     {c.email}
                                                 </p>
                                             </div>
@@ -151,7 +182,7 @@ const ProjectSettingsModal = ({ show, onClose, project, onProjectUpdated }) => {
                                             <button
                                                 onClick={() => handleRemoveCollaborator(c.id)}
                                                 disabled={loading === c.id}
-                                                className="px-2 py-1 text-xs font-medium rounded-lg transition-colors text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/30 disabled:opacity-50"
+                                                className="px-2 py-1 text-xs font-medium rounded-lg transition-colors text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/30 disabled:opacity-50 ml-2"
                                             >
                                                 {loading === c.id ? '...' : 'Remove'}
                                             </button>

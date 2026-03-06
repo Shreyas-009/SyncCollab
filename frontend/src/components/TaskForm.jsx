@@ -1,23 +1,49 @@
 import React, { useState } from 'react'
 import { useTheme } from '../context/useTheme'
 
-const TaskForm = ({ show, onClose, onAddTask }) => {
+const TaskForm = ({ show, onClose, onAddTask, project }) => {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [priority, setPriority] = useState('medium');
     const [status, setStatus] = useState('pending');
+    const [assignedTo, setAssignedTo] = useState('');
     const { isDark } = useTheme();
 
     if (!show) return null;
 
+    // Build assignee list (owner + collaborators)
+    const assignees = project ? [
+        { id: project.ownerId, name: project.ownerName || 'Owner', image: project.ownerImage, role: 'Owner' },
+        ...(project.collaborators || []).map(c => ({
+            id: c.id,
+            name: c.name || c.email,
+            image: c.image,
+            role: c.role || 'Member'
+        }))
+    ] : [];
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const newTask = { title, description, priority, status };
+        
+        const selectedAssignee = assignees.find(a => a.id === assignedTo);
+        const newTask = { 
+            title, 
+            description, 
+            priority, 
+            status,
+            assignedTo: selectedAssignee?.id || '',
+            assignedToName: selectedAssignee?.name || '',
+            assignedToImage: selectedAssignee?.image || '',
+            assignedToRole: selectedAssignee?.role || ''
+        };
+        
         await onAddTask(newTask);
+        
         setTitle('');
         setDescription('');
         setPriority('medium');
         setStatus('pending');
+        setAssignedTo('');
     }
 
     return (
@@ -36,14 +62,12 @@ const TaskForm = ({ show, onClose, onAddTask }) => {
                         onClick={onClose}
                         className="p-2 rounded-lg transition-colors text-stone-400 hover:text-stone-600 hover:bg-stone-100 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-700"
                     >
-                        <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                            <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' />
-                        </svg>
+                        <i className="bi bi-x-lg text-lg"></i>
                     </button>
                 </div>
 
                 {/* Form Content */}
-                <form className="px-6 py-5 space-y-4 max-h-[65vh] overflow-y-auto bg-white">
+                <form className="px-6 py-5 space-y-4 max-h-[65vh] overflow-y-auto bg-white custom-scrollbar dark:bg-slate-900">
                     <div>
                         <label className="block text-sm font-medium mb-2 text-stone-700 dark:text-slate-300">
                             Task Title
@@ -69,6 +93,24 @@ const TaskForm = ({ show, onClose, onAddTask }) => {
                             onChange={(e) => setDescription(e.target.value)}
                             rows={3}
                         />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium mb-2 text-stone-700 dark:text-slate-300">
+                            Assign To
+                        </label>
+                        <select
+                            className="w-full px-4 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all cursor-pointer bg-stone-50 text-stone-700 border-stone-200 dark:bg-slate-900 dark:text-gray-100 dark:border-slate-600"
+                            value={assignedTo}
+                            onChange={(e) => setAssignedTo(e.target.value)}
+                        >
+                            <option value="">Unassigned</option>
+                            {assignees.map(a => (
+                                <option key={a.id} value={a.id}>
+                                    {a.name} ({a.role})
+                                </option>
+                            ))}
+                        </select>
                     </div>
 
                     <div className='grid grid-cols-2 gap-4'>
@@ -98,6 +140,7 @@ const TaskForm = ({ show, onClose, onAddTask }) => {
                             >
                                 <option value='pending'>Pending</option>
                                 <option value='in progress'>In Progress</option>
+                                <option value='testing'>Testing</option>
                                 <option value='completed'>Completed</option>
                             </select>
                         </div>
@@ -114,7 +157,7 @@ const TaskForm = ({ show, onClose, onAddTask }) => {
                         Cancel
                     </button>
                     <button
-                        type='submit'
+                        type='button'
                         onClick={handleSubmit}
                         className='px-6 py-2 text-sm font-medium text-white bg-purple-600 rounded-xl hover:bg-purple-700 transition-colors shadow-sm'
                     >
@@ -125,6 +168,5 @@ const TaskForm = ({ show, onClose, onAddTask }) => {
         </div>
     );
 };
-
 
 export default TaskForm

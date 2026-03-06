@@ -266,3 +266,44 @@ export const leaveProject = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 };
+
+// Update collaborator role
+export const updateCollaboratorRole = async (req, res) => {
+    try {
+        const { projectId } = req.params;
+        const { collaboratorId, role } = req.body;
+        const userId = req.userId;
+
+        if (!collaboratorId || !role) {
+            return res.status(400).json({ message: 'Collaborator ID and Role are required' });
+        }
+
+        const validRoles = ['Team Lead', 'Frontend Developer', 'Backend Developer', 'Tester', 'Designer', 'Member'];
+        if (!validRoles.includes(role)) {
+            return res.status(400).json({ message: 'Invalid role provided' });
+        }
+
+        // Only owner can update roles
+        const project = await Project.findOne({ _id: projectId, ownerId: userId });
+        if (!project) {
+            return res.status(404).json({ message: 'Project not found or you are not the owner' });
+        }
+
+        // Update the specific collaborator's role
+        await Project.updateOne(
+            { _id: projectId, 'collaborators.id': collaboratorId },
+            { $set: { 'collaborators.$.role': role } }
+        );
+
+        const updatedProject = await Project.findById(projectId);
+
+        return res.status(200).json({
+            success: true,
+            message: 'Collaborator role updated successfully',
+            data: updatedProject
+        });
+    } catch (error) {
+        console.error('Update role error:', error);
+        return res.status(500).json({ message: error.message });
+    }
+};
