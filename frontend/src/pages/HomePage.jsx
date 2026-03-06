@@ -254,6 +254,12 @@ const HomePage = () => {
     const testingTasks = tasks.filter(task => task.status === 'testing');
     const completedTasks = tasks.filter(task => task.status === 'completed');
 
+    // Build project assignees list for filters
+    const projectAssignees = selectedProject ? [
+        { id: selectedProject.ownerId, name: selectedProject.ownerName || 'Owner' },
+        ...(selectedProject.collaborators || []).map(c => ({ id: c.id, name: c.name || c.email }))
+    ] : [];
+
     return (
         <>
             <div className="flex h-screen transition-colors duration-300 bg-stone-50 dark:bg-slate-900 font-sans">
@@ -308,10 +314,10 @@ const HomePage = () => {
                         <DragDropContext onDragEnd={handleDragEnd}>
                             <main className="flex-1 flex py-6 px-[2%] gap-5 overflow-x-auto custom-scrollbar bg-stone-50/30 dark:bg-slate-950/30">
                                 <div className="flex gap-5 h-full pb-4">
-                                    <TaskColumn title='Pending' statusId='pending' img={Todo} tasks={pendingTasks} onDelete={setSelectedTaskForDelete} onEdit={setSelectedTaskForEdit} onView={setSelectedTaskForView} />
-                                    <TaskColumn title='In Progress' statusId='in progress' img={doing} tasks={inProgressTasks} onDelete={setSelectedTaskForDelete} onEdit={setSelectedTaskForEdit} onView={setSelectedTaskForView} />
-                                    <TaskColumn title='Testing' statusId='testing' img={null} tasks={testingTasks} onDelete={setSelectedTaskForDelete} onEdit={setSelectedTaskForEdit} onView={setSelectedTaskForView} />
-                                    <TaskColumn title='Completed' statusId='completed' img={completed} tasks={completedTasks} onDelete={setSelectedTaskForDelete} onEdit={setSelectedTaskForEdit} onView={setSelectedTaskForView} />
+                                    <TaskColumn title='Pending' statusId='pending' img={Todo} tasks={pendingTasks} onDelete={setSelectedTaskForDelete} onEdit={setSelectedTaskForEdit} onView={setSelectedTaskForView} projectAssignees={projectAssignees} />
+                                    <TaskColumn title='In Progress' statusId='in progress' img={doing} tasks={inProgressTasks} onDelete={setSelectedTaskForDelete} onEdit={setSelectedTaskForEdit} onView={setSelectedTaskForView} projectAssignees={projectAssignees} />
+                                    <TaskColumn title='Testing' statusId='testing' img={null} tasks={testingTasks} onDelete={setSelectedTaskForDelete} onEdit={setSelectedTaskForEdit} onView={setSelectedTaskForView} projectAssignees={projectAssignees} />
+                                    <TaskColumn title='Completed' statusId='completed' img={completed} tasks={completedTasks} onDelete={setSelectedTaskForDelete} onEdit={setSelectedTaskForEdit} onView={setSelectedTaskForView} projectAssignees={projectAssignees} />
                                 </div>
                             </main>
                         </DragDropContext>

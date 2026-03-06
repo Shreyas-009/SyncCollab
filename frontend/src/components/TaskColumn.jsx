@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import TaskCard from './TaskCard';
 import { Droppable } from '@hello-pangea/dnd';
 
-const TaskColumn = ({ title, statusId, img, tasks, onDelete, onEdit, onView }) => {
+const TaskColumn = ({ title, statusId, img, tasks, onDelete, onEdit, onView, projectAssignees }) => {
     const [priorityFilter, setPriorityFilter] = useState('all');
-    const [showFilter, setShowFilter] = useState(false);
+    const [assigneeFilter, setAssigneeFilter] = useState('all');
+    const [showPriorityFilter, setShowPriorityFilter] = useState(false);
+    const [showAssigneeFilter, setShowAssigneeFilter] = useState(false);
 
     const priorityOptions = [
         { value: 'all', label: 'All Priorities' },
@@ -13,11 +15,18 @@ const TaskColumn = ({ title, statusId, img, tasks, onDelete, onEdit, onView }) =
         { value: 'high', label: 'High' }
     ];
 
-    const filteredTasks = priorityFilter === 'all'
-        ? tasks
-        : tasks?.filter(task => task.priority === priorityFilter);
+    const assigneeOptions = [
+        { value: 'all', label: 'Everyone' },
+        { value: 'unassigned', label: 'Unassigned' },
+        ...(projectAssignees || []).map(a => ({ value: a.id, label: a.name }))
+    ];
 
-    const currentFilterLabel = priorityOptions.find(opt => opt.value === priorityFilter)?.label || 'All Priorities';
+    const filteredTasks = tasks?.filter(task => {
+        const matchesPriority = priorityFilter === 'all' || task.priority === priorityFilter;
+        const matchesAssignee = assigneeFilter === 'all' || 
+            (assigneeFilter === 'unassigned' ? !task.assignedTo : task.assignedTo === assigneeFilter);
+        return matchesPriority && matchesAssignee;
+    });
 
     return (
         <section className="flex flex-col flex-1 min-w-[300px] max-w-sm rounded-[24px] bg-stone-100/50 border border-stone-200/60 shadow-sm dark:bg-slate-800/30 dark:border-slate-700/50 overflow-hidden">
@@ -39,43 +48,87 @@ const TaskColumn = ({ title, statusId, img, tasks, onDelete, onEdit, onView }) =
                     </span>
                 </div>
 
-                {/* Priority Filter */}
-                <div className="relative">
-                    <button
-                        onClick={() => setShowFilter(!showFilter)}
-                        className={`flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold rounded-lg transition-all ${priorityFilter !== 'all'
-                            ? 'bg-purple-100 text-purple-700 ring-1 ring-purple-200 dark:bg-purple-900/40 dark:text-purple-300 dark:ring-purple-800/50 shadow-sm'
-                            : "bg-white text-stone-500 hover:bg-stone-50 hover:text-stone-700 shadow-sm border border-stone-200 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200"
-                            }`}
-                    >
-                        <i className="bi bi-funnel"></i>
-                    </button>
+                {/* Filters */}
+                <div className="flex items-center gap-2 relative">
+                    {/* Assignee Filter */}
+                    <div className="relative">
+                        <button
+                            onClick={() => { setShowAssigneeFilter(!showAssigneeFilter); setShowPriorityFilter(false); }}
+                            className={`flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold rounded-lg transition-all ${assigneeFilter !== 'all'
+                                ? 'bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200 dark:bg-indigo-900/40 dark:text-indigo-300 dark:ring-indigo-800/50 shadow-sm'
+                                : "bg-white text-stone-500 hover:bg-stone-50 hover:text-stone-700 shadow-sm border border-stone-200 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200"
+                                }`}
+                            title="Filter by Assignee"
+                        >
+                            <i className="bi bi-person-fill border border-transparent"></i>
+                        </button>
 
-                    {showFilter && (
-                        <>
-                            <div className="fixed inset-0 z-20" onClick={() => setShowFilter(false)} />
-                            <div className="absolute right-0 top-full mt-2 w-40 z-30 rounded-xl shadow-xl border overflow-hidden bg-white border-stone-100 dark:bg-slate-800 dark:border-slate-700">
-                                <div className="p-1">
-                                    {priorityOptions.map((option) => (
-                                        <button
-                                            key={option.value}
-                                            onClick={() => {
-                                                setPriorityFilter(option.value);
-                                                setShowFilter(false);
-                                            }}
-                                            className={`w-full text-left px-3 py-2 text-sm font-medium rounded-lg transition-colors flex items-center justify-between ${priorityFilter === option.value
-                                                ? "bg-purple-50 text-purple-700 dark:bg-purple-900/50 dark:text-purple-300"
-                                                : "text-stone-600 hover:bg-stone-50 dark:text-slate-300 dark:hover:bg-slate-700/50"
-                                                }`}
-                                        >
-                                            {option.label}
-                                            {priorityFilter === option.value && <i className="bi bi-check2"></i>}
-                                        </button>
-                                    ))}
+                        {showAssigneeFilter && (
+                            <>
+                                <div className="fixed inset-0 z-20" onClick={() => setShowAssigneeFilter(false)} />
+                                <div className="absolute right-0 top-full mt-2 w-48 z-30 rounded-xl shadow-xl border overflow-hidden bg-white border-stone-100 dark:bg-slate-800 dark:border-slate-700">
+                                    <div className="p-1 max-h-48 overflow-y-auto custom-scrollbar">
+                                        {assigneeOptions.map((option) => (
+                                            <button
+                                                key={option.value}
+                                                onClick={() => {
+                                                    setAssigneeFilter(option.value);
+                                                    setShowAssigneeFilter(false);
+                                                }}
+                                                className={`w-full text-left px-3 py-2 text-xs font-medium rounded-lg transition-colors flex items-center justify-between ${assigneeFilter === option.value
+                                                    ? "bg-indigo-50 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300"
+                                                    : "text-stone-600 hover:bg-stone-50 dark:text-slate-300 dark:hover:bg-slate-700/50"
+                                                    }`}
+                                            >
+                                                <span className="truncate">{option.label}</span>
+                                                {assigneeFilter === option.value && <i className="bi bi-check2 flex-shrink-0"></i>}
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
-                            </div>
-                        </>
-                    )}
+                            </>
+                        )}
+                    </div>
+
+                    {/* Priority Filter */}
+                    <div className="relative">
+                        <button
+                            onClick={() => { setShowPriorityFilter(!showPriorityFilter); setShowAssigneeFilter(false); }}
+                            className={`flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold rounded-lg transition-all ${priorityFilter !== 'all'
+                                ? 'bg-purple-100 text-purple-700 ring-1 ring-purple-200 dark:bg-purple-900/40 dark:text-purple-300 dark:ring-purple-800/50 shadow-sm'
+                                : "bg-white text-stone-500 hover:bg-stone-50 hover:text-stone-700 shadow-sm border border-stone-200 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200"
+                                }`}
+                            title="Filter by Priority"
+                        >
+                            <i className="bi bi-funnel text-xs"></i>
+                        </button>
+
+                        {showPriorityFilter && (
+                            <>
+                                <div className="fixed inset-0 z-20" onClick={() => setShowPriorityFilter(false)} />
+                                <div className="absolute right-0 top-full mt-2 w-36 z-30 rounded-xl shadow-xl border overflow-hidden bg-white border-stone-100 dark:bg-slate-800 dark:border-slate-700">
+                                    <div className="p-1">
+                                        {priorityOptions.map((option) => (
+                                            <button
+                                                key={option.value}
+                                                onClick={() => {
+                                                    setPriorityFilter(option.value);
+                                                    setShowPriorityFilter(false);
+                                                }}
+                                                className={`w-full text-left px-3 py-2 text-xs font-medium rounded-lg transition-colors flex items-center justify-between ${priorityFilter === option.value
+                                                    ? "bg-purple-50 text-purple-700 dark:bg-purple-900/50 dark:text-purple-300"
+                                                    : "text-stone-600 hover:bg-stone-50 dark:text-slate-300 dark:hover:bg-slate-700/50"
+                                                    }`}
+                                            >
+                                                {option.label}
+                                                {priorityFilter === option.value && <i className="bi bi-check2"></i>}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            </>
+                        )}
+                    </div>
                 </div>
             </div>
 
@@ -85,7 +138,7 @@ const TaskColumn = ({ title, statusId, img, tasks, onDelete, onEdit, onView }) =
                     <div 
                         ref={provided.innerRef}
                         {...provided.droppableProps}
-                        className={`flex-1 p-4 overflow-y-auto custom-scrollbar transition-colors duration-200 ${
+                        className={`flex-1 p-2 overflow-y-auto custom-scrollbar transition-colors duration-200 ${
                             snapshot.isDraggingOver 
                                 ? 'bg-purple-50/50 dark:bg-purple-900/10' 
                                 : ''
@@ -110,7 +163,7 @@ const TaskColumn = ({ title, statusId, img, tasks, onDelete, onEdit, onView }) =
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
                                     </svg>
                                     <p className='text-sm font-medium'>
-                                        {priorityFilter !== 'all' ? `No ${priorityFilter} tasks` : 'Drop tasks here'}
+                                        {(priorityFilter !== 'all' || assigneeFilter !== 'all') ? 'No tasks match filters' : 'Drop tasks here'}
                                     </p>
                                 </div>
                             )}

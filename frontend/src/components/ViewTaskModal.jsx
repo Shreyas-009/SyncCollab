@@ -6,8 +6,14 @@ const ViewTaskModal = ({ show, onClose, task }) => {
     const hasDescription = task.description && task.description.trim() !== '';
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
-            <div className="bg-white dark:bg-slate-800 w-full max-w-2xl rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[90vh]">
+        <div 
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm px-4"
+            onClick={onClose}
+        >
+            <div 
+                className="bg-white dark:bg-slate-800 w-full max-w-2xl rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[90vh]"
+                onClick={(e) => e.stopPropagation()}
+            >
                 
                 {/* Header */}
                 <div className="px-6 py-4 border-b border-stone-200 dark:border-slate-700 flex justify-between items-start break-words gap-4">

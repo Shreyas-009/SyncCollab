@@ -64,22 +64,23 @@ const ProjectSidebar = ({ projects, selectedProject, onSelectProject, onCreatePr
                 </button>
 
                 {/* Project dots */}
-                <div className="flex-1 flex flex-col gap-2 overflow-y-auto">
+                <div className="flex-1 flex flex-col gap-3 overflow-y-auto overflow-x-hidden px-2 w-full items-center custom-scrollbar">
                     {projects.map(project => (
-                        <button
-                            key={project._id}
-                            onClick={() => onSelectProject(project)}
-                            className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${selectedProject?._id === project._id
-                                    ? 'ring-2 ring-purple-500 ring-offset-2'
-                                    : ''
-                                }`}
-                            style={{ backgroundColor: project.color || '#8B5CF6' }}
-                            title={project.name}
-                        >
-                            <span className="text-white text-xs font-bold">
-                                {project.name?.[0]?.toUpperCase()}
-                            </span>
-                        </button>
+                        <div key={project._id} className="w-full flex justify-center py-1">
+                            <button
+                                onClick={() => onSelectProject(project)}
+                                className={`w-8 h-8 rounded-lg flex flex-shrink-0 items-center justify-center transition-all ${selectedProject?._id === project._id
+                                        ? 'ring-2 ring-purple-500 ring-offset-2 dark:ring-offset-slate-900 border-none'
+                                        : 'hover:scale-110'
+                                    }`}
+                                style={{ backgroundColor: project.color || '#8B5CF6' }}
+                                title={project.name}
+                            >
+                                <span className="text-white text-xs font-bold">
+                                    {project.name?.[0]?.toUpperCase()}
+                                </span>
+                            </button>
+                        </div>
                     ))}
                 </div>
             </aside>
@@ -98,7 +99,7 @@ const ProjectSidebar = ({ projects, selectedProject, onSelectProject, onCreatePr
 
             <aside className={`fixed md:relative inset-y-0 left-0 z-50 w-64 md:w-64 h-full flex flex-col border-r shadow-2xl md:shadow-none bg-stone-100/40 border-stone-200/60 dark:bg-slate-900/40 dark:border-slate-800 backdrop-blur-xl transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0 md:w-0 md:overflow-hidden'}`}>
                 {/* Header */}
-                <div className="flex items-center justify-between p-5 border-b border-stone-200/50 dark:border-slate-800">
+                <div className="flex items-center justify-between p-4 border-b border-stone-200/50 dark:border-slate-800">
                     <div className="flex items-center gap-2">
                         <div className="w-8 h-8 rounded-xl bg-purple-600 text-white flex items-center justify-center font-bold shadow-sm shadow-purple-600/20">
                             S
@@ -107,12 +108,17 @@ const ProjectSidebar = ({ projects, selectedProject, onSelectProject, onCreatePr
                             SyncTask
                         </h2>
                     </div>
-                    {/* Only show close button on mobile */}
+                    {/* Toggle Button (Mobile & Desktop) */}
                     <button
                         onClick={onToggle}
-                        className="md:hidden p-2 rounded-xl hover:bg-stone-200/50 text-stone-500 dark:hover:bg-slate-800 dark:text-slate-400 transition-colors"
+                        className="p-1.5 rounded-lg hover:bg-stone-200/50 text-stone-500 dark:hover:bg-slate-800 dark:text-slate-400 transition-colors"
+                        title={isOpen ? "Collapse Sidebar" : "Expand Sidebar"}
                     >
-                        <i className="bi bi-x-lg text-lg"></i>
+                        {window.innerWidth >= 768 ? (
+                           <i className="bi bi-layout-sidebar-inset text-lg"></i>
+                        ) : (
+                           <i className="bi bi-x-lg text-lg"></i>
+                        )}
                     </button>
                 </div>
 
@@ -154,27 +160,26 @@ const ProjectSidebar = ({ projects, selectedProject, onSelectProject, onCreatePr
                                     onSelectProject(project);
                                     if (window.innerWidth < 768) onToggle(); // auto-close on mobile
                                 }}
-                                className={`flex items-center gap-3 p-3 rounded-2xl cursor-pointer mb-2 group transition-all ${selectedProject?._id === project._id
+                                className={`flex items-center gap-3 p-2.5 rounded-2xl cursor-pointer mb-1.5 group transition-all ${selectedProject?._id === project._id
                                         ? "bg-purple-600 text-white shadow-md shadow-purple-600/20"
                                         : "hover:bg-white dark:hover:bg-slate-800/80 text-stone-600 dark:text-slate-300 hover:shadow-sm border border-transparent hover:border-stone-200/50 dark:hover:border-slate-700"
                                     }`}
                             >
                                 <div
-                                    className="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-sm bg-white/20 shrink-0"
+                                    className={`w-7 h-7 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 ${selectedProject?._id === project._id ? 'bg-white/20 text-white' : 'text-white'}`}
                                     style={{ 
-                                        backgroundColor: selectedProject?._id === project._id ? 'rgba(255,255,255,0.2)' : (project.color || '#8B5CF6'),
-                                        color: selectedProject?._id === project._id ? '#fff' : '#fff'
+                                        backgroundColor: selectedProject?._id === project._id ? 'rgba(255,255,255,0.2)' : (project.color || '#8B5CF6')
                                     }}
                                 >
                                     {project.name[0].toUpperCase()}
                                 </div>
-                                <span className="flex-1 truncate text-sm font-semibold">
+                                <span className={`flex-1 truncate text-sm font-medium ${selectedProject?._id === project._id ? 'text-white' : ''}`}>
                                     {project.name}
                                 </span>
                                 {project.collaborators?.length > 0 && (
-                                    <span className={`text-xs px-2 py-1 rounded-lg font-medium ${
+                                    <span className={`text-xs px-2 py-0.5 rounded-lg font-medium ${
                                         selectedProject?._id === project._id 
-                                            ? 'bg-purple-500/50 text-purple-100' 
+                                            ? 'bg-purple-500 text-purple-50' 
                                             : 'bg-stone-100 text-stone-500 dark:bg-slate-800 dark:text-slate-400'
                                     }`}>
                                         {project.collaborators.length}

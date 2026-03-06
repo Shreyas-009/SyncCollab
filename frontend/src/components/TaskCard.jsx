@@ -14,7 +14,7 @@ const TaskCard = ({ task, index, onDelete, onEdit, onView }) => {
           {...provided.draggableProps}
           {...provided.dragHandleProps}
           style={{ ...provided.draggableProps.style }}
-          className={`w-full flex flex-col justify-between min-h-[110px] border rounded-xl p-4 my-3 mx-0 overflow-hidden shadow-sm transition-all duration-200 group 
+          className={`w-full flex flex-col justify-between min-h-[90px] border rounded-xl p-3 my-2 mx-0 overflow-hidden shadow-sm transition-all duration-200 group 
             ${snapshot.isDragging 
               ? 'bg-purple-50 border-purple-300 dark:bg-purple-900/30 dark:border-purple-500 scale-[1.02] shadow-xl z-50' 
               : 'bg-white border-stone-200 hover:border-stone-300 dark:bg-gray-800/80 dark:border-gray-700 dark:hover:border-gray-600'
@@ -55,7 +55,7 @@ const TaskCard = ({ task, index, onDelete, onEdit, onView }) => {
           )}
 
           {/* Divider */}
-          <div className="h-[1px] w-full bg-stone-100 dark:bg-gray-700/50 my-3"></div>
+          <div className="h-[1px] w-full bg-stone-100 dark:bg-gray-700/50 my-2.5"></div>
 
           {/* Footer Row */}
           <div className='flex items-center justify-between mt-auto'>

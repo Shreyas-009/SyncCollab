@@ -154,19 +154,24 @@ const ProjectSettingsModal = ({ show, onClose, project, onProjectUpdated }) => {
                                                     {c.name || 'User'}
                                                     {c.id === user?.id && <span className="text-xs text-purple-500">(You)</span>}
                                                     {isOwner ? (
-                                                        <select
-                                                            disabled={loading === `role-${c.id}`}
-                                                            value={c.role || 'Member'}
-                                                            onChange={(e) => handleRoleChange(c.id, e.target.value)}
-                                                            className="text-[10px] uppercase font-bold tracking-wider ml-1 bg-stone-100 text-stone-600 border-none rounded p-1 cursor-pointer focus:ring-1 focus:ring-purple-500 dark:bg-slate-700 dark:text-slate-300 outline-none"
-                                                        >
-                                                            <option value="Team Lead">Team Lead</option>
-                                                            <option value="Frontend Developer">Frontend Developer</option>
-                                                            <option value="Backend Developer">Backend Developer</option>
-                                                            <option value="Tester">Tester</option>
-                                                            <option value="Designer">Designer</option>
-                                                            <option value="Member">Member</option>
-                                                        </select>
+                                                        <div className="relative inline-flex items-center">
+                                                            <select
+                                                                disabled={loading === `role-${c.id}`}
+                                                                value={c.role || 'Member'}
+                                                                onChange={(e) => handleRoleChange(c.id, e.target.value)}
+                                                                className={`text-[10px] uppercase font-bold tracking-wider ml-1 bg-stone-100 text-stone-600 border-none rounded p-1 cursor-pointer focus:ring-1 focus:ring-purple-500 dark:bg-slate-700 dark:text-slate-300 outline-none transition-opacity ${loading === `role-${c.id}` ? 'opacity-50' : 'opacity-100'}`}
+                                                            >
+                                                                <option value="Team Lead">Team Lead</option>
+                                                                <option value="Frontend Developer">Frontend Developer</option>
+                                                                <option value="Backend Developer">Backend Developer</option>
+                                                                <option value="Tester">Tester</option>
+                                                                <option value="Designer">Designer</option>
+                                                                <option value="Member">Member</option>
+                                                            </select>
+                                                            {loading === `role-${c.id}` && (
+                                                                <div className="absolute right-1 w-3 h-3 rounded-full border border-purple-600/30 border-t-purple-600 animate-spin pointer-events-none"></div>
+                                                            )}
+                                                        </div>
                                                     ) : (
                                                         <span className="text-[10px] uppercase font-bold tracking-wider text-stone-500 bg-stone-100 px-1.5 py-0.5 rounded dark:bg-slate-700 dark:text-slate-400">
                                                             {c.role || 'Member'}
@@ -182,9 +187,16 @@ const ProjectSettingsModal = ({ show, onClose, project, onProjectUpdated }) => {
                                             <button
                                                 onClick={() => handleRemoveCollaborator(c.id)}
                                                 disabled={loading === c.id}
-                                                className="px-2 py-1 text-xs font-medium rounded-lg transition-colors text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/30 disabled:opacity-50 ml-2"
+                                                className="px-2 py-1 text-[11px] font-medium rounded-lg transition-colors text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/30 disabled:opacity-50 ml-2 flex items-center justify-center gap-1.5 min-w-[65px]"
                                             >
-                                                {loading === c.id ? '...' : 'Remove'}
+                                                {loading === c.id ? (
+                                                    <>
+                                                        <div className="w-3 h-3 rounded-full border border-red-600/30 border-t-red-600 dark:border-red-400/30 dark:border-t-red-400 animate-spin"></div>
+                                                        Removing...
+                                                    </>
+                                                ) : (
+                                                    'Remove'
+                                                )}
                                             </button>
                                         )}
                                     </div>
@@ -216,9 +228,16 @@ const ProjectSettingsModal = ({ show, onClose, project, onProjectUpdated }) => {
                                         <button
                                             onClick={handleDeleteProject}
                                             disabled={loading === 'delete'}
-                                            className='flex-1 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50'
+                                            className='flex-1 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50 flex items-center justify-center gap-2 transition-colors'
                                         >
-                                            {loading === 'delete' ? 'Deleting...' : 'Delete Project'}
+                                            {loading === 'delete' ? (
+                                                <>
+                                                    <div className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin"></div>
+                                                    Deleting...
+                                                </>
+                                            ) : (
+                                                'Delete Project'
+                                            )}
                                         </button>
                                     </div>
                                 </div>
@@ -235,9 +254,16 @@ const ProjectSettingsModal = ({ show, onClose, project, onProjectUpdated }) => {
                             <button
                                 onClick={handleLeaveProject}
                                 disabled={loading === 'leave'}
-                                className="w-full py-2.5 text-sm font-medium rounded-xl transition-colors text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 disabled:opacity-50"
+                                className="w-full py-2.5 text-sm font-medium rounded-xl transition-colors text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 disabled:opacity-50 flex items-center justify-center gap-2"
                             >
-                                {loading === 'leave' ? 'Leaving...' : 'Leave Project'}
+                                {loading === 'leave' ? (
+                                    <>
+                                        <div className="w-4 h-4 rounded-full border-2 border-red-600/30 border-t-red-600 dark:border-red-400/30 dark:border-t-red-400 animate-spin"></div>
+                                        Leaving...
+                                    </>
+                                ) : (
+                                    'Leave Project'
+                                )}
                             </button>
                         )}
                     </div>

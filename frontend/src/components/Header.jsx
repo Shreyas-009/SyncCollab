@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { UserButton, useUser } from '@clerk/clerk-react'
+import { dark } from '@clerk/themes'
 import { useTheme } from '../context/useTheme'
 import InviteModal from './InviteModal'
 import ProjectSettingsModal from './ProjectSettingsModal'
@@ -189,16 +190,48 @@ const Header = ({ onOpen, onSearch, selectedProject, onProjectsUpdated, onOpenCh
                         </button>
 
                         {/* User Profile */}
-                        <div className="pl-1">
+                        <div className="pl-1 relative z-50">
                             <UserButton
                                 appearance={{
+                                    baseTheme: isDark ? dark : undefined,
                                     elements: {
                                         avatarBox: "w-9 h-9 rounded-xl shadow-sm",
-                                        userButtonPopoverCard: "dark:bg-slate-800 dark:border-slate-700",
-                                        userButtonPopoverFooter: "dark:hidden"
+                                        userButtonPopoverCard: "bg-white dark:bg-slate-800 border border-stone-200 dark:border-slate-700 shadow-xl rounded-2xl",
+                                        userButtonPopoverFooter: "hidden",
+                                        userPreviewMainIdentifier: "text-stone-800 dark:text-gray-100 font-semibold",
+                                        userPreviewSecondaryIdentifier: "text-stone-500 dark:text-slate-400 font-medium",
+                                        userButtonPopoverActionButton: "hover:bg-stone-50 dark:hover:bg-slate-700/50 text-stone-600 dark:text-slate-300 font-medium rounded-xl transition-colors",
+                                        userButtonPopoverActionButtonText: "text-stone-600 dark:text-slate-300",
+                                        userButtonPopoverActionButtonIcon: "text-stone-500 dark:text-slate-400",
+                                        userMenuOptionsBox: "dark:bg-slate-800",
+                                        userMenuContent: "dark:bg-slate-800 font-sans",
+                                        navbar: "dark:bg-slate-800/80 backdrop-blur-md border-r border-stone-200 dark:border-slate-700",
+                                        navbarButton: "text-stone-600 dark:text-slate-300 hover:bg-stone-100 dark:hover:bg-slate-700/50 rounded-xl transition-colors",
+                                        pageScrollBox: "bg-white dark:bg-slate-900/30",
+                                        profileSectionTitle: "text-stone-800 dark:text-slate-100 font-bold",
+                                        profileSectionPrimaryButton: "text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/30 rounded-lg",
+                                        profilePage: "bg-white dark:bg-slate-900 font-sans",
+                                        headerTitle: "text-stone-800 dark:text-gray-100 font-bold text-xl",
+                                        headerSubtitle: "text-stone-500 dark:text-slate-400",
+                                        card: "bg-white dark:bg-slate-900 font-sans rounded-2xl border border-stone-200 dark:border-slate-800 shadow-2xl",
+                                        profileSectionContent: "dark:text-slate-300",
+                                        formButtonPrimary: "bg-purple-600 hover:bg-purple-700 text-white rounded-xl shadow-sm",
+                                        formFieldInput: "bg-white dark:bg-slate-800 border-stone-200 dark:border-slate-700 rounded-xl text-stone-800 dark:text-slate-200 focus:ring-purple-500",
+                                        badge: "bg-stone-100 dark:bg-slate-800 text-stone-600 dark:text-slate-300 border-stone-200 dark:border-slate-700",
                                     }
                                 }}
-                            />
+                            >
+                                <UserButton.UserProfilePage 
+                                    label="Account" 
+                                    url="account" 
+                                    labelIcon={<i className="bi bi-person-circle"></i>}
+                                />
+                                <UserButton.UserProfilePage 
+                                    label="Security" 
+                                    url="security" 
+                                    labelIcon={<i className="bi bi-shield-lock"></i>}
+                                />
+                            </UserButton>
                         </div>
                     </div>
                 </div>

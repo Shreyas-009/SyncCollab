@@ -198,7 +198,7 @@ const InviteModal = ({ show, onClose, project }) => {
                 </div>
 
                 {/* Content */}
-                <div className="px-6 py-5 max-h-[60vh] overflow-y-auto bg-white">
+                <div className="px-6 py-5 max-h-[60vh] overflow-y-auto bg-white dark:bg-slate-800">
                     {mode === 'search' && (
                         <>
                             <p className="text-sm mb-4 text-stone-500 dark:text-slate-400">

@@ -28,7 +28,7 @@ const DeleteConfirmation = ({ show, onClose, onConfirm, taskTitle }) => {
                 </div>
 
                 {/* Content */}
-                <div className="px-6 py-5 bg-white">
+                <div className="px-6 py-5 bg-white dark:bg-slate-800">
                     <p className={"text-stone-600 dark:text-slate-300"}>
                         Are you sure you want to delete <span className="font-semibold text-stone-800 dark:text-gray-100">"{taskTitle}"</span>?
                     </p>
