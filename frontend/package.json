@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.59.0",
+    "@hello-pangea/dnd": "^18.0.1",
     "@tailwindcss/vite": "^4.1.16",
     "@vitejs/plugin-react": "^5.0.4",
     "assignment-8": "file:..",

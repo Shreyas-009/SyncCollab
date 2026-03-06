@@ -4,7 +4,7 @@ import { useTheme } from '../context/useTheme'
 import InviteModal from './InviteModal'
 import ProjectSettingsModal from './ProjectSettingsModal'
 
-const Header = ({ onOpen, onSearch, selectedProject, onProjectsUpdated, onOpenChat }) => {
+const Header = ({ onOpen, onSearch, selectedProject, onProjectsUpdated, onOpenChat, onToggleSidebar }) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [showInvite, setShowInvite] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
@@ -37,74 +37,103 @@ const Header = ({ onOpen, onSearch, selectedProject, onProjectsUpdated, onOpenCh
 
     return (
         <>
-            <header className="flex items-center justify-between gap-4 px-6 py-4 border-b transition-colors duration-300 bg-white border-stone-200 dark:bg-slate-900 dark:border-slate-700">
+            <header className="flex items-center justify-between gap-4 px-4 md:px-6 py-4 border-b bg-white border-stone-200/60 shadow-sm dark:bg-slate-900 dark:border-slate-800 z-30">
 
-                {/* Left: Project Info */}
+                {/* Left: Hamburger Menu (Mobile) & Project Info */}
                 <div className="flex items-center gap-3 min-w-0">
+                    {/* Hamburger Menu - Mobile Only */}
+                    <button
+                        onClick={onToggleSidebar}
+                        className="md:hidden p-2 -ml-2 rounded-xl text-stone-600 hover:bg-stone-100 dark:text-slate-300 dark:hover:bg-slate-800 transition-colors"
+                        title="Toggle Menu"
+                    >
+                        <i className="bi bi-list text-xl"></i>
+                    </button>
+
                     {selectedProject ? (
                         <>
                             <div
-                                className="w-4 h-4 rounded-md shrink-0"
+                                className="w-5 h-5 rounded-lg shrink-0 shadow-sm"
                                 style={{ backgroundColor: selectedProject.color || '#8B5CF6' }}
                             />
-                            <h1 className="text-xl font-bold truncate text-stone-800 dark:text-gray-100">
+                            <h1 className="text-xl font-bold truncate tracking-tight text-stone-800 dark:text-gray-100 hidden sm:block">
                                 {selectedProject.name}
                             </h1>
 
-                            {/* Owner + Collaborators avatars - clickable to open settings */}
-                            <button
-                                onClick={() => setShowSettings(true)}
-                                className="flex -space-x-3 ml-3 shrink-0 hover:opacity-80 transition-opacity"
-                                title="Manage project members"
-                            >
-                                {/* Owner avatar */}
-                                <div className="w-9 h-9 rounded-full border-2 border-white dark:border-slate-900 overflow-hidden shadow-sm">
-                                    {selectedProject.ownerImage ? (
-                                        <img src={selectedProject.ownerImage} alt="" className="w-full h-full object-cover" />
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center text-sm font-medium bg-purple-500 text-white dark:bg-purple-700 dark:text-white">
-                                            {selectedProject.ownerName?.[0] || selectedProject.ownerEmail?.[0]?.toUpperCase() || 'O'}
-                                        </div>
-                                    )}
-                                </div>
+                            {/* Divider hidden on mobile */}
+                            <div className="hidden sm:block w-px h-5 mx-2 bg-stone-200 dark:bg-slate-700" />
 
-                                {/* Collaborator avatars */}
-                                {selectedProject.collaborators?.slice(0, 3).map((c, i) => (
-                                    <div key={c.id || i} className="w-9 h-9 rounded-full border-2 border-white dark:border-slate-900 overflow-hidden shadow-sm">
-                                        {c.image ? (
-                                            <img src={c.image} alt="" className="w-full h-full object-cover" />
+                            {/* Project Actions Grouped Together */}
+                            <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+                                {/* Collaborator Avatars */}
+                                <button
+                                    onClick={() => setShowSettings(true)}
+                                    className="flex -space-x-3 hover:opacity-80 transition-opacity mr-1"
+                                    title="Manage project members"
+                                >
+                                    <div className="w-8 h-8 rounded-full border-2 border-white dark:border-slate-900 overflow-hidden shadow-sm relative z-30">
+                                        {selectedProject.ownerImage ? (
+                                            <img src={selectedProject.ownerImage} alt="" className="w-full h-full object-cover" />
                                         ) : (
-                                            <div className="w-full h-full flex items-center justify-center text-sm font-medium bg-stone-300 text-stone-700 dark:bg-slate-700 dark:text-slate-200">
-                                                {c.name?.[0] || c.email?.[0]?.toUpperCase() || '?'}
+                                            <div className="w-full h-full flex items-center justify-center text-xs font-bold bg-purple-500 text-white dark:bg-purple-700">
+                                                {selectedProject.ownerName?.[0] || selectedProject.ownerEmail?.[0]?.toUpperCase() || 'O'}
                                             </div>
                                         )}
                                     </div>
-                                ))}
+                                    {selectedProject.collaborators?.slice(0, 2).map((c, i) => (
+                                        <div key={c.id || i} className={`w-8 h-8 rounded-full border-2 border-white dark:border-slate-900 overflow-hidden shadow-sm relative z-[${20 - i}]`}>
+                                            {c.image ? (
+                                                <img src={c.image} alt="" className="w-full h-full object-cover" />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center text-xs font-bold bg-stone-300 text-stone-700 dark:bg-slate-700 dark:text-slate-200">
+                                                    {c.name?.[0] || c.email?.[0]?.toUpperCase() || '?'}
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                    {selectedProject.collaborators?.length > 2 && (
+                                        <div className="w-8 h-8 rounded-full border-2 flex items-center justify-center text-xs font-bold shadow-sm border-white bg-stone-100 text-stone-600 dark:border-slate-900 dark:bg-slate-800 dark:text-slate-300 z-10">
+                                            +{selectedProject.collaborators.length - 2}
+                                        </div>
+                                    )}
+                                </button>
 
-                                {/* +N badge if more than 3 collaborators */}
-                                {selectedProject.collaborators?.length > 3 && (
-                                    <div className="w-9 h-9 rounded-full border-2 flex items-center justify-center text-sm font-semibold shadow-sm border-white bg-stone-800 text-white dark:border-slate-900 dark:bg-slate-700 dark:text-slate-200">
-                                        +{selectedProject.collaborators.length - 3}
-                                    </div>
+                                {/* Invite Button - Only owners */}
+                                {isOwner && (
+                                    <button
+                                        onClick={() => setShowInvite(true)}
+                                        className="h-8 px-2.5 rounded-lg transition-colors text-xs font-semibold text-stone-600 bg-stone-100 hover:bg-purple-100 hover:text-purple-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-purple-900/40 dark:hover:text-purple-400 hidden sm:flex items-center gap-1.5"
+                                        title="Invite collaborators"
+                                    >
+                                        <i className="bi bi-person-plus-fill"></i>
+                                        Invite
+                                    </button>
                                 )}
-                            </button>
+
+                                {/* Settings Button */}
+                                <button
+                                    onClick={() => setShowSettings(true)}
+                                    className="w-8 h-8 flex items-center justify-center rounded-lg transition-colors text-stone-500 hover:text-stone-700 hover:bg-stone-100 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-800"
+                                    title="Project settings"
+                                >
+                                    <i className="bi bi-gear-fill"></i>
+                                </button>
+                            </div>
                         </>
                     ) : (
-                        <p className="text-sm text-stone-500 dark:text-slate-400">
-                            Select a project
+                        <p className="text-sm font-medium text-stone-500 dark:text-slate-400">
+                            Select project
                         </p>
                     )}
                 </div>
 
-                {/* Center: Search */}
-                <div className="flex-1 max-w-md">
-                    <div className="relative">
-                        <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
+                {/* Center: Search & Ask AI */}
+                <div className="flex-1 max-w-md hidden lg:flex items-center gap-2">
+                    <div className="relative flex-1 group">
+                        <i className="bi bi-search absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 group-focus-within:text-purple-500 transition-colors"></i>
                         <input
                             type="text"
-                            className="w-full pl-10 pr-10 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all bg-stone-50 text-stone-800 border-stone-200 placeholder-stone-400 dark:bg-slate-800 dark:text-gray-100 dark:border-slate-700 dark:placeholder-slate-500"
+                            className="w-full pl-10 pr-10 py-2.5 text-sm font-medium rounded-xl border focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500 transition-all bg-stone-50 text-stone-800 border-stone-200/80 placeholder-stone-400 dark:bg-slate-900/50 dark:text-gray-100 dark:border-slate-700 dark:placeholder-slate-500 dark:focus:ring-purple-500/30 shadow-sm shadow-stone-200/20 dark:shadow-none"
                             placeholder='Search tasks...'
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
@@ -115,99 +144,63 @@ const Header = ({ onOpen, onSearch, selectedProject, onProjectsUpdated, onOpenCh
                             <button
                                 type="button"
                                 onClick={handleClearSearch}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 flex items-center justify-center rounded-full transition-colors text-stone-400 hover:text-stone-600 hover:bg-stone-200 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-700"
+                                className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center rounded-full transition-colors text-stone-400 hover:text-stone-600 hover:bg-stone-200 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-700"
                             >
-                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                </svg>
+                                <i className="bi bi-x-circle-fill"></i>
                             </button>
                         )}
                     </div>
-                </div>
 
-                {/* Right: Actions */}
-                <div className="flex items-center gap-2 shrink-0">
-                    {/* Ask AI Button */}
+                    {/* Ask AI - sleek secondary button */}
                     <button
                         onClick={onOpenChat}
                         disabled={!selectedProject}
-                        className='flex items-center gap-2 px-4 py-2 text-sm font-medium text-indigo-700 bg-indigo-100 rounded-lg hover:bg-indigo-200 dark:text-indigo-200 dark:bg-indigo-900/50 dark:hover:bg-indigo-800/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed border border-indigo-200 dark:border-indigo-800'
+                        className='flex items-center justify-center gap-2 w-10 h-10 shrink-0 text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed dark:bg-indigo-900/30 dark:text-indigo-400 dark:hover:bg-indigo-900/50'
+                        title="Ask AI"
                     >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                        </svg>
-                        Ask AI
+                        <i className="bi bi-stars"></i>
                     </button>
+                </div>
 
-                    {/* Add Task Button */}
+                {/* Right: Primary Call to Action & Profile */}
+                <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+                    
+                    {/* Add Task - Dominant CTA */}
                     <button
                         onClick={onOpen}
                         disabled={!selectedProject}
-                        className='flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
+                        className='flex items-center gap-2 px-4 py-2.5 sm:px-5 sm:py-2.5 text-sm font-bold text-white bg-purple-600 rounded-xl hover:bg-purple-700 hover:shadow-md hover:shadow-purple-600/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none active:scale-[0.98]'
                     >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                        </svg>
-                        Add Task
+                        <i className="bi bi-plus-lg"></i>
+                        <span className="hidden sm:inline">Add Task</span>
                     </button>
 
-                    {/* Invite Button - Only for owners */}
-                    {selectedProject && isOwner && (
+                    <div className="w-px h-6 mx-0 sm:mx-1 bg-stone-200 dark:bg-slate-700 hidden sm:block" />
+
+                    {/* Universal Layout Controls */}
+                    <div className="flex items-center gap-2">
+                        {/* Theme Toggle */}
                         <button
-                            onClick={() => setShowInvite(true)}
-                            className="p-2 rounded-lg transition-colors text-stone-500 hover:text-stone-700 hover:bg-stone-100 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-800"
-                            title="Invite collaborators"
+                            onClick={toggleTheme}
+                            className="w-9 h-9 flex items-center justify-center rounded-xl transition-colors text-stone-500 hover:bg-stone-100 dark:text-amber-400 dark:hover:bg-slate-800"
+                            title="Toggle theme"
                         >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-                            </svg>
+                            {isDark ? <i className="bi bi-sun-fill text-lg"></i> : <i className="bi bi-moon-stars-fill text-lg"></i>}
                         </button>
-                    )}
 
-                    {/* Settings Button */}
-                    {selectedProject && (
-                        <button
-                            onClick={() => setShowSettings(true)}
-                            className="p-2 rounded-lg transition-colors text-stone-500 hover:text-stone-700 hover:bg-stone-100 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-800"
-                            title="Project settings"
-                        >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                        </button>
-                    )}
-
-                    {/* Theme Toggle */}
-                    <button
-                        onClick={toggleTheme}
-                        className="p-2 rounded-lg transition-colors text-stone-500 hover:bg-stone-100 dark:text-amber-400 dark:hover:bg-slate-800"
-                        title="Toggle theme"
-                    >
-                        {isDark ? (
-                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clipRule="evenodd" />
-                            </svg>
-                        ) : (
-                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
-                            </svg>
-                        )}
-                    </button>
-
-                    {/* Divider */}
-                    <div className="w-px h-6 mx-1 bg-stone-200 dark:bg-slate-700" />
-
-                    {/* User Profile */}
-                    <UserButton
-                        appearance={{
-                            elements: {
-                                avatarBox: "w-8 h-8",
-                                userButtonPopoverCard: "dark:bg-slate-800 dark:border-slate-700",
-                                userButtonPopoverFooter: "dark:hidden"
-                            }
-                        }}
-                    />
+                        {/* User Profile */}
+                        <div className="pl-1">
+                            <UserButton
+                                appearance={{
+                                    elements: {
+                                        avatarBox: "w-9 h-9 rounded-xl shadow-sm",
+                                        userButtonPopoverCard: "dark:bg-slate-800 dark:border-slate-700",
+                                        userButtonPopoverFooter: "dark:hidden"
+                                    }
+                                }}
+                            />
+                        </div>
+                    </div>
                 </div>
             </header>
 

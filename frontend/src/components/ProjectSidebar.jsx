@@ -87,126 +87,155 @@ const ProjectSidebar = ({ projects, selectedProject, onSelectProject, onCreatePr
     }
 
     return (
-        <aside className="w-64 h-full flex flex-col border-r bg-white border-stone-200 dark:bg-slate-900 dark:border-slate-700">
-            {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-stone-200 dark:border-slate-700">
-                <h2 className="text-lg font-semibold text-stone-800 dark:text-gray-100">
-                    Projects
-                </h2>
-                <button
+        <>
+            {/* Mobile Overlay */}
+            {isOpen && (
+                <div 
+                    className="fixed inset-0 z-40 bg-stone-900/50 backdrop-blur-sm md:hidden transition-opacity"
                     onClick={onToggle}
-                    className="p-1.5 rounded-lg hover:bg-stone-100 text-stone-500 dark:hover:bg-slate-800 dark:text-slate-400"
-                >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
-                    </svg>
-                </button>
-            </div>
+                />
+            )}
 
-            {/* Requests Button */}
-            <button
-                onClick={onShowRequests}
-                className="mx-3 mt-3 flex items-center gap-2 p-2.5 rounded-xl text-sm font-medium transition-colors bg-stone-100 hover:bg-stone-200 text-stone-600 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-300"
-            >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-                Requests
-                {pendingCount > 0 && (
-                    <span className="ml-auto px-2 py-0.5 bg-purple-600 text-white text-xs rounded-full">
-                        {pendingCount}
-                    </span>
-                )}
-            </button>
-
-            {/* Project List */}
-            <div className="flex-1 overflow-y-auto p-2 mt-2">
-                {projects.length === 0 ? (
-                    <p className="text-sm text-center py-4 text-stone-500 dark:text-slate-400">
-                        No projects yet
-                    </p>
-                ) : (
-                    projects.map(project => (
-                        <div
-                            key={project._id}
-                            onClick={() => onSelectProject(project)}
-                            className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer mb-1 group transition-all ${selectedProject?._id === project._id
-                                    ? "bg-purple-50 dark:bg-slate-700"
-                                    : "hover:bg-stone-50 dark:hover:bg-slate-800"
-                                }`}
-                        >
-                            <div
-                                className="w-3 h-3 rounded-full shrink-0"
-                                style={{ backgroundColor: project.color || '#8B5CF6' }}
-                            />
-                            <span className={`flex-1 truncate text-sm font-medium ${selectedProject?._id === project._id
-                                    ? "text-purple-700 dark:text-white"
-                                    : "text-stone-700 dark:text-gray-300"
-                                }`}>
-                                {project.name}
-                            </span>
-                            {project.collaborators?.length > 0 && (
-                                <span className="text-xs px-1.5 py-0.5 rounded bg-stone-200 text-stone-600 dark:bg-slate-600 dark:text-slate-300">
-                                    {project.collaborators.length}
-                                </span>
-                            )}
+            <aside className={`fixed md:relative inset-y-0 left-0 z-50 w-64 md:w-64 h-full flex flex-col border-r shadow-2xl md:shadow-none bg-stone-100/40 border-stone-200/60 dark:bg-slate-900/40 dark:border-slate-800 backdrop-blur-xl transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0 md:w-0 md:overflow-hidden'}`}>
+                {/* Header */}
+                <div className="flex items-center justify-between p-5 border-b border-stone-200/50 dark:border-slate-800">
+                    <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-xl bg-purple-600 text-white flex items-center justify-center font-bold shadow-sm shadow-purple-600/20">
+                            S
                         </div>
-                    ))
-                )}
-            </div>
-
-            {/* Create Project Form */}
-            {showForm ? (
-                <div className="p-3 border-t border-stone-200 dark:border-slate-700">
-                    <input
-                        type="text"
-                        placeholder="Project name..."
-                        value={newName}
-                        onChange={(e) => setNewName(e.target.value)}
-                        onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
-                        className="w-full px-3 py-2 text-sm rounded-lg border mb-2 focus:outline-none focus:ring-2 focus:ring-purple-500 bg-stone-50 text-stone-800 border-stone-200 dark:bg-slate-800 dark:text-gray-100 dark:border-slate-600"
-                        autoFocus
-                    />
-                    <div className="flex gap-1 mb-2">
-                        {colors.map(color => (
-                            <button
-                                key={color}
-                                onClick={() => setNewColor(color)}
-                                className={`w-6 h-6 rounded-full transition-transform ${newColor === color ? 'scale-110 ring-2 ring-offset-2 ring-purple-500' : ''
-                                    }`}
-                                style={{ backgroundColor: color }}
-                            />
-                        ))}
+                        <h2 className="text-xl font-bold tracking-tight text-stone-800 dark:text-gray-100">
+                            SyncTask
+                        </h2>
                     </div>
-                    <div className="flex gap-2">
-                        <button
-                            onClick={() => setShowForm(false)}
-                            className="flex-1 py-1.5 text-xs font-medium rounded-lg bg-stone-100 text-stone-600 dark:bg-slate-700 dark:text-slate-300"
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            onClick={handleCreate}
-                            className="flex-1 py-1.5 text-xs font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700"
-                        >
-                            Create
-                        </button>
-                    </div>
-                </div>
-            ) : (
-                <div className="p-3 border-t border-stone-200 dark:border-slate-700">
+                    {/* Only show close button on mobile */}
                     <button
-                        onClick={() => setShowForm(true)}
-                        className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-colors bg-purple-50 text-purple-600 hover:bg-purple-100 dark:bg-slate-800 dark:text-purple-400 dark:hover:bg-slate-700"
+                        onClick={onToggle}
+                        className="md:hidden p-2 rounded-xl hover:bg-stone-200/50 text-stone-500 dark:hover:bg-slate-800 dark:text-slate-400 transition-colors"
                     >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                        </svg>
-                        New Project
+                        <i className="bi bi-x-lg text-lg"></i>
                     </button>
                 </div>
-            )}
-        </aside>
+
+                {/* Requests Button */}
+                <button
+                    onClick={onShowRequests}
+                    className="mx-4 mt-5 flex items-center gap-3 p-3 rounded-2xl text-sm font-semibold transition-all bg-white hover:bg-stone-50 text-stone-700 shadow-sm border border-stone-200/50 dark:bg-slate-800/80 dark:border-slate-700 dark:hover:bg-slate-700 dark:text-slate-200 hover:shadow-md"
+                >
+                    <div className="w-8 h-8 rounded-xl bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-400 flex items-center justify-center">
+                        <i className="bi bi-inbox-fill text-lg"></i>
+                    </div>
+                    Requests
+                    {pendingCount > 0 && (
+                        <span className="ml-auto px-2.5 py-1 bg-red-500 text-white text-xs font-bold rounded-full shadow-sm shadow-red-500/30">
+                            + {pendingCount}
+                        </span>
+                    )}
+                </button>
+
+                {/* Section Title */}
+                <div className="px-5 mt-6 mb-2">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-stone-400 dark:text-slate-500">
+                        Your Projects
+                    </h3>
+                </div>
+
+                {/* Project List */}
+                <div className="flex-1 overflow-y-auto px-3 custom-scrollbar">
+                    {projects.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center py-10 text-stone-400 dark:text-slate-500">
+                            <i className="bi bi-folder-x text-3xl mb-2 opacity-50"></i>
+                            <p className="text-sm font-medium">No projects yet</p>
+                        </div>
+                    ) : (
+                        projects.map(project => (
+                            <div
+                                key={project._id}
+                                onClick={() => {
+                                    onSelectProject(project);
+                                    if (window.innerWidth < 768) onToggle(); // auto-close on mobile
+                                }}
+                                className={`flex items-center gap-3 p-3 rounded-2xl cursor-pointer mb-2 group transition-all ${selectedProject?._id === project._id
+                                        ? "bg-purple-600 text-white shadow-md shadow-purple-600/20"
+                                        : "hover:bg-white dark:hover:bg-slate-800/80 text-stone-600 dark:text-slate-300 hover:shadow-sm border border-transparent hover:border-stone-200/50 dark:hover:border-slate-700"
+                                    }`}
+                            >
+                                <div
+                                    className="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-sm bg-white/20 shrink-0"
+                                    style={{ 
+                                        backgroundColor: selectedProject?._id === project._id ? 'rgba(255,255,255,0.2)' : (project.color || '#8B5CF6'),
+                                        color: selectedProject?._id === project._id ? '#fff' : '#fff'
+                                    }}
+                                >
+                                    {project.name[0].toUpperCase()}
+                                </div>
+                                <span className="flex-1 truncate text-sm font-semibold">
+                                    {project.name}
+                                </span>
+                                {project.collaborators?.length > 0 && (
+                                    <span className={`text-xs px-2 py-1 rounded-lg font-medium ${
+                                        selectedProject?._id === project._id 
+                                            ? 'bg-purple-500/50 text-purple-100' 
+                                            : 'bg-stone-100 text-stone-500 dark:bg-slate-800 dark:text-slate-400'
+                                    }`}>
+                                        {project.collaborators.length}
+                                    </span>
+                                )}
+                            </div>
+                        ))
+                    )}
+                </div>
+
+                {/* Create Project Form */}
+                {showForm ? (
+                    <div className="p-4 mx-4 mb-4 mt-2 bg-white dark:bg-slate-800 rounded-2xl border border-stone-200 dark:border-slate-700 shadow-sm animate-in fade-in slide-in-from-bottom-2 duration-200">
+                        <input
+                            type="text"
+                            placeholder="Project name..."
+                            value={newName}
+                            onChange={(e) => setNewName(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
+                            className="w-full px-3 py-2 text-sm font-medium rounded-xl border border-stone-200 dark:border-slate-600 mb-3 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-stone-50/50 text-stone-800 dark:bg-slate-900/50 dark:text-gray-100 transition-all placeholder:font-normal"
+                            autoFocus
+                        />
+                        <div className="flex gap-2 mb-4 justify-between">
+                            {colors.map(color => (
+                                <button
+                                    key={color}
+                                    onClick={() => setNewColor(color)}
+                                    className={`w-6 h-6 rounded-full transition-all ${newColor === color ? 'scale-125 ring-2 ring-offset-2 ring-purple-500 dark:ring-offset-slate-800 shadow-sm' : 'hover:scale-110 hover:shadow-sm'
+                                        }`}
+                                    style={{ backgroundColor: color }}
+                                />
+                            ))}
+                        </div>
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => setShowForm(false)}
+                                className="flex-1 py-2 text-xs font-semibold rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-600 dark:bg-slate-700 dark:hover:bg-slate-600 dark:text-slate-300 transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleCreate}
+                                className="flex-1 py-2 text-xs font-semibold text-white bg-purple-600 rounded-xl hover:bg-purple-700 shadow-sm shadow-purple-600/30 transition-all"
+                            >
+                                Create
+                            </button>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="p-4 mt-auto">
+                        <button
+                            onClick={() => setShowForm(true)}
+                            className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-bold transition-all bg-purple-50 text-purple-600 hover:bg-purple-100 hover:shadow-sm dark:bg-purple-900/20 dark:text-purple-400 dark:hover:bg-purple-900/40 border border-purple-100 dark:border-purple-800/30"
+                        >
+                            <i className="bi bi-plus-lg text-lg line-height-1"></i>
+                            New Project
+                        </button>
+                    </div>
+                )}
+            </aside>
+        </>
     );
 };
 
