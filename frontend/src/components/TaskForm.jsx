@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useTheme } from '../context/useTheme'
+import { X } from 'lucide-react'
 
 const TaskForm = ({ show, onClose, onAddTask, project }) => {
     const [title, setTitle] = useState('');
@@ -7,7 +7,6 @@ const TaskForm = ({ show, onClose, onAddTask, project }) => {
     const [priority, setPriority] = useState('medium');
     const [status, setStatus] = useState('pending');
     const [assignedTo, setAssignedTo] = useState('');
-    const { isDark } = useTheme();
 
     if (!show) return null;
 
@@ -62,7 +61,7 @@ const TaskForm = ({ show, onClose, onAddTask, project }) => {
                         onClick={onClose}
                         className="p-2 rounded-lg transition-colors text-stone-400 hover:text-stone-600 hover:bg-stone-100 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-700"
                     >
-                        <i className="bi bi-x-lg text-lg"></i>
+                        <X className="w-5 h-5" />
                     </button>
                 </div>
 

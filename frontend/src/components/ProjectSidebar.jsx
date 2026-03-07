@@ -99,13 +99,13 @@ const ProjectSidebar = ({ projects, selectedProject, onSelectProject, onCreatePr
 
             <aside className={`fixed md:relative inset-y-0 left-0 z-50 w-64 md:w-64 h-full flex flex-col border-r shadow-2xl md:shadow-none bg-stone-100/40 border-stone-200/60 dark:bg-slate-900/40 dark:border-slate-800 backdrop-blur-xl transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0 md:w-0 md:overflow-hidden'}`}>
                 {/* Header */}
-                <div className="flex items-center justify-between p-4 border-b border-stone-200/50 dark:border-slate-800">
+                <div className="flex items-center justify-between p-4 border-b border-stone-200/50 dark:border-slate-800 h-[72px]">
                     <div className="flex items-center gap-2">
                         <div className="w-8 h-8 rounded-xl bg-purple-600 text-white flex items-center justify-center font-bold shadow-sm shadow-purple-600/20">
                             S
                         </div>
                         <h2 className="text-xl font-bold tracking-tight text-stone-800 dark:text-gray-100">
-                            SyncTask
+                            SyncCollab
                         </h2>
                     </div>
                     {/* Toggle Button (Mobile & Desktop) */}

@@ -275,10 +275,13 @@ export const acceptInviteLink = async (token, userData) => {
 };
 
 // Send Chat Message
-export const sendChatMessage = async (projectId, message) => {
+export const sendChatMessage = async (projectId, message, internalType = null) => {
     try {
-        const response = await apiClient.post(`/chat/${projectId}`, { message });
-        return response.data.response; // The backend sends { success: true, response: "markdown text" }
+        const payload = { message };
+        if (internalType) payload.internalType = internalType;
+        
+        const response = await apiClient.post(`/chat/${projectId}`, payload);
+        return response.data; // The backend sends { success: true, response: "markdown text", allowPDF: true/false }
     } catch (error) {
         console.error('Error sending chat message:', error);
         throw error;

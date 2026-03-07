@@ -10,7 +10,7 @@ const model = genAI.getGenerativeModel({ model: process.env.GEMINI_MODEL || 'gem
 export const getProjectChatResponse = async (req, res) => {
     try {
         const { projectId } = req.params;
-        const { message } = req.body;
+        const { message, internalType } = req.body;
         const userId = req.userId;
 
         if (!projectId) return res.status(400).json({ message: 'Project ID is required' });
@@ -35,36 +35,94 @@ export const getProjectChatResponse = async (req, res) => {
             createdAt: { $gte: thirtyDaysAgo }
         }).sort({ createdAt: 1 }); // Ascending order
 
-        // Format the context for Gemini
-        let contextString = `You are a helpful AI assistant for a project management tool. The project is named "${project.name}".\n`;
-        contextString += `Here is the activity log for this project over the last 30 days:\n\n`;
-
+        // Handle Insufficient Data Scenario
         if (logs.length === 0) {
-            contextString += "No activity recorded in the last 30 days.\n";
-        } else {
-            logs.forEach(log => {
-                const date = new Date(log.createdAt).toLocaleString();
-                contextString += `[${date}] ${log.userName} performed ${log.action}: ${log.taskSnapshot}\n`;
+            return res.status(200).json({
+                success: true,
+                response: `### Insufficient Data\n\nThe activity logs do not contain enough information to answer this question.`,
+                allowPDF: false
             });
         }
 
-        contextString += `\nBased strictly on the logs provided above, answer the user's question.\n`;
-        contextString += `Formatting instructions:\n`;
-        contextString += `- Be extremely concise and structured.\n`;
-        contextString += `- If the user asks for a table or tabular form, provide a well-formatted markdown table with clear columns (e.g., Date, Time, User, Action, Details).\n`;
-        contextString += `- Use bullet points for summarizing multiple events or actions.\n`;
-        contextString += `- Use bold text for user names, action types, or task titles to make them stand out.\n`;
-        contextString += `Never invent information not present in the logs. If the user asks something outside the scope of the project activity, kindly remind them your primary knowledge is limited to the project logs.\n`;
+        // Format date compactly: "Mar 7, 9:04 AM"
+        const formatDate = (date) => {
+            return new Date(date).toLocaleString('en-US', {
+                month: 'short', day: 'numeric',
+                hour: 'numeric', minute: '2-digit', hour12: true
+            });
+        };
+
+        // Humanize action labels
+        const actionLabels = {
+            CREATED_TASK: 'Created Task',
+            UPDATED_TASK: 'Updated Task',
+            UPDATED_STATUS: 'Status Updated',
+            DELETED_TASK: 'Deleted Task',
+            PROJECTCREATED: 'Project Created',
+            PROJECT_CREATED: 'Project Created',
+            ADDED_COLLABORATOR: 'Added Collaborator',
+            REMOVED_COLLABORATOR: 'Removed Collaborator',
+        };
+        const humanizeAction = (action) => actionLabels[action] || action.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+
+        // Structure logs as JSON objects
+        const structuredLogs = logs.map(log => ({
+            date: formatDate(log.createdAt),
+            user: log.userName,
+            action: humanizeAction(log.action),
+            task: log.taskSnapshot || "N/A"
+        }));
+
+        // Hidden instruction mapping
+        const suggestionMapping = {
+            report: "Generate a full structured project activity report. Include a single activity table, key insights, most active collaborators, task status changes, and observations. Use markdown tables.",
+            summary: "Provide a concise executive summary of the project activity. Focus on important updates, key task changes, and overall progress.",
+            updates: "List the most recent project updates in a markdown table with columns Date, User, Action, Task.",
+            blockers: "Analyze activity patterns and identify potential blockers, stalled tasks, or unusual workflow behavior."
+        };
+
+        const hiddenInstruction = internalType ? suggestionMapping[internalType] : "";
+
+        // Build System Prompt Context
+        let contextString = `You are Nexus, an expert project activity analyst inside the SyncCollab platform. The project is named "${project.name}".
+Your task is to analyze the last 30 days of project activity logs and answer user questions.
+
+### SYSTEM RULES & FORMATTING
+1. Provide highly structured, concise, and reliable responses.
+2. Avoid long paragraphs. Prefer concise bullet points and bolding for emphasis.
+3. Always output valid Markdown. Use ## for section titles and ### for subsections.
+4. When listing events or updates, ALWAYS use a Markdown table formatted as:
+   | Date | User | Action | Task |
+   |------|------|--------|------|
+5. Highlight important entities (like user names and task titles) using **bold**.
+6. NEVER invent information. Only use the provided structured JSON logs. If asked something outside the logs, remind the user you only know about project activity.
+7. Observe patterns: most active collaborator, frequently updated tasks, status toggling, or workflow inefficiencies. Note these under 'Key Insights' or 'Observations'.
+8. Maximum 8 bullet points per section.
+
+Here is the structured project activity data formatted as JSON:
+${JSON.stringify(structuredLogs, null, 2)}
+`;
 
         // Combine system context + user message
-        const prompt = `${contextString}\nUser: ${message}`;
+        let finalPrompt = `${contextString}\n\nUser Question: ${message}`;
+        if (hiddenInstruction) {
+            finalPrompt += `\nInternal Instructions (Follow strictly): ${hiddenInstruction}`;
+        }
 
-        const result = await model.generateContent(prompt);
+        const result = await model.generateContent(finalPrompt);
         const responseText = result.response.text();
+
+        // Calculate allowPDF flag
+        const isReportRequested = typeof message === 'string' && message.toLowerCase().includes('report');
+        const isReportType = internalType === 'report';
+        const hasSummaryHeader = responseText.includes('Project Activity Summary') || responseText.includes('Activity Table');
+        
+        const allowPDF = isReportRequested || isReportType || hasSummaryHeader;
 
         return res.status(200).json({
             success: true,
-            response: responseText
+            response: responseText,
+            allowPDF: allowPDF
         });
 
     } catch (error) {

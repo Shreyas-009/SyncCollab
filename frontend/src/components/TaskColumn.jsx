@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import TaskCard from './TaskCard';
 import { Droppable } from '@hello-pangea/dnd';
+import { Grid, Check, User, Filter, Inbox } from 'lucide-react';
 
-const TaskColumn = ({ title, statusId, img, tasks, onDelete, onEdit, onView, projectAssignees }) => {
+const TaskColumn = ({ title, statusId, img, icon, tasks, onDelete, onEdit, onView, projectAssignees }) => {
     const [priorityFilter, setPriorityFilter] = useState('all');
     const [assigneeFilter, setAssigneeFilter] = useState('all');
     const [showPriorityFilter, setShowPriorityFilter] = useState(false);
@@ -33,13 +34,17 @@ const TaskColumn = ({ title, statusId, img, tasks, onDelete, onEdit, onView, pro
             {/* Column Header */}
             <div className="flex items-center justify-between p-5 bg-white/40 dark:bg-slate-800/40 backdrop-blur-md border-b border-stone-200/50 dark:border-slate-700/50 z-10 sticky top-0">
                 <div className="flex items-center gap-3">
-                    {img ? (
+                    {icon ? (
+                        <div className="w-8 h-8 rounded-xl bg-white dark:bg-slate-700 shadow-sm border border-stone-100 dark:border-slate-600 flex items-center justify-center">
+                            {icon}
+                        </div>
+                    ) : img ? (
                         <div className="w-8 h-8 rounded-xl bg-white dark:bg-slate-700 shadow-sm border border-stone-100 dark:border-slate-600 flex items-center justify-center p-1.5">
                             <img className='w-full h-full object-contain' src={img} alt={title} />
                         </div>
                     ) : (
                         <div className="w-8 h-8 rounded-xl bg-white dark:bg-slate-700 shadow-sm border border-stone-100 dark:border-slate-600 flex items-center justify-center text-purple-600 dark:text-purple-400">
-                           <i className="bi bi-ui-radios-grid text-lg"></i>
+                           <Grid className="w-4 h-4" />
                         </div>
                     )}
                     <h3 className="font-bold text-lg text-stone-800 tracking-tight dark:text-gray-100">{title}</h3>
@@ -60,7 +65,7 @@ const TaskColumn = ({ title, statusId, img, tasks, onDelete, onEdit, onView, pro
                                 }`}
                             title="Filter by Assignee"
                         >
-                            <i className="bi bi-person-fill border border-transparent"></i>
+                            <User className="w-3.5 h-3.5" />
                         </button>
 
                         {showAssigneeFilter && (
@@ -81,7 +86,7 @@ const TaskColumn = ({ title, statusId, img, tasks, onDelete, onEdit, onView, pro
                                                     }`}
                                             >
                                                 <span className="truncate">{option.label}</span>
-                                                {assigneeFilter === option.value && <i className="bi bi-check2 flex-shrink-0"></i>}
+                                                {assigneeFilter === option.value && <Check className="w-3 h-3 flex-shrink-0" />}
                                             </button>
                                         ))}
                                     </div>
@@ -100,7 +105,7 @@ const TaskColumn = ({ title, statusId, img, tasks, onDelete, onEdit, onView, pro
                                 }`}
                             title="Filter by Priority"
                         >
-                            <i className="bi bi-funnel text-xs"></i>
+                            <Filter className="w-3 h-3" />
                         </button>
 
                         {showPriorityFilter && (
@@ -121,7 +126,7 @@ const TaskColumn = ({ title, statusId, img, tasks, onDelete, onEdit, onView, pro
                                                     }`}
                                             >
                                                 {option.label}
-                                                {priorityFilter === option.value && <i className="bi bi-check2"></i>}
+                                                {priorityFilter === option.value && <Check className="w-3 h-3" />}
                                             </button>
                                         ))}
                                     </div>
@@ -159,9 +164,7 @@ const TaskColumn = ({ title, statusId, img, tasks, onDelete, onEdit, onView, pro
                                 ))
                             ) : (
                                 <div className="flex flex-col items-center justify-center py-10 mt-4 text-stone-400 dark:text-slate-500 border-2 border-dashed border-stone-200 dark:border-slate-700 rounded-2xl bg-white/40 dark:bg-slate-800/20">
-                                    <svg className="w-10 h-10 mb-2 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-                                    </svg>
+                                    <Inbox className="w-10 h-10 mb-2 opacity-40" />
                                     <p className='text-sm font-medium'>
                                         {(priorityFilter !== 'all' || assigneeFilter !== 'all') ? 'No tasks match filters' : 'Drop tasks here'}
                                     </p>

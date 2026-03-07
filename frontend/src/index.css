@@ -65,43 +65,61 @@ body {
     overflow: hidden;
 }
 
-/* Custom scrollbar for dark mode */
+/* Custom scrollbar for dark mode - only visible on hover */
+.dark .custom-scrollbar::-webkit-scrollbar,
 .dark ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
 }
 
+.dark .custom-scrollbar::-webkit-scrollbar-track,
 .dark ::-webkit-scrollbar-track {
     background: transparent;
     margin: 4px 0;
 }
 
+.dark .custom-scrollbar::-webkit-scrollbar-thumb,
 .dark ::-webkit-scrollbar-thumb {
-    background: #475569;
+    background: transparent;
     border-radius: 3px;
 }
 
-.dark ::-webkit-scrollbar-thumb:hover {
+.dark .custom-scrollbar:hover::-webkit-scrollbar-thumb,
+.dark *:hover::-webkit-scrollbar-thumb {
+    background: #475569;
+}
+
+.dark .custom-scrollbar:hover::-webkit-scrollbar-thumb:hover,
+.dark *:hover::-webkit-scrollbar-thumb:hover {
     background: #64748b;
 }
 
-/* Light mode scrollbar */
+/* Light mode scrollbar - only visible on hover */
+.custom-scrollbar::-webkit-scrollbar,
 ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
 }
 
+.custom-scrollbar::-webkit-scrollbar-track,
 ::-webkit-scrollbar-track {
     background: transparent;
     margin: 4px 0;
 }
 
+.custom-scrollbar::-webkit-scrollbar-thumb,
 ::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
+    background: transparent;
     border-radius: 3px;
 }
 
-::-webkit-scrollbar-thumb:hover {
+.custom-scrollbar:hover::-webkit-scrollbar-thumb,
+*:hover::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+}
+
+.custom-scrollbar:hover::-webkit-scrollbar-thumb:hover,
+*:hover::-webkit-scrollbar-thumb:hover {
     background: #94a3b8;
 }
 

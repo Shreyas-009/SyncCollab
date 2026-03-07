@@ -57,7 +57,7 @@ const RequestsPage = ({ onClose, onInviteAccepted }) => {
     return (
         <div className="flex flex-col h-full bg-white dark:bg-slate-900">
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-stone-200 dark:border-slate-700">
+            <div className="flex items-center justify-between p-4.5 border-b border-stone-200 dark:border-slate-700">
                 <h2 className="text-lg font-semibold text-stone-800 dark:text-gray-100">
                     Project Invites
                 </h2>

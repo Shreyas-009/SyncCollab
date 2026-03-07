@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Priority from './Priority';
 import { Draggable } from '@hello-pangea/dnd';
+import { Edit2, Trash2 } from 'lucide-react';
 
 const TaskCard = ({ task, index, onDelete, onEdit, onView }) => {
   const priority = task.priority;
@@ -33,14 +34,14 @@ const TaskCard = ({ task, index, onDelete, onEdit, onView }) => {
                 className="w-7 h-7 flex items-center justify-center rounded-lg text-stone-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/40 dark:hover:text-blue-400 transition-colors"
                 title="Edit Task"
               >
-                <i className="bi bi-pencil-square text-sm"></i>
+                <Edit2 className="w-3.5 h-3.5" />
               </button>
               <button
                 onClick={(e) => { e.stopPropagation(); onDelete(task); }}
                 className="w-7 h-7 flex items-center justify-center rounded-lg text-stone-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/40 dark:hover:text-red-400 transition-colors"
                 title="Delete Task"
               >
-                <i className="bi bi-trash text-sm"></i>
+                <Trash2 className="w-3.5 h-3.5" />
               </button>
             </div>
           </div>

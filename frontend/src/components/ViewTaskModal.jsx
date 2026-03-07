@@ -1,4 +1,5 @@
 import React from 'react';
+import { X, User } from 'lucide-react';
 
 const ViewTaskModal = ({ show, onClose, task }) => {
     if (!show || !task) return null;
@@ -24,9 +25,7 @@ const ViewTaskModal = ({ show, onClose, task }) => {
                         onClick={onClose}
                         className="text-stone-400 hover:text-stone-600 dark:hover:text-gray-300 transition-colors flex-shrink-0"
                     >
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
+                        <X className="w-6 h-6" />
                     </button>
                 </div>
 
@@ -57,7 +56,7 @@ const ViewTaskModal = ({ show, onClose, task }) => {
                             ) : (
                                 <span className="text-sm text-stone-400 italic dark:text-slate-500 flex items-center gap-2 h-6">
                                     <div className="w-6 h-6 rounded-full border border-dashed border-stone-300 dark:border-slate-600 flex items-center justify-center">
-                                        <i className="bi bi-person text-xs text-stone-300 dark:text-slate-600"></i>
+                                        <User className="w-3.5 h-3.5 text-stone-300 dark:text-slate-600" />
                                     </div>
                                     Unassigned
                                 </span>

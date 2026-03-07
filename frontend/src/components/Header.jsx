@@ -4,6 +4,7 @@ import { dark } from '@clerk/themes'
 import { useTheme } from '../context/useTheme'
 import InviteModal from './InviteModal'
 import ProjectSettingsModal from './ProjectSettingsModal'
+import { Menu, UserPlus, Settings, Search, XCircle, Sparkles, Plus, Sun, Moon } from 'lucide-react'
 
 const Header = ({ onOpen, onSearch, selectedProject, onProjectsUpdated, onOpenChat, onToggleSidebar }) => {
     const [searchQuery, setSearchQuery] = useState('');
@@ -38,7 +39,7 @@ const Header = ({ onOpen, onSearch, selectedProject, onProjectsUpdated, onOpenCh
 
     return (
         <>
-            <header className="flex items-center justify-between gap-4 px-4 md:px-6 py-4 border-b bg-white border-stone-200/60 shadow-sm dark:bg-slate-900 dark:border-slate-800 z-30">
+            <header className="flex items-center justify-between gap-4 px-4 md:px-6 py-4 border-b bg-white border-stone-200/60 shadow-sm dark:bg-slate-900 dark:border-slate-800 z-30 h-[72px]">
 
                 {/* Left: Hamburger Menu (Mobile) & Project Info */}
                 <div className="flex items-center gap-3 min-w-0">
@@ -48,7 +49,7 @@ const Header = ({ onOpen, onSearch, selectedProject, onProjectsUpdated, onOpenCh
                         className="md:hidden p-2 -ml-2 rounded-xl text-stone-600 hover:bg-stone-100 dark:text-slate-300 dark:hover:bg-slate-800 transition-colors"
                         title="Toggle Menu"
                     >
-                        <i className="bi bi-list text-xl"></i>
+                        <Menu className="w-5 h-5" />
                     </button>
 
                     {selectedProject ? (
@@ -106,7 +107,7 @@ const Header = ({ onOpen, onSearch, selectedProject, onProjectsUpdated, onOpenCh
                                         className="h-8 px-2.5 rounded-lg transition-colors text-xs font-semibold text-stone-600 bg-stone-100 hover:bg-purple-100 hover:text-purple-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-purple-900/40 dark:hover:text-purple-400 hidden sm:flex items-center gap-1.5"
                                         title="Invite collaborators"
                                     >
-                                        <i className="bi bi-person-plus-fill"></i>
+                                        <UserPlus className="w-4 h-4" />
                                         Invite
                                     </button>
                                 )}
@@ -117,7 +118,7 @@ const Header = ({ onOpen, onSearch, selectedProject, onProjectsUpdated, onOpenCh
                                     className="w-8 h-8 flex items-center justify-center rounded-lg transition-colors text-stone-500 hover:text-stone-700 hover:bg-stone-100 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-800"
                                     title="Project settings"
                                 >
-                                    <i className="bi bi-gear-fill"></i>
+                                    <Settings className="w-4 h-4" />
                                 </button>
                             </div>
                         </>
@@ -131,7 +132,7 @@ const Header = ({ onOpen, onSearch, selectedProject, onProjectsUpdated, onOpenCh
                 {/* Center: Search & Ask AI */}
                 <div className="flex-1 max-w-md hidden lg:flex items-center gap-2">
                     <div className="relative flex-1 group">
-                        <i className="bi bi-search absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 group-focus-within:text-purple-500 transition-colors"></i>
+                        <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 group-focus-within:text-purple-500 transition-colors" />
                         <input
                             type="text"
                             className="w-full pl-10 pr-10 py-2.5 text-sm font-medium rounded-xl border focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500 transition-all bg-stone-50 text-stone-800 border-stone-200/80 placeholder-stone-400 dark:bg-slate-900/50 dark:text-gray-100 dark:border-slate-700 dark:placeholder-slate-500 dark:focus:ring-purple-500/30 shadow-sm shadow-stone-200/20 dark:shadow-none"
@@ -147,7 +148,7 @@ const Header = ({ onOpen, onSearch, selectedProject, onProjectsUpdated, onOpenCh
                                 onClick={handleClearSearch}
                                 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center rounded-full transition-colors text-stone-400 hover:text-stone-600 hover:bg-stone-200 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-700"
                             >
-                                <i className="bi bi-x-circle-fill"></i>
+                                <XCircle className="w-4 h-4" />
                             </button>
                         )}
                     </div>
@@ -159,7 +160,7 @@ const Header = ({ onOpen, onSearch, selectedProject, onProjectsUpdated, onOpenCh
                         className='flex items-center justify-center gap-2 w-10 h-10 shrink-0 text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed dark:bg-indigo-900/30 dark:text-indigo-400 dark:hover:bg-indigo-900/50'
                         title="Ask AI"
                     >
-                        <i className="bi bi-stars"></i>
+                        <Sparkles className="w-5 h-5" />
                     </button>
                 </div>
 
@@ -172,7 +173,7 @@ const Header = ({ onOpen, onSearch, selectedProject, onProjectsUpdated, onOpenCh
                         disabled={!selectedProject}
                         className='flex items-center gap-2 px-4 py-2.5 sm:px-5 sm:py-2.5 text-sm font-bold text-white bg-purple-600 rounded-xl hover:bg-purple-700 hover:shadow-md hover:shadow-purple-600/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none active:scale-[0.98]'
                     >
-                        <i className="bi bi-plus-lg"></i>
+                        <Plus className="w-4 h-4" />
                         <span className="hidden sm:inline">Add Task</span>
                     </button>
 
@@ -186,7 +187,7 @@ const Header = ({ onOpen, onSearch, selectedProject, onProjectsUpdated, onOpenCh
                             className="w-9 h-9 flex items-center justify-center rounded-xl transition-colors text-stone-500 hover:bg-stone-100 dark:text-amber-400 dark:hover:bg-slate-800"
                             title="Toggle theme"
                         >
-                            {isDark ? <i className="bi bi-sun-fill text-lg"></i> : <i className="bi bi-moon-stars-fill text-lg"></i>}
+                            {isDark ? <Sun className="w-5 h-5 text-amber-500" /> : <Moon className="w-5 h-5" />}
                         </button>
 
                         {/* User Profile */}
@@ -221,16 +222,6 @@ const Header = ({ onOpen, onSearch, selectedProject, onProjectsUpdated, onOpenCh
                                     }
                                 }}
                             >
-                                <UserButton.UserProfilePage 
-                                    label="Account" 
-                                    url="account" 
-                                    labelIcon={<i className="bi bi-person-circle"></i>}
-                                />
-                                <UserButton.UserProfilePage 
-                                    label="Security" 
-                                    url="security" 
-                                    labelIcon={<i className="bi bi-shield-lock"></i>}
-                                />
                             </UserButton>
                         </div>
                     </div>

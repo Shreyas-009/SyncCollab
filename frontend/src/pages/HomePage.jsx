@@ -69,20 +69,23 @@ const HomePage = () => {
         try {
             const data = await fetchProjects();
             setProjects(data || []);
-            // Auto-select first project if none selected
-            if (data && data.length > 0 && !selectedProject) {
-                setSelectedProject(data[0]);
-            }
             setLoading(false);
         } catch (err) {
             console.error('Error loading projects:', err);
             setProjects([]);
             setLoading(false);
         }
-    }, [selectedProject]);
+    }, []);
+
+    // Auto-select first project if none selected
+    useEffect(() => {
+        if (projects.length > 0 && !selectedProject) {
+            setSelectedProject(projects[0]);
+        }
+    }, [projects, selectedProject]);
 
     const loadTasks = useCallback(async () => {
-        if (!selectedProject) return;
+        if (!selectedProject?._id) return;
         try {
             const data = await fetchTasks(selectedProject._id);
             setTasks(data || []);
@@ -90,7 +93,7 @@ const HomePage = () => {
             console.error('Error loading tasks:', err);
             setTasks([]);
         }
-    }, [selectedProject]);
+    }, [selectedProject?._id]);
 
     useEffect(() => {
         if (user) {
@@ -155,8 +158,8 @@ const HomePage = () => {
         }
     };
 
-    const handleSearch = async (query) => {
-        if (!selectedProject) return;
+    const handleSearch = useCallback(async (query) => {
+        if (!selectedProject?._id) return;
         try {
             if (!query.trim()) {
                 await loadTasks();
@@ -167,7 +170,7 @@ const HomePage = () => {
         } catch (err) {
             console.error('Search error:', err);
         }
-    };
+    }, [selectedProject?._id, loadTasks]);
 
     const handleUpdateTask = async (taskId, updatedData) => {
         try {
