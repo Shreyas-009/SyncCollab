@@ -85,7 +85,7 @@ const MemberCard = ({ member, isOwner, isCurrentUser, onUpdateRole, onRemove, pr
                     <button
                         onClick={handleRemove}
                         disabled={isUpdating}
-                        className="text-[10px] font-bold text-red-400 hover:text-red-500 uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="text-[10px] font-bold text-red-400 hover:text-red-500 uppercase tracking-widest md:opacity-0 opacity-100 group-hover:opacity-100 transition-opacity"
                     >
                         Remove
                     </button>

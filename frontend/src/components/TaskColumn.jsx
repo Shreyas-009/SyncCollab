@@ -32,7 +32,7 @@ const TaskColumn = ({ title, statusId, img, icon, tasks, onDelete, onEdit, onVie
     return (
         <section className="flex flex-col flex-1 min-w-[300px] max-w-sm rounded-[24px] bg-stone-100/50 border border-stone-200/60 shadow-sm dark:bg-slate-800/30 dark:border-slate-700/50 overflow-hidden">
             {/* Column Header */}
-            <div className="flex items-center justify-between p-5 bg-white/40 dark:bg-slate-800/40 backdrop-blur-md border-b border-stone-200/50 dark:border-slate-700/50 z-10 sticky top-0">
+            <div className="flex items-center justify-between p-5 bg-white/40 dark:bg-slate-800/40 border-b border-stone-200/50 dark:border-slate-700/50 z-10 sticky top-0">
                 <div className="flex items-center gap-3">
                     {icon ? (
                         <div className="w-8 h-8 rounded-xl bg-white dark:bg-slate-700 shadow-sm border border-stone-100 dark:border-slate-600 flex items-center justify-center">

@@ -70,7 +70,7 @@ const ProjectCard = ({ project, onClick, onEdit }) => {
             </div>
             <button
                 onClick={(e) => { e.stopPropagation(); onEdit(project); }}
-                className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 p-1.5 rounded-lg bg-white/80 dark:bg-slate-700/80 backdrop-blur-sm text-stone-500 dark:text-slate-400 hover:text-stone-700 dark:hover:text-slate-200 hover:bg-white dark:hover:bg-slate-700 transition-all shadow-sm border border-stone-200/60 dark:border-slate-600/50"
+                className="absolute top-3 right-3 md:opacity-0 opacity-100 group-hover:opacity-100 p-1.5 rounded-lg bg-white/80 dark:bg-slate-700/80 backdrop-blur-sm text-stone-500 dark:text-slate-400 hover:text-stone-700 dark:hover:text-slate-200 hover:bg-white dark:hover:bg-slate-700 transition-all shadow-sm border border-stone-200/60 dark:border-slate-600/50"
                 title="Edit project"
             >
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -158,9 +158,10 @@ const ProjectsHub = ({ projects, onSelectProject, onCreateProject, onProjectsUpd
 
     const greeting = () => {
         const h = new Date().getHours();
-        if (h < 12) return 'Good morning';
-        if (h < 18) return 'Good afternoon';
-        return 'Good evening';
+        if (h >= 5 && h < 12) return 'Good morning';
+        if (h >= 12 && h < 17) return 'Good afternoon';
+        if (h >= 17 && h < 22) return 'Good evening';
+        return 'Good night';
     };
 
     return (
@@ -175,7 +176,7 @@ const ProjectsHub = ({ projects, onSelectProject, onCreateProject, onProjectsUpd
                         <div>
                             <p className="text-sm text-stone-500 dark:text-slate-400 font-medium">{greeting()},</p>
                             <h1 className="text-2xl font-bold text-stone-800 dark:text-slate-100 tracking-tight leading-tight">
-                                {user?.firstName || 'there'} 👋
+                                {user?.firstName || 'User'}
                             </h1>
                         </div>
                     </div>

@@ -15,9 +15,9 @@ const TaskCard = ({ task, index, onDelete, onEdit, onView }) => {
           {...provided.draggableProps}
           {...provided.dragHandleProps}
           style={{ ...provided.draggableProps.style }}
-          className={`w-full flex flex-col justify-between min-h-[90px] border rounded-xl p-3 my-2 mx-0 overflow-hidden shadow-sm transition-all duration-200 group 
+          className={`w-full flex flex-col justify-between min-h-[90px] border rounded-xl p-3 my-2 mx-0 overflow-hidden shadow-sm transition-all duration-[0ms] group 
             ${snapshot.isDragging 
-              ? 'bg-purple-50 border-purple-300 dark:bg-purple-900/30 dark:border-purple-500 scale-[1.02] shadow-xl z-50' 
+              ? 'bg-white border-purple-500 ring-2 ring-purple-500/20 dark:bg-slate-800 dark:border-purple-500 scale-[1.05] shadow-2xl z-[9999]' 
               : 'bg-white border-stone-200 hover:border-stone-300 dark:bg-gray-800/80 dark:border-gray-700 dark:hover:border-gray-600'
             }`}
         >
@@ -28,7 +28,7 @@ const TaskCard = ({ task, index, onDelete, onEdit, onView }) => {
             </h4>
             
             {/* Action Buttons */}
-            <div className={`flex gap-1 shrink-0 transition-opacity duration-200 ${snapshot.isDragging ? 'opacity-0' : 'opacity-0 group-hover:opacity-100'}`}>
+            <div className={`flex gap-1 shrink-0 transition-opacity duration-200 ${snapshot.isDragging ? 'opacity-0' : 'md:opacity-0 group-hover:opacity-100 opacity-100'}`}>
               <button
                 onClick={(e) => { e.stopPropagation(); onEdit(task); }}
                 className="w-7 h-7 flex items-center justify-center rounded-lg text-stone-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/40 dark:hover:text-blue-400 transition-colors"
