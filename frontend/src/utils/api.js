@@ -116,6 +116,9 @@ export const updateProjectCollaboratorRole = async (projectId, collaboratorId, r
     }
 };
 
+export const removeCollaborator = removeProjectCollaborator;
+export const updateCollaboratorRole = updateProjectCollaboratorRole;
+
 export const leaveProject = async (projectId) => {
     try {
         const response = await apiClient.post(`/projects/${projectId}/leave`);
@@ -284,6 +287,18 @@ export const sendChatMessage = async (projectId, message, internalType = null) =
         return response.data; // The backend sends { success: true, response: "markdown text", allowPDF: true/false }
     } catch (error) {
         console.error('Error sending chat message:', error);
+        throw error;
+    }
+};
+
+// ============ ACTIVITY LOG API ============
+
+export const fetchActivityLogs = async (projectId) => {
+    try {
+        const response = await apiClient.get(`/activity/${projectId}`);
+        return response.data.data || response.data;
+    } catch (error) {
+        console.error('Error fetching activity logs:', error);
         throw error;
     }
 };

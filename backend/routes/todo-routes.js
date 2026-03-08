@@ -1,5 +1,5 @@
 import express from 'express';
-import { getAllTasks, addTask, getSignleTasks, updateTask, deleteTask, getTasksBySearch } from '../controller/todo-controller.js';
+import { getAllTasks, addTask, getSignleTasks, updateTask, deleteTask, getTasksBySearch, getActivityLogs } from '../controller/todo-controller.js';
 import { createProject, getProjects, getProject, updateProject, deleteProject, removeCollaborator, leaveProject, updateCollaboratorRole } from '../controller/project-controller.js';
 import { sendProjectInvite, getPendingInvites, acceptInvite, declineInvite, createInviteLink, getInviteLinkInfo, acceptInviteLink } from '../controller/project-invite-controller.js';
 import { requireAuth, sendInvitation, searchUsers } from '../middleware/clerk-auth.js';
@@ -39,6 +39,7 @@ router.get('/todos/search', getTasksBySearch);
 router.get('/todos/:id', getSignleTasks);
 router.patch('/todos/:id', updateTask);
 router.delete('/todos/:id', deleteTask);
+router.get('/activity/:projectId', getActivityLogs);
 
 // User routes
 router.get('/users/search', searchUsers);

@@ -217,6 +217,15 @@ export const removeCollaborator = async (req, res) => {
             }
         });
 
+        // Log the activity
+        await ActivityLog.create({
+            projectId,
+            userId,
+            userName: project.ownerName || 'Owner',
+            action: 'MEMBER_REMOVED',
+            taskSnapshot: `Member removed from the project.`
+        });
+
         const updatedProject = await Project.findById(projectId);
 
         return res.status(200).json({
@@ -294,6 +303,15 @@ export const updateCollaboratorRole = async (req, res) => {
             { _id: projectId, 'collaborators.id': collaboratorId },
             { $set: { 'collaborators.$.role': role } }
         );
+
+        // Log the activity
+        await ActivityLog.create({
+            projectId,
+            userId,
+            userName: project.ownerName || 'Owner',
+            action: 'ROLE_UPDATED',
+            taskSnapshot: `Member role updated to "${role}".`
+        });
 
         const updatedProject = await Project.findById(projectId);
 

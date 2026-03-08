@@ -1,6 +1,7 @@
 import ProjectInvite from '../model/project-invite-model.js';
 import ProjectInviteLink from '../model/project-invite-link-model.js';
 import Project from '../model/project-model.js';
+import ActivityLog from '../model/activity-log-model.js';
 
 // Send project invite
 export const sendProjectInvite = async (req, res) => {
@@ -110,6 +111,15 @@ export const acceptInvite = async (req, res) => {
         // Update invite status
         invite.status = 'accepted';
         await invite.save();
+
+        // Log the activity
+        await ActivityLog.create({
+            projectId: invite.projectId,
+            userId,
+            userName: userName || invite.toUserEmail,
+            action: 'MEMBER_ADDED',
+            taskSnapshot: `User joined the project via invitation.`
+        });
 
         return res.status(200).json({
             success: true,
@@ -283,6 +293,15 @@ export const acceptInviteLink = async (req, res) => {
                     image: userImage || ''
                 }
             }
+        });
+
+        // Log the activity
+        await ActivityLog.create({
+            projectId: inviteLink.projectId,
+            userId,
+            userName: userName || userEmail || 'New Member',
+            action: 'MEMBER_ADDED',
+            taskSnapshot: `User joined the project via invite link.`
         });
 
         return res.status(200).json({

@@ -42,6 +42,36 @@ export const getAllTasks = async (req, res) => {
     }
 };
 
+// Get activity logs for a project
+export const getActivityLogs = async (req, res) => {
+    try {
+        const { projectId } = req.params;
+        const userId = req.userId;
+
+        if (!projectId) {
+            return res.status(400).json({ message: 'Project ID is required' });
+        }
+
+        // Check access
+        const project = await checkProjectAccess(projectId, userId);
+        if (!project) {
+            return res.status(403).json({ message: 'You do not have access to this project' });
+        }
+
+        const logs = await ActivityLog.find({ projectId })
+            .sort({ createdAt: -1 })
+            .limit(50); // Limit to last 50 activities for performance
+
+        return res.status(200).json({
+            success: true,
+            data: logs
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: error.message });
+    }
+};
+
 // Get single task
 export const getSignleTasks = async (req, res) => {
     try {

@@ -20,7 +20,10 @@ const activityLogSchema = new Schema({
     action: {
         type: String,
         required: true,
-        enum: ['CREATED_TASK', 'UPDATED_TASK', 'UPDATED_STATUS', 'DELETED_TASK', 'PROJECT_CREATED']
+        enum: [
+            'CREATED_TASK', 'UPDATED_TASK', 'UPDATED_STATUS', 'DELETED_TASK', 
+            'PROJECT_CREATED', 'MEMBER_ADDED', 'MEMBER_REMOVED', 'ROLE_UPDATED'
+        ]
     },
     taskSnapshot: {
         type: String, // String summary of the task state at the time of action
