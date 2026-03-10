@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import { useUser } from '@clerk/clerk-react'
-import { useTheme } from '../context/useTheme'
 import { getPendingRequests, acceptRequest, declineRequest } from '../utils/api'
+import useMutationLocks from '../hooks/useMutationLocks'
 
 const PendingRequests = ({ onRequestHandled }) => {
     const [requests, setRequests] = useState([]);
     // const [loading, setLoading] = useState(false);
-    const [processingId, setProcessingId] = useState(null);
-    const { isDark } = useTheme();
     const { user } = useUser();
+    const { runLocked, isLocked } = useMutationLocks()
 
     useEffect(() => {
         loadRequests();
@@ -27,31 +26,33 @@ const PendingRequests = ({ onRequestHandled }) => {
     };
 
     const handleAccept = async (requestId) => {
-        setProcessingId(requestId);
+        const actionKey = `request:accept:${requestId}`
         try {
-            await acceptRequest(requestId, {
-                userEmail: user?.emailAddresses?.[0]?.emailAddress || '',
-                userName: `${user?.firstName || ''} ${user?.lastName || ''}`.trim(),
-                userImage: user?.imageUrl || ''
+            const { executed } = await runLocked(actionKey, async () => {
+                await acceptRequest(requestId, {
+                    userEmail: user?.emailAddresses?.[0]?.emailAddress || '',
+                    userName: `${user?.firstName || ''} ${user?.lastName || ''}`.trim(),
+                    userImage: user?.imageUrl || ''
+                });
+                await loadRequests();
+                if (onRequestHandled) onRequestHandled();
             });
-            await loadRequests();
-            if (onRequestHandled) onRequestHandled();
+            if (!executed) return
         } catch (error) {
             console.error('Error accepting request:', error);
-        } finally {
-            setProcessingId(null);
         }
     };
 
     const handleDecline = async (requestId) => {
-        setProcessingId(requestId);
+        const actionKey = `request:decline:${requestId}`
         try {
-            await declineRequest(requestId);
-            await loadRequests();
+            const { executed } = await runLocked(actionKey, async () => {
+                await declineRequest(requestId);
+                await loadRequests();
+            });
+            if (!executed) return
         } catch (error) {
             console.error('Error declining request:', error);
-        } finally {
-            setProcessingId(null);
         }
     };
 
@@ -67,7 +68,12 @@ const PendingRequests = ({ onRequestHandled }) => {
             </div>
 
             <div className="max-h-80 overflow-y-auto">
-                {requests.map(request => (
+                {requests.map(request => {
+                    const isAccepting = isLocked(`request:accept:${request._id}`)
+                    const isDeclining = isLocked(`request:decline:${request._id}`)
+                    const isProcessing = isAccepting || isDeclining
+
+                    return (
                     <div
                         key={request._id}
                         className="p-4 border-b last:border-b-0 border-stone-100 dark:border-slate-700"
@@ -98,21 +104,22 @@ const PendingRequests = ({ onRequestHandled }) => {
                         <div className="flex gap-2">
                             <button
                                 onClick={() => handleDecline(request._id)}
-                                disabled={processingId === request._id}
+                                disabled={isProcessing}
                                 className="flex-1 py-2 text-xs font-medium rounded-lg transition-colors disabled:opacity-50 bg-stone-100 text-stone-600 hover:bg-stone-200 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600"
                             >
-                                Decline
+                                {isDeclining ? 'Declining...' : 'Decline'}
                             </button>
                             <button
                                 onClick={() => handleAccept(request._id)}
-                                disabled={processingId === request._id}
+                                disabled={isProcessing}
                                 className='flex-1 py-2 text-xs font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 disabled:opacity-50'
                             >
-                                {processingId === request._id ? '...' : 'Accept'}
+                                {isAccepting ? 'Accepting...' : 'Accept'}
                             </button>
                         </div>
                     </div>
-                ))}
+                    )
+                })}
             </div>
         </div>
     );

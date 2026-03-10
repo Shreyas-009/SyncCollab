@@ -1,137 +1,159 @@
 import React, { useState } from 'react'
 import { useUser } from '@clerk/clerk-react'
-import { useTheme } from '../context/useTheme'
 import { searchUsers, sendProjectInvite, sendInvitation, createInviteLink } from '../utils/api'
+import useMutationLocks from '../hooks/useMutationLocks'
 
 const InviteModal = ({ show, onClose, project }) => {
-    const [email, setEmail] = useState('');
-    const [status, setStatus] = useState('idle');
-    const [message, setMessage] = useState('');
-    const [searchResults, setSearchResults] = useState([]);
-    const [mode, setMode] = useState('search');
-    const [inviteLink, setInviteLink] = useState('');
-    const [copied, setCopied] = useState(false);
-    const { isDark } = useTheme();
-    const { user } = useUser();
+    const [email, setEmail] = useState('')
+    const [message, setMessage] = useState('')
+    const [messageType, setMessageType] = useState('info')
+    const [searchResults, setSearchResults] = useState([])
+    const [mode, setMode] = useState('search')
+    const [inviteLink, setInviteLink] = useState('')
+    const [copied, setCopied] = useState(false)
+    const [isSearching, setIsSearching] = useState(false)
+    const { user } = useUser()
+    const { runLocked, isLocked, hasLocks } = useMutationLocks()
 
-    if (!show) return null;
+    if (!show) return null
+
+    const getProjectInviteKey = (toUserId) => `invite:project:send:${project?._id}:${toUserId}`
+    const getEmailInviteKey = (value) => `invite:email:send:${value.trim().toLowerCase()}`
+    const inviteLinkKey = `invite:link:create:${project?._id || 'none'}`
 
     const handleSearch = async () => {
+        if (isSearching) return
         if (!email.trim() || email.length < 3) {
-            setMessage('Enter at least 3 characters to search');
-            return;
+            setMessage('Enter at least 3 characters to search')
+            setMessageType('info')
+            return
         }
 
-        setStatus('searching');
-        setMessage('');
-        setSearchResults([]);
+        setIsSearching(true)
+        setMessage('')
+        setSearchResults([])
 
         try {
-            const users = await searchUsers(email);
-            setSearchResults(users);
+            const users = await searchUsers(email)
+            setSearchResults(users)
             if (users.length === 0) {
-                setMessage('No users found. You can invite them instead!');
+                setMessage('No users found. You can invite them instead!')
+                setMessageType('info')
             }
         } catch (error) {
-            setMessage(error.response?.data?.message || 'Error searching users');
+            setMessage(error.response?.data?.message || 'Error searching users')
+            setMessageType('error')
         } finally {
-            setStatus('idle');
+            setIsSearching(false)
         }
-    };
+    }
 
     const handleSendInvite = async (toUser) => {
         if (!project) {
-            setMessage('No project selected');
-            return;
+            setMessage('No project selected')
+            setMessageType('error')
+            return
         }
 
-        setStatus('sending');
+        const inviteKey = getProjectInviteKey(toUser.id)
         try {
-            await sendProjectInvite({
-                projectId: project._id,
-                toUserId: toUser.id,
-                toUserEmail: toUser.email,
-                fromUserEmail: user?.emailAddresses?.[0]?.emailAddress || '',
-                fromUserName: `${user?.firstName || ''} ${user?.lastName || ''}`.trim(),
-                fromUserImage: user?.imageUrl || ''
-            });
-            setStatus('success');
-            setMessage(`Invite sent to ${toUser.firstName || toUser.email}! They need to accept it.`);
-            setTimeout(() => handleClose(), 2000);
+            const { executed } = await runLocked(inviteKey, async () => {
+                await sendProjectInvite({
+                    projectId: project._id,
+                    toUserId: toUser.id,
+                    toUserEmail: toUser.email,
+                    fromUserEmail: user?.emailAddresses?.[0]?.emailAddress || '',
+                    fromUserName: `${user?.firstName || ''} ${user?.lastName || ''}`.trim(),
+                    fromUserImage: user?.imageUrl || ''
+                })
+                setMessage(`Invite sent to ${toUser.firstName || toUser.email}! They need to accept it.`)
+                setMessageType('success')
+                setTimeout(() => handleClose(), 2000)
+            })
+            if (!executed) return
         } catch (error) {
-            setStatus('error');
-            const errorMsg = error.response?.data?.message || 'Failed to send invite';
-            setMessage(errorMsg);
+            setMessage(error.response?.data?.message || 'Failed to send invite')
+            setMessageType('error')
         }
-    };
+    }
 
     const handleInviteNew = async () => {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
         if (!emailRegex.test(email)) {
-            setStatus('error');
-            setMessage('Please enter a valid email address');
-            return;
+            setMessage('Please enter a valid email address')
+            setMessageType('error')
+            return
         }
 
-        setStatus('sending');
+        const inviteKey = getEmailInviteKey(email)
         try {
-            await sendInvitation(email);
-            setStatus('success');
-            setMessage(`Invitation sent to ${email}!`);
-            setTimeout(() => handleClose(), 2000);
+            const { executed } = await runLocked(inviteKey, async () => {
+                await sendInvitation(email)
+                setMessage(`Invitation sent to ${email}!`)
+                setMessageType('success')
+                setTimeout(() => handleClose(), 2000)
+            })
+            if (!executed) return
         } catch (error) {
-            setStatus('error');
-            const errorMsg = error.response?.data?.message || 'Failed to send invitation';
-            setMessage(errorMsg);
+            setMessage(error.response?.data?.message || 'Failed to send invitation')
+            setMessageType('error')
         }
-    };
+    }
 
     const handleGenerateLink = async () => {
         if (!project) {
-            setMessage('No project selected');
-            return;
+            setMessage('No project selected')
+            setMessageType('error')
+            return
         }
 
-        setStatus('generating');
-        setMessage('');
+        setMessage('')
         try {
-            const userName = `${user?.firstName || ''} ${user?.lastName || ''}`.trim();
-            const response = await createInviteLink(project._id, userName);
-            setInviteLink(response.data.inviteUrl);
-            setStatus('success');
-            setMessage('Invite link generated! Share it with others.');
+            const { executed } = await runLocked(inviteLinkKey, async () => {
+                const userName = `${user?.firstName || ''} ${user?.lastName || ''}`.trim()
+                const response = await createInviteLink(project._id, userName)
+                setInviteLink(response.data.inviteUrl)
+                setMessage('Invite link generated! Share it with others.')
+                setMessageType('success')
+            })
+            if (!executed) return
         } catch (error) {
-            setStatus('error');
-            const errorMsg = error.response?.data?.message || 'Failed to generate invite link';
-            setMessage(errorMsg);
+            setMessage(error.response?.data?.message || 'Failed to generate invite link')
+            setMessageType('error')
         }
-    };
+    }
 
     const handleCopyLink = async () => {
         try {
-            await navigator.clipboard.writeText(inviteLink);
-            setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
+            await navigator.clipboard.writeText(inviteLink)
+            setCopied(true)
+            setTimeout(() => setCopied(false), 2000)
         } catch {
-            setMessage('Failed to copy link');
+            setMessage('Failed to copy link')
+            setMessageType('error')
         }
-    };
+    }
 
     const handleClose = () => {
-        setEmail('');
-        setStatus('idle');
-        setMessage('');
-        setSearchResults([]);
-        setMode('search');
-        setInviteLink('');
-        setCopied(false);
-        onClose();
-    };
+        if (hasLocks) return
+        setEmail('')
+        setMessage('')
+        setMessageType('info')
+        setSearchResults([])
+        setMode('search')
+        setInviteLink('')
+        setCopied(false)
+        onClose()
+    }
+
+    const inviteEmailKey = getEmailInviteKey(email)
+    const isGeneratingLink = isLocked(inviteLinkKey)
+    const isSendingEmailInvite = isLocked(inviteEmailKey)
 
     return (
         <div
             className='fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-50'
-            onClick={handleClose}
+            onClick={hasLocks ? undefined : handleClose}
         >
             <div
                 className="flex flex-col w-[90%] max-w-lg rounded-2xl shadow-xl overflow-hidden transition-colors bg-white border border-stone-200 dark:bg-slate-800 dark:border dark:border-slate-700"
@@ -158,7 +180,8 @@ const InviteModal = ({ show, onClose, project }) => {
                     </div>
                     <button
                         onClick={handleClose}
-                        className="p-2 rounded-lg transition-colors text-stone-400 hover:text-stone-600 hover:bg-stone-100 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-700"
+                        disabled={hasLocks}
+                        className="p-2 rounded-lg transition-colors text-stone-400 hover:text-stone-600 hover:bg-stone-100 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                             <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' />
@@ -213,50 +236,56 @@ const InviteModal = ({ show, onClose, project }) => {
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                                    disabled={isSearching}
                                 />
                                 <button
                                     onClick={handleSearch}
-                                    disabled={status === 'searching'}
-                                    className='px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-xl hover:bg-purple-700 disabled:opacity-50'
+                                    disabled={isSearching}
+                                    className='px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-xl hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed'
                                 >
-                                    {status === 'searching' ? '...' : 'Search'}
+                                    {isSearching ? 'Searching...' : 'Search'}
                                 </button>
                             </div>
 
                             {/* Search Results */}
                             {searchResults.length > 0 && (
                                 <div className="rounded-xl border border-stone-200 dark:border-slate-700">
-                                    {searchResults.map(resultUser => (
-                                        <div
-                                            key={resultUser.id}
-                                            className="flex items-center justify-between p-3 border-b last:border-b-0 border-stone-100 hover:bg-stone-50 dark:border-slate-700 dark:hover:bg-slate-700/50"
-                                        >
-                                            <div className="flex items-center gap-3">
-                                                {resultUser.imageUrl ? (
-                                                    <img src={resultUser.imageUrl} alt="" className="w-8 h-8 rounded-full" />
-                                                ) : (
-                                                    <div className="w-8 h-8 rounded-full flex items-center justify-center bg-stone-200 dark:bg-slate-600">
-                                                        <span className="text-sm font-medium">{resultUser.firstName?.[0] || resultUser.email[0].toUpperCase()}</span>
-                                                    </div>
-                                                )}
-                                                <div>
-                                                    <p className="text-sm font-medium text-stone-800 dark:text-gray-100">
-                                                        {resultUser.firstName} {resultUser.lastName}
-                                                    </p>
-                                                    <p className="text-xs text-stone-500 dark:text-slate-400">
-                                                        {resultUser.email}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <button
-                                                onClick={() => handleSendInvite(resultUser)}
-                                                disabled={status === 'sending'}
-                                                className='px-3 py-1.5 text-xs font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 disabled:opacity-50'
+                                    {searchResults.map(resultUser => {
+                                        const inviteKey = getProjectInviteKey(resultUser.id)
+                                        const isSending = isLocked(inviteKey)
+
+                                        return (
+                                            <div
+                                                key={resultUser.id}
+                                                className="flex items-center justify-between p-3 border-b last:border-b-0 border-stone-100 hover:bg-stone-50 dark:border-slate-700 dark:hover:bg-slate-700/50"
                                             >
-                                                Send Invite
-                                            </button>
-                                        </div>
-                                    ))}
+                                                <div className="flex items-center gap-3">
+                                                    {resultUser.imageUrl ? (
+                                                        <img src={resultUser.imageUrl} alt="" className="w-8 h-8 rounded-full" />
+                                                    ) : (
+                                                        <div className="w-8 h-8 rounded-full flex items-center justify-center bg-stone-200 dark:bg-slate-600">
+                                                            <span className="text-sm font-medium">{resultUser.firstName?.[0] || resultUser.email[0].toUpperCase()}</span>
+                                                        </div>
+                                                    )}
+                                                    <div>
+                                                        <p className="text-sm font-medium text-stone-800 dark:text-gray-100">
+                                                            {resultUser.firstName} {resultUser.lastName}
+                                                        </p>
+                                                        <p className="text-xs text-stone-500 dark:text-slate-400">
+                                                            {resultUser.email}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <button
+                                                    onClick={() => handleSendInvite(resultUser)}
+                                                    disabled={isSending}
+                                                    className='px-3 py-1.5 text-xs font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed'
+                                                >
+                                                    {isSending ? 'Sending...' : 'Send Invite'}
+                                                </button>
+                                            </div>
+                                        )
+                                    })}
                                 </div>
                             )}
                         </>
@@ -274,6 +303,7 @@ const InviteModal = ({ show, onClose, project }) => {
                                 placeholder='Enter email address...'
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
+                                disabled={isSendingEmailInvite}
                             />
                         </>
                     )}
@@ -287,13 +317,13 @@ const InviteModal = ({ show, onClose, project }) => {
                             {!inviteLink ? (
                                 <button
                                     onClick={handleGenerateLink}
-                                    disabled={status === 'generating'}
-                                    className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 border-dashed transition-colors border-stone-300 hover:border-purple-500 hover:bg-purple-50 text-stone-600 dark:border-slate-600 dark:hover:border-purple-500 dark:hover:bg-slate-700/50 dark:text-slate-300 disabled:opacity-50"
+                                    disabled={isGeneratingLink}
+                                    className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 border-dashed transition-colors border-stone-300 hover:border-purple-500 hover:bg-purple-50 text-stone-600 dark:border-slate-600 dark:hover:border-purple-500 dark:hover:bg-slate-700/50 dark:text-slate-300 disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                                     </svg>
-                                    {status === 'generating' ? 'Generating...' : 'Generate Invite Link'}
+                                    {isGeneratingLink ? 'Generating...' : 'Generate Invite Link'}
                                 </button>
                             ) : (
                                 <div className="p-4 rounded-xl border bg-stone-50 border-stone-200 dark:bg-slate-900 dark:border-slate-600">
@@ -329,9 +359,9 @@ const InviteModal = ({ show, onClose, project }) => {
 
                     {/* Status Message */}
                     {message && (
-                        <div className={`mt-4 p-3 rounded-xl text-sm ${status === 'success'
+                        <div className={`mt-4 p-3 rounded-xl text-sm ${messageType === 'success'
                             ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300"
-                            : status === 'error'
+                            : messageType === 'error'
                                 ? "bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300"
                                 : "bg-stone-100 text-stone-600 dark:bg-slate-700 dark:text-slate-300"
                             }`}>
@@ -344,23 +374,24 @@ const InviteModal = ({ show, onClose, project }) => {
                 <div className="px-6 py-4 border-t flex justify-end gap-3 bg-stone-50 border-stone-100 dark:bg-slate-900/50 dark:border-slate-700">
                     <button
                         onClick={handleClose}
-                        className="px-4 py-2 text-sm font-medium border rounded-xl transition-colors text-stone-600 bg-white border-stone-200 hover:bg-stone-50 dark:text-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:hover:bg-slate-700"
+                        disabled={hasLocks}
+                        className="px-4 py-2 text-sm font-medium border rounded-xl transition-colors text-stone-600 bg-white border-stone-200 hover:bg-stone-50 dark:text-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         Cancel
                     </button>
                     {mode === 'invite' && (
                         <button
                             onClick={handleInviteNew}
-                            disabled={status === 'sending'}
-                            className='px-6 py-2 text-sm font-medium text-white bg-purple-600 rounded-xl hover:bg-purple-700 disabled:opacity-50'
+                            disabled={isSendingEmailInvite}
+                            className='px-6 py-2 text-sm font-medium text-white bg-purple-600 rounded-xl hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed'
                         >
-                            {status === 'sending' ? 'Sending...' : 'Send Invite'}
+                            {isSendingEmailInvite ? 'Sending...' : 'Send Invite'}
                         </button>
                     )}
                 </div>
             </div>
         </div>
-    );
-};
+    )
+}
 
 export default InviteModal

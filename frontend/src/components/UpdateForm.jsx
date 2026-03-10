@@ -1,12 +1,21 @@
-import React, { useState } from 'react'
+import React, { useEffect, useId, useState } from 'react'
 import { X } from 'lucide-react'
 
-const UpdateForm = ({ show, onClose, task, onUpdate, project }) => {
+const UpdateForm = ({ show, onClose, task, onUpdate, project, isSubmitting = false }) => {
     const [title, setTitle] = useState(task?.title || '');
     const [description, setDescription] = useState(task?.description || '');
     const [priority, setPriority] = useState(task?.priority || 'medium');
     const [status, setStatus] = useState(task?.status || 'pending');
     const [assignedTo, setAssignedTo] = useState(task?.assignedTo || '');
+    const formId = useId();
+
+    useEffect(() => {
+        setTitle(task?.title || '');
+        setDescription(task?.description || '');
+        setPriority(task?.priority || 'medium');
+        setStatus(task?.status || 'pending');
+        setAssignedTo(task?.assignedTo || '');
+    }, [task]);
 
     if (!show) return null;
 
@@ -23,6 +32,7 @@ const UpdateForm = ({ show, onClose, task, onUpdate, project }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (isSubmitting) return;
         
         const selectedAssignee = assignees.find(a => a.id === assignedTo);
         const updatedData = { 
@@ -37,13 +47,12 @@ const UpdateForm = ({ show, onClose, task, onUpdate, project }) => {
         };
         
         await onUpdate(task._id, updatedData);
-        onClose();
     }
 
     return (
         <div
             className='fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-50'
-            onClick={onClose}
+            onClick={isSubmitting ? undefined : onClose}
         >
             <div
                 className="flex flex-col w-[90%] max-w-md rounded-2xl shadow-xl overflow-hidden transition-colors bg-white border border-stone-200 dark:bg-slate-800 dark:border dark:border-slate-700"
@@ -54,6 +63,7 @@ const UpdateForm = ({ show, onClose, task, onUpdate, project }) => {
                     <h2 className="text-xl font-semibold text-stone-800 dark:text-gray-100">Edit Task</h2>
                     <button
                         onClick={onClose}
+                        disabled={isSubmitting}
                         className="p-2 rounded-lg transition-colors text-stone-400 hover:text-stone-600 hover:bg-stone-100 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-700"
                     >
                         <X className="w-5 h-5" />
@@ -61,7 +71,11 @@ const UpdateForm = ({ show, onClose, task, onUpdate, project }) => {
                 </div>
 
                 {/* Form Content */}
-                <form className="px-6 py-5 space-y-4 max-h-[65vh] overflow-y-auto bg-white custom-scrollbar dark:bg-slate-900">
+                <form
+                    id={formId}
+                    onSubmit={handleSubmit}
+                    className="px-6 py-5 space-y-4 max-h-[65vh] overflow-y-auto bg-white custom-scrollbar dark:bg-slate-900"
+                >
                     <div>
                         <label className="block text-sm font-medium mb-2 text-stone-700 dark:text-slate-300">
                             Task Title
@@ -72,6 +86,7 @@ const UpdateForm = ({ show, onClose, task, onUpdate, project }) => {
                             placeholder='Enter your task...'
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
+                            disabled={isSubmitting}
                             required
                         />
                     </div>
@@ -85,6 +100,7 @@ const UpdateForm = ({ show, onClose, task, onUpdate, project }) => {
                             placeholder='Add more details...'
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
+                            disabled={isSubmitting}
                             rows={3}
                         />
                     </div>
@@ -97,6 +113,7 @@ const UpdateForm = ({ show, onClose, task, onUpdate, project }) => {
                             className="w-full px-4 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all cursor-pointer bg-stone-50 text-stone-700 border-stone-200 dark:bg-slate-900 dark:text-gray-100 dark:border-slate-600"
                             value={assignedTo}
                             onChange={(e) => setAssignedTo(e.target.value)}
+                            disabled={isSubmitting}
                         >
                             <option value="">Unassigned</option>
                             {assignees.map(a => (
@@ -116,6 +133,7 @@ const UpdateForm = ({ show, onClose, task, onUpdate, project }) => {
                                 className="w-full px-4 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all cursor-pointer bg-stone-50 text-stone-700 border-stone-200 dark:bg-slate-900 dark:text-gray-100 dark:border-slate-600"
                                 value={priority}
                                 onChange={(e) => setPriority(e.target.value)}
+                                disabled={isSubmitting}
                             >
                                 <option value='low'>Low</option>
                                 <option value='medium'>Medium</option>
@@ -131,6 +149,7 @@ const UpdateForm = ({ show, onClose, task, onUpdate, project }) => {
                                 className="w-full px-4 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all cursor-pointer bg-stone-50 text-stone-700 border-stone-200 dark:bg-slate-900 dark:text-gray-100 dark:border-slate-600"
                                 value={status}
                                 onChange={(e) => setStatus(e.target.value)}
+                                disabled={isSubmitting}
                             >
                                 <option value='pending'>Pending</option>
                                 <option value='in progress'>In Progress</option>
@@ -146,16 +165,19 @@ const UpdateForm = ({ show, onClose, task, onUpdate, project }) => {
                     <button
                         type='button'
                         onClick={onClose}
+                        disabled={isSubmitting}
                         className="px-4 py-2 text-sm font-medium border rounded-xl transition-colors text-stone-600 bg-white border-stone-200 hover:bg-stone-50 dark:text-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:hover:bg-slate-700"
                     >
                         Cancel
                     </button>
                     <button
-                        type='button'
-                        onClick={handleSubmit}
-                        className='px-6 py-2 text-sm font-medium text-white bg-purple-600 rounded-xl hover:bg-purple-700 transition-colors shadow-sm'
+                        type='submit'
+                        form={formId}
+                        disabled={isSubmitting}
+                        className='px-6 py-2 text-sm font-medium text-white bg-purple-600 rounded-xl hover:bg-purple-700 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2'
                     >
-                        Update Task
+                        {isSubmitting && <span className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />}
+                        {isSubmitting ? 'Updating...' : 'Update Task'}
                     </button>
                 </div>
             </div>

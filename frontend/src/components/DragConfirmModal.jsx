@@ -1,6 +1,6 @@
 import React from 'react';
 
-const DragConfirmModal = ({ show, taskName, currentStatus, newStatus, onConfirm, onCancel }) => {
+const DragConfirmModal = ({ show, taskName, newStatus, onConfirm, onCancel, isProcessing = false }) => {
     if (!show) return null;
 
     return (
@@ -24,15 +24,18 @@ const DragConfirmModal = ({ show, taskName, currentStatus, newStatus, onConfirm,
                     <div className="flex gap-3 w-full">
                         <button
                             onClick={onCancel}
-                            className="flex-1 px-4 py-2.5 rounded-xl font-medium text-stone-700 bg-stone-100 hover:bg-stone-200 dark:text-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 transition-colors"
+                            disabled={isProcessing}
+                            className="flex-1 px-4 py-2.5 rounded-xl font-medium text-stone-700 bg-stone-100 hover:bg-stone-200 dark:text-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             Cancel
                         </button>
                         <button
                             onClick={onConfirm}
-                            className="flex-1 px-4 py-2.5 rounded-xl font-medium text-white bg-purple-600 hover:bg-purple-700 dark:bg-purple-600 dark:hover:bg-purple-500 transition-colors shadow-sm shadow-purple-200 dark:shadow-none"
+                            disabled={isProcessing}
+                            className="flex-1 px-4 py-2.5 rounded-xl font-medium text-white bg-purple-600 hover:bg-purple-700 dark:bg-purple-600 dark:hover:bg-purple-500 transition-colors shadow-sm shadow-purple-200 dark:shadow-none disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                         >
-                            Yes, Move It
+                            {isProcessing && <span className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />}
+                            {isProcessing ? 'Moving...' : 'Yes, Move It'}
                         </button>
                     </div>
                 </div>

@@ -1,15 +1,12 @@
 import React from 'react'
-import { useTheme } from '../context/useTheme'
 
-const DeleteConfirmation = ({ show, onClose, onConfirm, taskTitle }) => {
-    const { isDark } = useTheme();
-
+const DeleteConfirmation = ({ show, onClose, onConfirm, taskTitle, isProcessing = false }) => {
     if (!show) return null;
 
     return (
         <div
             className='fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-50'
-            onClick={onClose}
+            onClick={isProcessing ? undefined : onClose}
         >
             <div
                 className="flex flex-col w-[90%] max-w-sm rounded-2xl shadow-xl overflow-hidden transition-colors bg-white border border-stone-200 dark:bg-slate-800 dark:border dark:border-slate-700"
@@ -42,19 +39,19 @@ const DeleteConfirmation = ({ show, onClose, onConfirm, taskTitle }) => {
                     <button
                         type='button'
                         onClick={onClose}
+                        disabled={isProcessing}
                         className="px-4 py-2 text-sm font-medium border rounded-xl transition-colors text-stone-600 bg-white border-stone-200 hover:bg-stone-50 dark:text-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:hover:bg-slate-700"
                     >
                         Cancel
                     </button>
                     <button
                         type='button'
-                        onClick={() => {
-                            onConfirm();
-                            onClose();
-                        }}
-                        className='px-5 py-2 text-sm font-medium text-white bg-red-600 rounded-xl hover:bg-red-700 transition-colors shadow-sm'
+                        onClick={onConfirm}
+                        disabled={isProcessing}
+                        className='px-5 py-2 text-sm font-medium text-white bg-red-600 rounded-xl hover:bg-red-700 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2'
                     >
-                        Delete
+                        {isProcessing && <span className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />}
+                        {isProcessing ? 'Deleting...' : 'Delete'}
                     </button>
                 </div>
             </div>

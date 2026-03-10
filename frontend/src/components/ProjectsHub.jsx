@@ -81,22 +81,18 @@ const ProjectCard = ({ project, onClick, onEdit }) => {
     );
 };
 
-const CreateCard = ({ onCreateProject }) => {
+const CreateCard = ({ onCreateProject, isCreatingProject = false }) => {
     const [showForm, setShowForm] = useState(false);
     const [name, setName] = useState('');
     const [color, setColor] = useState('#8B5CF6');
-    const [loading, setLoading] = useState(false);
 
     const handleCreate = async () => {
-        if (!name.trim()) return;
-        setLoading(true);
-        try {
-            await onCreateProject({ name: name.trim(), color });
+        if (!name.trim() || isCreatingProject) return;
+        const created = await onCreateProject({ name: name.trim(), color });
+        if (created) {
             setName('');
             setColor('#8B5CF6');
             setShowForm(false);
-        } finally {
-            setLoading(false);
         }
     };
 
@@ -124,11 +120,11 @@ const CreateCard = ({ onCreateProject }) => {
                     ))}
                 </div>
                 <div className="flex gap-2">
-                    <button onClick={() => { setShowForm(false); setName(''); }} className="flex-1 py-2 text-xs font-semibold rounded-xl bg-stone-100 dark:bg-slate-700 text-stone-600 dark:text-slate-300 hover:bg-stone-200 dark:hover:bg-slate-600 transition-colors">
+                    <button onClick={() => { setShowForm(false); setName(''); }} disabled={isCreatingProject} className="flex-1 py-2 text-xs font-semibold rounded-xl bg-stone-100 dark:bg-slate-700 text-stone-600 dark:text-slate-300 hover:bg-stone-200 dark:hover:bg-slate-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                         Cancel
                     </button>
-                    <button onClick={handleCreate} disabled={!name.trim() || loading} className="flex-1 py-2 text-xs font-semibold rounded-xl bg-purple-600 text-white hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm shadow-purple-600/20">
-                        {loading ? 'Creating...' : 'Create'}
+                    <button onClick={handleCreate} disabled={!name.trim() || isCreatingProject} className="flex-1 py-2 text-xs font-semibold rounded-xl bg-purple-600 text-white hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm shadow-purple-600/20">
+                        {isCreatingProject ? 'Creating...' : 'Create'}
                     </button>
                 </div>
             </div>
@@ -152,7 +148,7 @@ const CreateCard = ({ onCreateProject }) => {
     );
 };
 
-const ProjectsHub = ({ projects, onSelectProject, onCreateProject, onProjectsUpdated, loading }) => {
+const ProjectsHub = ({ projects, onSelectProject, onCreateProject, onProjectsUpdated, loading, isCreatingProject = false }) => {
     const { user } = useUser();
     const [editProject, setEditProject] = useState(null);
 
@@ -228,7 +224,7 @@ const ProjectsHub = ({ projects, onSelectProject, onCreateProject, onProjectsUpd
                                     onEdit={setEditProject}
                                 />
                             ))}
-                            <CreateCard onCreateProject={onCreateProject} />
+                            <CreateCard onCreateProject={onCreateProject} isCreatingProject={isCreatingProject} />
                         </div>
                     )}
 

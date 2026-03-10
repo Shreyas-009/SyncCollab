@@ -1,31 +1,22 @@
 import React, { useState } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { updateCollaboratorRole, removeCollaborator } from '../utils/api';
+import useMutationLocks from '../hooks/useMutationLocks';
 
 const ROLES = ['Team Lead', 'Frontend Developer', 'Backend Developer', 'Tester', 'Designer', 'Member'];
 
-const MemberCard = ({ member, isOwner, isCurrentUser, onUpdateRole, onRemove, projectColor }) => {
-    const [isUpdating, setIsUpdating] = useState(false);
+const MemberCard = ({ member, isOwner, isCurrentUser, onUpdateRole, onRemove, isUpdatingRole, isRemoving }) => {
     const [showRoleMenu, setShowRoleMenu] = useState(false);
+    const isBusy = isUpdatingRole || isRemoving;
 
     const handleRoleUpdate = async (newRole) => {
-        setIsUpdating(true);
         setShowRoleMenu(false);
-        try {
-            await onUpdateRole(member.id, newRole);
-        } finally {
-            setIsUpdating(false);
-        }
+        await onUpdateRole(member.id, newRole);
     };
 
     const handleRemove = async () => {
         if (!window.confirm(`Are you sure you want to remove ${member.name || member.email} from the project?`)) return;
-        setIsUpdating(true);
-        try {
-            await onRemove(member.id);
-        } finally {
-            setIsUpdating(false);
-        }
+        await onRemove(member.id);
     };
 
     return (
@@ -51,11 +42,11 @@ const MemberCard = ({ member, isOwner, isCurrentUser, onUpdateRole, onRemove, pr
                 <p className="text-xs text-stone-400 dark:text-slate-500 truncate">{member.email}</p>
             </div>
 
-            <div className="flex flex-col items-end gap-1.5 shrink-0">
+            <div className="flex items-center sm:flex-col sm:items-end gap-2 shrink-0">
                 <div className="relative">
                     <button
                         onClick={() => isOwner && !isCurrentUser && setShowRoleMenu(!showRoleMenu)}
-                        disabled={isUpdating || !isOwner || isCurrentUser}
+                        disabled={isBusy || !isOwner || isCurrentUser}
                         className={`text-[11px] font-bold px-2.5 py-1 rounded-lg transition-all ${
                             isOwner && !isCurrentUser 
                                 ? 'bg-stone-100 dark:bg-slate-700 hover:bg-stone-200 dark:hover:bg-slate-600 text-stone-600 dark:text-slate-300' 
@@ -65,6 +56,9 @@ const MemberCard = ({ member, isOwner, isCurrentUser, onUpdateRole, onRemove, pr
                         {member.role || 'Member'}
                         {isOwner && !isCurrentUser && <i className="bi bi-chevron-down ml-1.5 text-[8px]" />}
                     </button>
+                    {isUpdatingRole && (
+                        <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full border-2 border-purple-200 dark:border-purple-900/50 border-t-purple-600 dark:border-t-purple-400 animate-spin bg-white dark:bg-slate-800" />
+                    )}
 
                     {showRoleMenu && (
                         <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 border border-stone-200 dark:border-slate-700 shadow-xl rounded-xl z-50 p-1 animate-in fade-in zoom-in duration-200">
@@ -72,6 +66,7 @@ const MemberCard = ({ member, isOwner, isCurrentUser, onUpdateRole, onRemove, pr
                                 <button
                                     key={role}
                                     onClick={() => handleRoleUpdate(role)}
+                                    disabled={isBusy}
                                     className={`w-full text-left px-3 py-2 text-xs font-semibold rounded-lg hover:bg-stone-50 dark:hover:bg-slate-700 transition-colors ${member.role === role ? 'text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/10' : 'text-stone-600 dark:text-slate-300'}`}
                                 >
                                     {role}
@@ -84,10 +79,15 @@ const MemberCard = ({ member, isOwner, isCurrentUser, onUpdateRole, onRemove, pr
                 {isOwner && !isCurrentUser && (
                     <button
                         onClick={handleRemove}
-                        disabled={isUpdating}
-                        className="text-[10px] font-bold text-red-400 hover:text-red-500 uppercase tracking-widest md:opacity-0 opacity-100 group-hover:opacity-100 transition-opacity"
+                        disabled={isBusy}
+                        className="w-8 h-8 flex items-center justify-center rounded-lg bg-red-50 dark:bg-red-900/20 text-red-500 hover:bg-red-500 hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        title="Remove member"
                     >
-                        Remove
+                        {isRemoving ? (
+                            <span className="w-3.5 h-3.5 rounded-full border border-red-300 border-t-red-600 animate-spin" />
+                        ) : (
+                            <i className="bi bi-trash text-xs" />
+                        )}
                     </button>
                 )}
             </div>
@@ -95,7 +95,7 @@ const MemberCard = ({ member, isOwner, isCurrentUser, onUpdateRole, onRemove, pr
     );
 };
 
-const OwnerCard = ({ project, user, isCurrentUser }) => (
+const OwnerCard = ({ project, isCurrentUser }) => (
     <div className="bg-gradient-to-br from-purple-600/5 to-indigo-600/5 dark:from-purple-900/10 dark:to-indigo-900/10 border border-purple-100 dark:border-purple-900/20 rounded-2xl p-5 flex items-center gap-4 mb-6 shadow-sm">
         <div className="relative shrink-0">
             {project.ownerImage ? (
@@ -123,21 +123,33 @@ const OwnerCard = ({ project, user, isCurrentUser }) => (
 const MembersPage = ({ selectedProject, onProjectUpdated, onShowInvite }) => {
     const { user } = useUser();
     const isOwner = selectedProject.ownerId === user?.id;
+    const { runLocked, isLocked } = useMutationLocks();
+
+    const getRoleUpdateKey = (collaboratorId) => `member:update-role:${selectedProject._id}:${collaboratorId}`;
+    const getRemoveMemberKey = (collaboratorId) => `member:remove:${selectedProject._id}:${collaboratorId}`;
 
     const handleUpdateRole = async (collaboratorId, role) => {
+        const actionKey = getRoleUpdateKey(collaboratorId);
         try {
-            await updateCollaboratorRole(selectedProject._id, collaboratorId, role);
-            onProjectUpdated();
-        } catch (error) {
+            const { executed } = await runLocked(actionKey, async () => {
+                const updatedProject = await updateCollaboratorRole(selectedProject._id, collaboratorId, role);
+                if (onProjectUpdated) await onProjectUpdated(updatedProject);
+            });
+            if (!executed) return;
+        } catch {
             alert('Failed to update role');
         }
     };
 
     const handleRemoveMember = async (collaboratorId) => {
+        const actionKey = getRemoveMemberKey(collaboratorId);
         try {
-            await removeCollaborator(selectedProject._id, collaboratorId);
-            onProjectUpdated();
-        } catch (error) {
+            const { executed } = await runLocked(actionKey, async () => {
+                const updatedProject = await removeCollaborator(selectedProject._id, collaboratorId);
+                if (onProjectUpdated) await onProjectUpdated(updatedProject);
+            });
+            if (!executed) return;
+        } catch {
             alert('Failed to remove member');
         }
     };
@@ -166,7 +178,7 @@ const MembersPage = ({ selectedProject, onProjectUpdated, onShowInvite }) => {
                 <div className="max-w-4xl mx-auto">
                     {/* Owner Section */}
                     <h3 className="text-[11px] font-bold uppercase tracking-[0.2em] text-stone-400 dark:text-slate-600 mb-4 px-1">Organization</h3>
-                    <OwnerCard project={selectedProject} user={user} isCurrentUser={isOwner} />
+                    <OwnerCard project={selectedProject} isCurrentUser={isOwner} />
 
                     {/* Collaborators Section */}
                     <div className="flex items-center justify-between mb-4 px-1">
@@ -190,7 +202,8 @@ const MembersPage = ({ selectedProject, onProjectUpdated, onShowInvite }) => {
                                     isCurrentUser={member.id === user?.id}
                                     onUpdateRole={handleUpdateRole}
                                     onRemove={handleRemoveMember}
-                                    projectColor={selectedProject.color}
+                                    isUpdatingRole={isLocked(getRoleUpdateKey(member.id))}
+                                    isRemoving={isLocked(getRemoveMemberKey(member.id))}
                                 />
                             ))
                         ) : (

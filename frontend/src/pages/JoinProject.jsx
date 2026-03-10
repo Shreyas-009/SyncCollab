@@ -1,21 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useUser, useAuth, SignedIn, SignedOut, RedirectToSignIn } from '@clerk/clerk-react';
-import { useTheme } from '../context/useTheme';
 import { getInviteLinkInfo, acceptInviteLink, setAuthFunctions } from '../utils/api';
+import useMutationLocks from '../hooks/useMutationLocks';
 
 const JoinProjectContent = () => {
     const { token } = useParams();
     const navigate = useNavigate();
     const { user } = useUser();
     const { getToken } = useAuth();
-    const { isDark } = useTheme();
+    const { runLocked, isLocked } = useMutationLocks();
 
     const [loading, setLoading] = useState(true);
-    const [joining, setJoining] = useState(false);
     const [error, setError] = useState('');
     const [projectInfo, setProjectInfo] = useState(null);
     const [success, setSuccess] = useState(false);
+
+    const joinKey = `invite:link:accept:${token || 'none'}`;
+    const joining = isLocked(joinKey);
 
     // Set up auth functions for API calls
     useEffect(() => {
@@ -43,21 +45,21 @@ const JoinProjectContent = () => {
     }, [token]);
 
     const handleJoin = async () => {
-        setJoining(true);
         setError('');
 
         try {
-            await acceptInviteLink(token, {
-                userEmail: user?.emailAddresses?.[0]?.emailAddress || '',
-                userName: `${user?.firstName || ''} ${user?.lastName || ''}`.trim(),
-                userImage: user?.imageUrl || ''
+            const { executed } = await runLocked(joinKey, async () => {
+                await acceptInviteLink(token, {
+                    userEmail: user?.emailAddresses?.[0]?.emailAddress || '',
+                    userName: `${user?.firstName || ''} ${user?.lastName || ''}`.trim(),
+                    userImage: user?.imageUrl || ''
+                });
+                setSuccess(true);
+                setTimeout(() => navigate('/'), 2000);
             });
-            setSuccess(true);
-            setTimeout(() => navigate('/'), 2000);
+            if (!executed) return;
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to join project');
-        } finally {
-            setJoining(false);
         }
     };
 

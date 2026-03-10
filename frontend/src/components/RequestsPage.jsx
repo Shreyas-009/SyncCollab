@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import { useUser } from '@clerk/clerk-react'
-import { useTheme } from '../context/useTheme'
 import { getPendingInvites, acceptInvite, declineInvite } from '../utils/api'
+import useMutationLocks from '../hooks/useMutationLocks'
 
 const RequestsPage = ({ onClose, onInviteAccepted }) => {
     const [invites, setInvites] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [processingId, setProcessingId] = useState(null);
-    const { isDark } = useTheme();
     const { user } = useUser();
+    const { runLocked, isLocked } = useMutationLocks();
 
     useEffect(() => {
         loadInvites();
@@ -26,31 +25,33 @@ const RequestsPage = ({ onClose, onInviteAccepted }) => {
     };
 
     const handleAccept = async (inviteId) => {
-        setProcessingId(inviteId);
+        const actionKey = `invite:accept:${inviteId}`;
         try {
-            await acceptInvite(inviteId, {
-                userEmail: user?.emailAddresses?.[0]?.emailAddress || '',
-                userName: `${user?.firstName || ''} ${user?.lastName || ''}`.trim(),
-                userImage: user?.imageUrl || ''
+            const { executed } = await runLocked(actionKey, async () => {
+                await acceptInvite(inviteId, {
+                    userEmail: user?.emailAddresses?.[0]?.emailAddress || '',
+                    userName: `${user?.firstName || ''} ${user?.lastName || ''}`.trim(),
+                    userImage: user?.imageUrl || ''
+                });
+                await loadInvites();
+                if (onInviteAccepted) onInviteAccepted();
             });
-            await loadInvites();
-            if (onInviteAccepted) onInviteAccepted();
+            if (!executed) return;
         } catch (error) {
             console.error('Error accepting invite:', error);
-        } finally {
-            setProcessingId(null);
         }
     };
 
     const handleDecline = async (inviteId) => {
-        setProcessingId(inviteId);
+        const actionKey = `invite:decline:${inviteId}`;
         try {
-            await declineInvite(inviteId);
-            await loadInvites();
+            const { executed } = await runLocked(actionKey, async () => {
+                await declineInvite(inviteId);
+                await loadInvites();
+            });
+            if (!executed) return;
         } catch (error) {
             console.error('Error declining invite:', error);
-        } finally {
-            setProcessingId(null);
         }
     };
 
@@ -88,7 +89,12 @@ const RequestsPage = ({ onClose, onInviteAccepted }) => {
                     </div>
                 ) : (
                     <div className="space-y-3">
-                        {invites.map(invite => (
+                        {invites.map(invite => {
+                            const isAccepting = isLocked(`invite:accept:${invite._id}`);
+                            const isDeclining = isLocked(`invite:decline:${invite._id}`);
+                            const isProcessing = isAccepting || isDeclining;
+
+                            return (
                             <div
                                 key={invite._id}
                                 className="p-4 rounded-xl border bg-stone-50 border-stone-200 dark:bg-slate-800 dark:border-slate-700"
@@ -126,21 +132,22 @@ const RequestsPage = ({ onClose, onInviteAccepted }) => {
                                 <div className="flex gap-2">
                                     <button
                                         onClick={() => handleDecline(invite._id)}
-                                        disabled={processingId === invite._id}
+                                        disabled={isProcessing}
                                         className="flex-1 py-2 text-sm font-medium rounded-lg transition-colors disabled:opacity-50 bg-stone-100 text-stone-600 hover:bg-stone-200 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600"
                                     >
-                                        Decline
+                                        {isDeclining ? 'Declining...' : 'Decline'}
                                     </button>
                                     <button
                                         onClick={() => handleAccept(invite._id)}
-                                        disabled={processingId === invite._id}
+                                        disabled={isProcessing}
                                         className='flex-1 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 disabled:opacity-50'
                                     >
-                                        {processingId === invite._id ? '...' : 'Accept'}
+                                        {isAccepting ? 'Accepting...' : 'Accept'}
                                     </button>
                                 </div>
                             </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 )}
             </div>

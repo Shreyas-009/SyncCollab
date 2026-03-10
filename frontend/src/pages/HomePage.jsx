@@ -18,6 +18,7 @@ import NexusPage from '../components/NexusPage'
 import MembersPage from '../components/MembersPage'
 import InviteModal from '../components/InviteModal'
 import ProjectSettingsModal from '../components/ProjectSettingsModal'
+import useMutationLocks from '../hooks/useMutationLocks'
 
 import Todo from '../assets/todo.png'
 import doing from '../assets/doing.png'
@@ -58,9 +59,15 @@ const HomePage = () => {
     const [selectedTaskForView, setSelectedTaskForView] = useState(null)
     const [pendingDragAction, setPendingDragAction] = useState(null)
 
-    const { isDark } = _useTheme()
     const { user } = useUser()
     const { getToken } = useAuth()
+    const { runLocked, isLocked } = useMutationLocks()
+
+    const taskCreateKey = 'task:create'
+    const projectCreateKey = 'project:create'
+    const taskDeleteKey = (taskId) => `task:delete:${taskId}`
+    const taskUpdateKey = (taskId) => `task:update:${taskId}`
+    const taskMoveKey = (taskId) => `task:move:${taskId}`
 
     useEffect(() => {
         setAuthFunctions(
@@ -74,10 +81,12 @@ const HomePage = () => {
             const data = await fetchProjects()
             setProjects(data || [])
             setLoading(false)
+            return data || []
         } catch (err) {
             console.error('Error loading projects:', err)
             setProjects([])
             setLoading(false)
+            return []
         }
     }, [])
 
@@ -120,51 +129,65 @@ const HomePage = () => {
 
     const handleCreateProject = async (projectData) => {
         try {
-            const newProject = await createProject({
-                ...projectData,
-                ownerEmail: user?.emailAddresses?.[0]?.emailAddress || '',
-                ownerName: `${user?.firstName || ''} ${user?.lastName || ''}`.trim(),
-                ownerImage: user?.imageUrl || ''
+            const { executed, value: newProject } = await runLocked(projectCreateKey, async () => {
+                const createdProject = await createProject({
+                    ...projectData,
+                    ownerEmail: user?.emailAddresses?.[0]?.emailAddress || '',
+                    ownerName: `${user?.firstName || ''} ${user?.lastName || ''}`.trim(),
+                    ownerImage: user?.imageUrl || ''
+                })
+                await loadProjects()
+                setSelectedProject(createdProject)
+                setCurrentPage('board')
+                return createdProject
             })
-            await loadProjects()
-            setSelectedProject(newProject)
-            setCurrentPage('board')
+
+            return executed && !!newProject
         } catch (err) {
             console.error('Error creating project:', err)
             alert('Error creating project')
+            return false
         }
     }
 
     const handleAddTask = async (newTask) => {
         if (!selectedProject) {
             alert('Please select or create a project first')
-            return
+            return false
         }
         try {
-            const result = await addTask({
-                ...newTask,
-                projectId: selectedProject._id,
-                createdByName: `${user?.firstName || ''} ${user?.lastName || ''}`.trim(),
-                createdByImage: user?.imageUrl || ''
+            const { executed } = await runLocked(taskCreateKey, async () => {
+                const result = await addTask({
+                    ...newTask,
+                    projectId: selectedProject._id,
+                    createdByName: `${user?.firstName || ''} ${user?.lastName || ''}`.trim(),
+                    createdByImage: user?.imageUrl || ''
+                })
+                if (result) {
+                    await loadTasks()
+                    setShowForm(false)
+                }
             })
-            if (result) {
-                await loadTasks()
-                setShowForm(false)
-            }
+            return executed
         } catch (err) {
             const msg = err.response?.data?.message || 'Error adding task.'
             alert(msg)
+            return false
         }
     }
 
     const handleDeleteTask = async (taskId) => {
         try {
-            await deleteTask(taskId)
-            await loadTasks()
-            setSelectedTaskForDelete(null)
+            const { executed } = await runLocked(taskDeleteKey(taskId), async () => {
+                await deleteTask(taskId)
+                await loadTasks()
+                setSelectedTaskForDelete(null)
+            })
+            return executed
         } catch (err) {
             const msg = err.response?.data?.message || 'Error deleting task.'
             alert(msg)
+            return false
         }
     }
 
@@ -179,17 +202,21 @@ const HomePage = () => {
 
     const handleUpdateTask = async (taskId, updatedData) => {
         try {
-            await updateTask(taskId, {
-                ...updatedData,
-                updatedBy: user?.id,
-                updatedByName: `${user?.firstName || ''} ${user?.lastName || ''}`.trim(),
-                updatedByImage: user?.imageUrl || ''
+            const { executed } = await runLocked(taskUpdateKey(taskId), async () => {
+                await updateTask(taskId, {
+                    ...updatedData,
+                    updatedBy: user?.id,
+                    updatedByName: `${user?.firstName || ''} ${user?.lastName || ''}`.trim(),
+                    updatedByImage: user?.imageUrl || ''
+                })
+                await loadTasks()
+                setSelectedTaskForEdit(null)
             })
-            await loadTasks()
-            setSelectedTaskForEdit(null)
+            return executed
         } catch (err) {
             const msg = err.response?.data?.message || 'Error updating task.'
             alert(msg)
+            return false
         }
     }
 
@@ -205,6 +232,7 @@ const HomePage = () => {
         if (source.droppableId === destination.droppableId && source.index === destination.index) return
         const task = tasks.find(t => t._id === draggableId)
         if (!task) return
+        if (isTaskBusy(task._id)) return
         if (source.droppableId !== destination.droppableId) {
             setPendingDragAction({ task, source, destination, newStatus: destination.droppableId })
         }
@@ -213,23 +241,35 @@ const HomePage = () => {
     const confirmDrag = async () => {
         if (!pendingDragAction) return
         const { task, newStatus } = pendingDragAction
-        setTasks(tasks.map(t => t._id === task._id ? { ...t, status: newStatus } : t))
-        setPendingDragAction(null)
         try {
-            await updateTask(task._id, {
-                status: newStatus,
-                updatedBy: user?.id,
-                updatedByName: `${user?.firstName || ''} ${user?.lastName || ''}`.trim(),
-                updatedByImage: user?.imageUrl || ''
+            const { executed } = await runLocked(taskMoveKey(task._id), async () => {
+                setTasks((currentTasks) => currentTasks.map((t) => (
+                    t._id === task._id ? { ...t, status: newStatus } : t
+                )))
+                await updateTask(task._id, {
+                    status: newStatus,
+                    updatedBy: user?.id,
+                    updatedByName: `${user?.firstName || ''} ${user?.lastName || ''}`.trim(),
+                    updatedByImage: user?.imageUrl || ''
+                })
+                await loadTasks()
             })
-            await loadTasks()
-        } catch (err) {
+            if (!executed) return
+            setPendingDragAction(null)
+        } catch {
             alert('Error moving task')
             await loadTasks()
+            setPendingDragAction(null)
         }
     }
 
     const cancelDrag = () => setPendingDragAction(null)
+
+    const isTaskBusy = useCallback((taskId) => (
+        isLocked(taskDeleteKey(taskId)) ||
+        isLocked(taskUpdateKey(taskId)) ||
+        isLocked(taskMoveKey(taskId))
+    ), [isLocked])
 
     // Derived states
     const pendingTasks = tasks.filter(t => t.status === 'pending')
@@ -329,6 +369,7 @@ const HomePage = () => {
                                 onCreateProject={handleCreateProject}
                                 onProjectsUpdated={loadProjects}
                                 loading={loading}
+                                isCreatingProject={isLocked(projectCreateKey)}
                             />
                         </PageTransition>
                     ) : showBoard ? (
@@ -336,10 +377,10 @@ const HomePage = () => {
                             <DragDropContext onDragEnd={handleDragEnd}>
                                 <main className="flex-1 flex py-6 px-[2%] gap-5 overflow-x-auto custom-scrollbar bg-stone-50/10 dark:bg-slate-950/10">
                                     <div className="flex gap-5 h-full pb-4">
-                                        <TaskColumn title='Pending' statusId='pending' img={Todo} tasks={pendingTasks} onDelete={setSelectedTaskForDelete} onEdit={setSelectedTaskForEdit} onView={setSelectedTaskForView} projectAssignees={projectAssignees} />
-                                        <TaskColumn title='In Progress' statusId='in progress' img={doing} tasks={inProgressTasks} onDelete={setSelectedTaskForDelete} onEdit={setSelectedTaskForEdit} onView={setSelectedTaskForView} projectAssignees={projectAssignees} />
-                                        <TaskColumn title='Testing' statusId='testing' img={null} tasks={testingTasks} onDelete={setSelectedTaskForDelete} onEdit={setSelectedTaskForEdit} onView={setSelectedTaskForView} projectAssignees={projectAssignees} />
-                                        <TaskColumn title='Completed' statusId='completed' img={completed} tasks={completedTasks} onDelete={setSelectedTaskForDelete} onEdit={setSelectedTaskForEdit} onView={setSelectedTaskForView} projectAssignees={projectAssignees} />
+                                        <TaskColumn title='Pending' statusId='pending' img={Todo} tasks={pendingTasks} onDelete={setSelectedTaskForDelete} onEdit={setSelectedTaskForEdit} onView={setSelectedTaskForView} projectAssignees={projectAssignees} isTaskBusy={isTaskBusy} />
+                                        <TaskColumn title='In Progress' statusId='in progress' img={doing} tasks={inProgressTasks} onDelete={setSelectedTaskForDelete} onEdit={setSelectedTaskForEdit} onView={setSelectedTaskForView} projectAssignees={projectAssignees} isTaskBusy={isTaskBusy} />
+                                        <TaskColumn title='Testing' statusId='testing' img={null} tasks={testingTasks} onDelete={setSelectedTaskForDelete} onEdit={setSelectedTaskForEdit} onView={setSelectedTaskForView} projectAssignees={projectAssignees} isTaskBusy={isTaskBusy} />
+                                        <TaskColumn title='Completed' statusId='completed' img={completed} tasks={completedTasks} onDelete={setSelectedTaskForDelete} onEdit={setSelectedTaskForEdit} onView={setSelectedTaskForView} projectAssignees={projectAssignees} isTaskBusy={isTaskBusy} />
                                     </div>
                                 </main>
                             </DragDropContext>
@@ -356,7 +397,21 @@ const HomePage = () => {
                         <PageTransition pageKey={`members-${selectedProject._id}`}>
                             <MembersPage 
                                 selectedProject={selectedProject} 
-                                onProjectUpdated={async () => { await loadProjects(); const updated = projects.find(p => p._id === selectedProject._id); if(updated) setSelectedProject(updated); }} 
+                                onProjectUpdated={async (updatedProject) => {
+                                    if (updatedProject?._id) {
+                                        setProjects((currentProjects) => currentProjects.map((project) => (
+                                            project._id === updatedProject._id ? updatedProject : project
+                                        )))
+                                        setSelectedProject(updatedProject)
+                                        return
+                                    }
+
+                                    const refreshedProjects = await loadProjects()
+                                    const refreshedProject = refreshedProjects.find((project) => project._id === selectedProject._id)
+                                    if (refreshedProject) {
+                                        setSelectedProject(refreshedProject)
+                                    }
+                                }} 
                                 onShowInvite={() => setShowInviteModal(true)}
                             />
                         </PageTransition>
@@ -370,6 +425,7 @@ const HomePage = () => {
                 onClose={() => setShowForm(false)}
                 onAddTask={handleAddTask}
                 project={selectedProject}
+                isSubmitting={isLocked(taskCreateKey)}
             />
 
             {selectedTaskForDelete && (
@@ -378,6 +434,7 @@ const HomePage = () => {
                     onClose={() => setSelectedTaskForDelete(null)}
                     onConfirm={() => handleDeleteTask(selectedTaskForDelete._id)}
                     taskTitle={selectedTaskForDelete.title}
+                    isProcessing={isLocked(taskDeleteKey(selectedTaskForDelete._id))}
                 />
             )}
 
@@ -388,6 +445,7 @@ const HomePage = () => {
                     task={selectedTaskForEdit}
                     onUpdate={handleUpdateTask}
                     project={selectedProject}
+                    isSubmitting={isLocked(taskUpdateKey(selectedTaskForEdit._id))}
                 />
             )}
 
@@ -400,10 +458,10 @@ const HomePage = () => {
             <DragConfirmModal
                 show={!!pendingDragAction}
                 taskName={pendingDragAction?.task?.title}
-                currentStatus={pendingDragAction?.task?.status}
                 newStatus={pendingDragAction?.newStatus}
                 onConfirm={confirmDrag}
                 onCancel={cancelDrag}
+                isProcessing={pendingDragAction ? isLocked(taskMoveKey(pendingDragAction.task._id)) : false}
             />
 
             {showInviteModal && selectedProject && (

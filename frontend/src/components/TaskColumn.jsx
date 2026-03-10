@@ -3,7 +3,7 @@ import TaskCard from './TaskCard';
 import { Droppable } from '@hello-pangea/dnd';
 import { Grid, Check, User, Filter, Inbox } from 'lucide-react';
 
-const TaskColumn = ({ title, statusId, img, icon, tasks, onDelete, onEdit, onView, projectAssignees }) => {
+const TaskColumn = ({ title, statusId, img, icon, tasks, onDelete, onEdit, onView, projectAssignees, isTaskBusy = () => false }) => {
     const [priorityFilter, setPriorityFilter] = useState('all');
     const [assigneeFilter, setAssigneeFilter] = useState('all');
     const [showPriorityFilter, setShowPriorityFilter] = useState(false);
@@ -160,6 +160,7 @@ const TaskColumn = ({ title, statusId, img, icon, tasks, onDelete, onEdit, onVie
                                         onDelete={onDelete} 
                                         onEdit={onEdit} 
                                         onView={onView} 
+                                        isBusy={isTaskBusy(task._id)}
                                     />
                                 ))
                             ) : (

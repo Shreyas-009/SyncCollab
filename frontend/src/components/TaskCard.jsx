@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Priority from './Priority';
 import { Draggable } from '@hello-pangea/dnd';
 import { Edit2, Trash2 } from 'lucide-react';
 
-const TaskCard = ({ task, index, onDelete, onEdit, onView }) => {
+const TaskCard = ({ task, index, onDelete, onEdit, onView, isBusy = false }) => {
   const priority = task.priority;
   const hasDescription = task.description && task.description.trim() !== '';
 
   return (
-    <Draggable draggableId={task._id} index={index}>
+    <Draggable draggableId={task._id} index={index} isDragDisabled={isBusy}>
       {(provided, snapshot) => (
         <article
           ref={provided.innerRef}
@@ -31,14 +31,16 @@ const TaskCard = ({ task, index, onDelete, onEdit, onView }) => {
             <div className={`flex gap-1 shrink-0 transition-opacity duration-200 ${snapshot.isDragging ? 'opacity-0' : 'md:opacity-0 group-hover:opacity-100 opacity-100'}`}>
               <button
                 onClick={(e) => { e.stopPropagation(); onEdit(task); }}
-                className="w-7 h-7 flex items-center justify-center rounded-lg text-stone-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/40 dark:hover:text-blue-400 transition-colors"
+                disabled={isBusy}
+                className="w-7 h-7 flex items-center justify-center rounded-lg text-stone-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/40 dark:hover:text-blue-400 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                 title="Edit Task"
               >
                 <Edit2 className="w-3.5 h-3.5" />
               </button>
               <button
                 onClick={(e) => { e.stopPropagation(); onDelete(task); }}
-                className="w-7 h-7 flex items-center justify-center rounded-lg text-stone-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/40 dark:hover:text-red-400 transition-colors"
+                disabled={isBusy}
+                className="w-7 h-7 flex items-center justify-center rounded-lg text-stone-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/40 dark:hover:text-red-400 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                 title="Delete Task"
               >
                 <Trash2 className="w-3.5 h-3.5" />
@@ -63,12 +65,16 @@ const TaskCard = ({ task, index, onDelete, onEdit, onView }) => {
             {/* View More Button */}
             <button
                 onClick={(e) => { e.stopPropagation(); onView(task); }}
-                className="text-xs font-semibold px-2.5 py-1.5 rounded-lg bg-stone-100 text-stone-600 hover:bg-purple-100 hover:text-purple-700 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-purple-900/50 dark:hover:text-purple-300 transition-colors"
+                disabled={isBusy}
+                className="text-xs font-semibold px-2.5 py-1.5 rounded-lg bg-stone-100 text-stone-600 hover:bg-purple-100 hover:text-purple-700 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-purple-900/50 dark:hover:text-purple-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
                 View details
             </button>
             
             <div className="flex items-center gap-2">
+                {isBusy && (
+                    <span className="w-4 h-4 rounded-full border-2 border-purple-200 border-t-purple-600 animate-spin" />
+                )}
                 {/* Assignee Avatar */}
                 {task.assignedTo && (
                     <div className="flex -space-x-1 overflow-hidden" title={`Assigned to ${task.assignedToName || 'Unknown'}`}>
