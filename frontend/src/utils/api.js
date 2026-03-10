@@ -225,9 +225,9 @@ export const getPendingInvites = async () => {
     }
 };
 
-export const acceptInvite = async (inviteId, userData) => {
+export const acceptInvite = async (inviteId) => {
     try {
-        const response = await apiClient.post(`/invites/${inviteId}/accept`, userData);
+        const response = await apiClient.post(`/invites/${inviteId}/accept`);
         return response.data;
     } catch (error) {
         console.error('Error accepting invite:', error);
@@ -247,9 +247,9 @@ export const declineInvite = async (inviteId) => {
 
 // ============ INVITE LINK API ============
 
-export const createInviteLink = async (projectId, createdByName) => {
+export const createInviteLink = async (projectId) => {
     try {
-        const response = await apiClient.post('/invites/link', { projectId, createdByName });
+        const response = await apiClient.post('/invites/link', { projectId });
         return response.data;
     } catch (error) {
         console.error('Error creating invite link:', error);
@@ -267,9 +267,9 @@ export const getInviteLinkInfo = async (token) => {
     }
 };
 
-export const acceptInviteLink = async (token, userData) => {
+export const acceptInviteLink = async (token) => {
     try {
-        const response = await apiClient.post(`/invites/link/${token}/accept`, userData);
+        const response = await apiClient.post(`/invites/link/${token}/accept`);
         return response.data;
     } catch (error) {
         console.error('Error accepting invite link:', error);

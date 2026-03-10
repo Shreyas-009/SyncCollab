@@ -32,10 +32,7 @@ const TaskForm = ({ show, onClose, onAddTask, project, isSubmitting = false }) =
             description, 
             priority, 
             status,
-            assignedTo: selectedAssignee?.id || '',
-            assignedToName: selectedAssignee?.name || '',
-            assignedToImage: selectedAssignee?.image || '',
-            assignedToRole: selectedAssignee?.role || ''
+            assignedTo: selectedAssignee?.id || ''
         };
         
         const created = await onAddTask(newTask);

@@ -49,11 +49,7 @@ const JoinProjectContent = () => {
 
         try {
             const { executed } = await runLocked(joinKey, async () => {
-                await acceptInviteLink(token, {
-                    userEmail: user?.emailAddresses?.[0]?.emailAddress || '',
-                    userName: `${user?.firstName || ''} ${user?.lastName || ''}`.trim(),
-                    userImage: user?.imageUrl || ''
-                });
+                await acceptInviteLink(token);
                 setSuccess(true);
                 setTimeout(() => navigate('/'), 2000);
             });

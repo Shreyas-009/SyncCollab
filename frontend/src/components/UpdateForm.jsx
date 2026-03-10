@@ -40,10 +40,7 @@ const UpdateForm = ({ show, onClose, task, onUpdate, project, isSubmitting = fal
             description, 
             priority, 
             status,
-            assignedTo: selectedAssignee ? selectedAssignee.id : '',
-            assignedToName: selectedAssignee ? selectedAssignee.name : '',
-            assignedToImage: selectedAssignee ? selectedAssignee.image : '',
-            assignedToRole: selectedAssignee ? selectedAssignee.role : ''
+            assignedTo: selectedAssignee ? selectedAssignee.id : ''
         };
         
         await onUpdate(task._id, updatedData);

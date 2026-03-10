@@ -130,12 +130,7 @@ const HomePage = () => {
     const handleCreateProject = async (projectData) => {
         try {
             const { executed, value: newProject } = await runLocked(projectCreateKey, async () => {
-                const createdProject = await createProject({
-                    ...projectData,
-                    ownerEmail: user?.emailAddresses?.[0]?.emailAddress || '',
-                    ownerName: `${user?.firstName || ''} ${user?.lastName || ''}`.trim(),
-                    ownerImage: user?.imageUrl || ''
-                })
+                const createdProject = await createProject(projectData)
                 await loadProjects()
                 setSelectedProject(createdProject)
                 setCurrentPage('board')
@@ -159,9 +154,7 @@ const HomePage = () => {
             const { executed } = await runLocked(taskCreateKey, async () => {
                 const result = await addTask({
                     ...newTask,
-                    projectId: selectedProject._id,
-                    createdByName: `${user?.firstName || ''} ${user?.lastName || ''}`.trim(),
-                    createdByImage: user?.imageUrl || ''
+                    projectId: selectedProject._id
                 })
                 if (result) {
                     await loadTasks()
@@ -203,12 +196,7 @@ const HomePage = () => {
     const handleUpdateTask = async (taskId, updatedData) => {
         try {
             const { executed } = await runLocked(taskUpdateKey(taskId), async () => {
-                await updateTask(taskId, {
-                    ...updatedData,
-                    updatedBy: user?.id,
-                    updatedByName: `${user?.firstName || ''} ${user?.lastName || ''}`.trim(),
-                    updatedByImage: user?.imageUrl || ''
-                })
+                await updateTask(taskId, updatedData)
                 await loadTasks()
                 setSelectedTaskForEdit(null)
             })
@@ -246,12 +234,7 @@ const HomePage = () => {
                 setTasks((currentTasks) => currentTasks.map((t) => (
                     t._id === task._id ? { ...t, status: newStatus } : t
                 )))
-                await updateTask(task._id, {
-                    status: newStatus,
-                    updatedBy: user?.id,
-                    updatedByName: `${user?.firstName || ''} ${user?.lastName || ''}`.trim(),
-                    updatedByImage: user?.imageUrl || ''
-                })
+                await updateTask(task._id, { status: newStatus })
                 await loadTasks()
             })
             if (!executed) return

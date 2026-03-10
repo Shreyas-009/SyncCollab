@@ -1,11 +1,73 @@
 import Project from '../model/project-model.js';
 import Todo from '../model/todo-model.js';
 import ActivityLog from '../model/activity-log-model.js';
+import { createUserProfileResolver } from '../utils/user-profile-resolver.js';
+
+const hydrateProjectsWithProfiles = async (projects) => {
+    if (!projects || projects.length === 0) return [];
+
+    const { resolveProfiles, addFallback } = createUserProfileResolver();
+    const userIds = [];
+    const fallbacksById = {};
+
+    projects.forEach((projectDoc) => {
+        const project = projectDoc.toObject();
+        if (project.ownerId) {
+            userIds.push(project.ownerId);
+            addFallback(fallbacksById, project.ownerId, {
+                name: project.ownerName,
+                image: project.ownerImage,
+                email: project.ownerEmail
+            });
+        }
+
+        (project.collaborators || []).forEach((collaborator) => {
+            if (!collaborator.id) return;
+            userIds.push(collaborator.id);
+            addFallback(fallbacksById, collaborator.id, {
+                name: collaborator.name,
+                image: collaborator.image,
+                email: collaborator.email
+            });
+        });
+    });
+
+    const profiles = await resolveProfiles(userIds, fallbacksById);
+
+    return projects.map((projectDoc) => {
+        const project = projectDoc.toObject();
+        const ownerProfile = profiles[project.ownerId];
+
+        return {
+            ...project,
+            ownerName: ownerProfile?.name || project.ownerName || 'Unknown User',
+            ownerImage: ownerProfile?.image || project.ownerImage || '',
+            ownerEmail: ownerProfile?.email || project.ownerEmail || '',
+            owner: ownerProfile || null,
+            collaborators: (project.collaborators || []).map((collaborator) => {
+                const profile = profiles[collaborator.id];
+                return {
+                    ...collaborator,
+                    name: profile?.name || collaborator.name || collaborator.email || 'Unknown User',
+                    image: profile?.image || collaborator.image || '',
+                    email: profile?.email || collaborator.email || '',
+                    user: profile || null
+                };
+            })
+        };
+    });
+};
+
+const hydrateProjectWithProfiles = async (project) => {
+    if (!project) return null;
+    const [hydratedProject] = await hydrateProjectsWithProfiles([project]);
+    return hydratedProject;
+};
 
 // Create new project
 export const createProject = async (req, res) => {
     try {
-        const { name, description, color, ownerEmail, ownerName, ownerImage } = req.body;
+        const { name, description, color } = req.body;
         const ownerId = req.userId;
 
         if (!name) {
@@ -16,9 +78,6 @@ export const createProject = async (req, res) => {
             name,
             description: description || '',
             ownerId,
-            ownerEmail: ownerEmail || '',
-            ownerName: ownerName || '',
-            ownerImage: ownerImage || '',
             color: color || '#8B5CF6',
             collaborators: []
         });
@@ -27,15 +86,16 @@ export const createProject = async (req, res) => {
         await ActivityLog.create({
             projectId: project._id,
             userId: ownerId,
-            userName: ownerName || 'Unknown User',
             action: 'PROJECT_CREATED',
             taskSnapshot: `Project "${name}" created.`
         });
 
+        const hydratedProject = await hydrateProjectWithProfiles(project);
+
         return res.status(201).json({
             success: true,
             message: 'Project created successfully',
-            data: project
+            data: hydratedProject
         });
     } catch (error) {
         console.error('Create project error:', error);
@@ -55,9 +115,11 @@ export const getProjects = async (req, res) => {
             ]
         }).sort({ createdAt: -1 });
 
+        const hydratedProjects = await hydrateProjectsWithProfiles(projects);
+
         return res.status(200).json({
             success: true,
-            data: projects
+            data: hydratedProjects
         });
     } catch (error) {
         console.error('Get projects error:', error);
@@ -83,9 +145,11 @@ export const getProject = async (req, res) => {
             return res.status(404).json({ message: 'Project not found' });
         }
 
+        const hydratedProject = await hydrateProjectWithProfiles(project);
+
         return res.status(200).json({
             success: true,
-            data: project
+            data: hydratedProject
         });
     } catch (error) {
         console.error('Get project error:', error);
@@ -111,10 +175,12 @@ export const updateProject = async (req, res) => {
             return res.status(404).json({ message: 'Project not found or you are not the owner' });
         }
 
+        const hydratedProject = await hydrateProjectWithProfiles(project);
+
         return res.status(200).json({
             success: true,
             message: 'Project updated successfully',
-            data: project
+            data: hydratedProject
         });
     } catch (error) {
         console.error('Update project error:', error);
@@ -152,7 +218,7 @@ export const deleteProject = async (req, res) => {
 export const addCollaborator = async (req, res) => {
     try {
         const { projectId } = req.params;
-        const { collaboratorId, email, name, image } = req.body;
+        const { collaboratorId } = req.body;
         const userId = req.userId;
 
         if (!collaboratorId) {
@@ -170,23 +236,25 @@ export const addCollaborator = async (req, res) => {
             return res.status(400).json({ message: 'User is already a collaborator' });
         }
 
+        if (project.ownerId === collaboratorId) {
+            return res.status(400).json({ message: 'Project owner is already in the project' });
+        }
+
         await Project.findByIdAndUpdate(projectId, {
             $push: {
                 collaborators: {
-                    id: collaboratorId,
-                    email: email || '',
-                    name: name || '',
-                    image: image || ''
+                    id: collaboratorId
                 }
             }
         });
 
         const updatedProject = await Project.findById(projectId);
+        const hydratedProject = await hydrateProjectWithProfiles(updatedProject);
 
         return res.status(200).json({
             success: true,
             message: 'Collaborator added successfully',
-            data: updatedProject
+            data: hydratedProject
         });
     } catch (error) {
         console.error('Add collaborator error:', error);
@@ -221,17 +289,17 @@ export const removeCollaborator = async (req, res) => {
         await ActivityLog.create({
             projectId,
             userId,
-            userName: project.ownerName || 'Owner',
             action: 'MEMBER_REMOVED',
             taskSnapshot: `Member removed from the project.`
         });
 
         const updatedProject = await Project.findById(projectId);
+        const hydratedProject = await hydrateProjectWithProfiles(updatedProject);
 
         return res.status(200).json({
             success: true,
             message: 'Collaborator removed successfully',
-            data: updatedProject
+            data: hydratedProject
         });
     } catch (error) {
         console.error('Remove collaborator error:', error);
@@ -308,17 +376,17 @@ export const updateCollaboratorRole = async (req, res) => {
         await ActivityLog.create({
             projectId,
             userId,
-            userName: project.ownerName || 'Owner',
             action: 'ROLE_UPDATED',
             taskSnapshot: `Member role updated to "${role}".`
         });
 
         const updatedProject = await Project.findById(projectId);
+        const hydratedProject = await hydrateProjectWithProfiles(updatedProject);
 
         return res.status(200).json({
             success: true,
             message: 'Collaborator role updated successfully',
-            data: updatedProject
+            data: hydratedProject
         });
     } catch (error) {
         console.error('Update role error:', error);

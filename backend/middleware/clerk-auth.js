@@ -1,16 +1,8 @@
-import { createClerkClient } from '@clerk/clerk-sdk-node';
 import dotenv from 'dotenv';
+import { getClerkClient } from '../utils/clerk-client.js';
 dotenv.config();
 
-// Initialize Clerk client with secret key
-const clerkSecretKey = process.env.CLERK_SECRET_KEY;
-let clerkClient = null;
-
-if (clerkSecretKey) {
-    clerkClient = createClerkClient({ secretKey: clerkSecretKey });
-} else {
-    console.warn('WARNING: CLERK_SECRET_KEY not set. User search and invitations will not work.');
-}
+const clerkClient = getClerkClient();
 
 // Middleware to extract userId from header
 export const requireAuth = async (req, res, next) => {

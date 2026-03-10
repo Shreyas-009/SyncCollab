@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { useUser } from '@clerk/clerk-react'
 import { searchUsers, sendProjectInvite, sendInvitation, createInviteLink } from '../utils/api'
 import useMutationLocks from '../hooks/useMutationLocks'
 
@@ -12,7 +11,6 @@ const InviteModal = ({ show, onClose, project }) => {
     const [inviteLink, setInviteLink] = useState('')
     const [copied, setCopied] = useState(false)
     const [isSearching, setIsSearching] = useState(false)
-    const { user } = useUser()
     const { runLocked, isLocked, hasLocks } = useMutationLocks()
 
     if (!show) return null
@@ -60,11 +58,7 @@ const InviteModal = ({ show, onClose, project }) => {
             const { executed } = await runLocked(inviteKey, async () => {
                 await sendProjectInvite({
                     projectId: project._id,
-                    toUserId: toUser.id,
-                    toUserEmail: toUser.email,
-                    fromUserEmail: user?.emailAddresses?.[0]?.emailAddress || '',
-                    fromUserName: `${user?.firstName || ''} ${user?.lastName || ''}`.trim(),
-                    fromUserImage: user?.imageUrl || ''
+                    toUserId: toUser.id
                 })
                 setMessage(`Invite sent to ${toUser.firstName || toUser.email}! They need to accept it.`)
                 setMessageType('success')
@@ -110,8 +104,7 @@ const InviteModal = ({ show, onClose, project }) => {
         setMessage('')
         try {
             const { executed } = await runLocked(inviteLinkKey, async () => {
-                const userName = `${user?.firstName || ''} ${user?.lastName || ''}`.trim()
-                const response = await createInviteLink(project._id, userName)
+                const response = await createInviteLink(project._id)
                 setInviteLink(response.data.inviteUrl)
                 setMessage('Invite link generated! Share it with others.')
                 setMessageType('success')

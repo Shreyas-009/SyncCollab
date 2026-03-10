@@ -1,6 +1,7 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import ActivityLog from '../model/activity-log-model.js';
 import Project from '../model/project-model.js';
+import { createUserProfileResolver } from '../utils/user-profile-resolver.js';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -65,10 +66,20 @@ export const getProjectChatResponse = async (req, res) => {
         };
         const humanizeAction = (action) => actionLabels[action] || action.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 
+        const { resolveProfiles, addFallback } = createUserProfileResolver();
+        const userIds = [];
+        const fallbacksById = {};
+        logs.forEach((log) => {
+            if (!log.userId) return;
+            userIds.push(log.userId);
+            addFallback(fallbacksById, log.userId, { name: log.userName });
+        });
+        const profilesById = await resolveProfiles(userIds, fallbacksById);
+
         // Structure logs as JSON objects
         const structuredLogs = logs.map(log => ({
             date: formatDate(log.createdAt),
-            user: log.userName,
+            user: profilesById[log.userId]?.name || log.userName || 'Unknown User',
             action: humanizeAction(log.action),
             task: log.taskSnapshot || "N/A"
         }));

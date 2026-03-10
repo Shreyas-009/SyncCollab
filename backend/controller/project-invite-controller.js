@@ -2,15 +2,49 @@ import ProjectInvite from '../model/project-invite-model.js';
 import ProjectInviteLink from '../model/project-invite-link-model.js';
 import Project from '../model/project-model.js';
 import ActivityLog from '../model/activity-log-model.js';
+import { createUserProfileResolver } from '../utils/user-profile-resolver.js';
+
+const hydrateInvitesWithProfiles = async (invites) => {
+    if (!invites || invites.length === 0) return [];
+
+    const { resolveProfiles, addFallback } = createUserProfileResolver();
+    const userIds = [];
+    const fallbacksById = {};
+
+    invites.forEach((inviteDoc) => {
+        const invite = inviteDoc.toObject();
+        if (!invite.fromUserId) return;
+        userIds.push(invite.fromUserId);
+        addFallback(fallbacksById, invite.fromUserId, {
+            name: invite.fromUserName,
+            image: invite.fromUserImage,
+            email: invite.fromUserEmail
+        });
+    });
+
+    const profiles = await resolveProfiles(userIds, fallbacksById);
+
+    return invites.map((inviteDoc) => {
+        const invite = inviteDoc.toObject();
+        const fromProfile = invite.fromUserId ? profiles[invite.fromUserId] : null;
+        return {
+            ...invite,
+            fromUserName: fromProfile?.name || invite.fromUserName || 'Unknown User',
+            fromUserImage: fromProfile?.image || invite.fromUserImage || '',
+            fromUserEmail: fromProfile?.email || invite.fromUserEmail || '',
+            fromUser: fromProfile || null
+        };
+    });
+};
 
 // Send project invite
 export const sendProjectInvite = async (req, res) => {
     try {
-        const { projectId, toUserId, toUserEmail, fromUserEmail, fromUserName, fromUserImage } = req.body;
+        const { projectId, toUserId } = req.body;
         const fromUserId = req.userId;
 
-        if (!projectId || !toUserId || !toUserEmail) {
-            return res.status(400).json({ message: 'Project ID, recipient ID and email are required' });
+        if (!projectId || !toUserId) {
+            return res.status(400).json({ message: 'Project ID and recipient ID are required' });
         }
 
         // Check if project exists and user is owner
@@ -22,6 +56,18 @@ export const sendProjectInvite = async (req, res) => {
         // Check if already a collaborator
         if (project.collaborators.some(c => c.id === toUserId)) {
             return res.status(400).json({ message: 'User is already a collaborator' });
+        }
+
+        if (project.ownerId === toUserId) {
+            return res.status(400).json({ message: 'Project owner cannot be invited' });
+        }
+
+        const { resolveProfiles } = createUserProfileResolver();
+        const profiles = await resolveProfiles([toUserId]);
+        const recipientProfile = profiles[toUserId];
+
+        if (!recipientProfile?.email) {
+            return res.status(400).json({ message: 'Could not resolve recipient email from Clerk profile' });
         }
 
         // Check if invite already exists
@@ -41,17 +87,14 @@ export const sendProjectInvite = async (req, res) => {
             projectName: project.name,
             projectColor: project.color,
             fromUserId,
-            fromUserEmail: fromUserEmail || '',
-            fromUserName: fromUserName || '',
-            fromUserImage: fromUserImage || '',
             toUserId,
-            toUserEmail
+            toUserEmail: recipientProfile.email
         });
 
         return res.status(201).json({
             success: true,
             message: 'Invite sent',
-            data: invite
+            data: (await hydrateInvitesWithProfiles([invite]))[0]
         });
     } catch (error) {
         console.error('Send invite error:', error);
@@ -69,9 +112,11 @@ export const getPendingInvites = async (req, res) => {
             status: 'pending'
         }).sort({ createdAt: -1 });
 
+        const hydratedInvites = await hydrateInvitesWithProfiles(invites);
+
         return res.status(200).json({
             success: true,
-            data: invites
+            data: hydratedInvites
         });
     } catch (error) {
         console.error('Get pending invites error:', error);
@@ -84,7 +129,6 @@ export const acceptInvite = async (req, res) => {
     try {
         const { inviteId } = req.params;
         const userId = req.userId;
-        const { userEmail, userName, userImage } = req.body;
 
         const invite = await ProjectInvite.findOne({
             _id: inviteId,
@@ -96,14 +140,24 @@ export const acceptInvite = async (req, res) => {
             return res.status(404).json({ message: 'Invite not found' });
         }
 
+        const project = await Project.findById(invite.projectId);
+        if (!project) {
+            return res.status(404).json({ message: 'Project no longer exists' });
+        }
+
+        if (project.ownerId === userId) {
+            return res.status(400).json({ message: 'You are the owner of this project' });
+        }
+
+        if (project.collaborators.some((collaborator) => collaborator.id === userId)) {
+            return res.status(400).json({ message: 'You are already a collaborator on this project' });
+        }
+
         // Add to project collaborators
         await Project.findByIdAndUpdate(invite.projectId, {
             $push: {
                 collaborators: {
-                    id: userId,
-                    email: userEmail || invite.toUserEmail,
-                    name: userName || '',
-                    image: userImage || ''
+                    id: userId
                 }
             }
         });
@@ -116,7 +170,6 @@ export const acceptInvite = async (req, res) => {
         await ActivityLog.create({
             projectId: invite.projectId,
             userId,
-            userName: userName || invite.toUserEmail,
             action: 'MEMBER_ADDED',
             taskSnapshot: `User joined the project via invitation.`
         });
@@ -165,7 +218,7 @@ export const declineInvite = async (req, res) => {
 // Create invite link for a project
 export const createInviteLink = async (req, res) => {
     try {
-        const { projectId, createdByName } = req.body;
+        const { projectId } = req.body;
         const userId = req.userId;
 
         if (!projectId) {
@@ -193,6 +246,12 @@ export const createInviteLink = async (req, res) => {
         });
 
         if (existingLink) {
+            const { resolveProfiles, addFallback } = createUserProfileResolver();
+            const fallback = {};
+            addFallback(fallback, existingLink.createdBy, { name: existingLink.createdByName });
+            const profiles = await resolveProfiles([existingLink.createdBy], fallback);
+            const creatorProfile = profiles[existingLink.createdBy];
+
             // Return existing link
             const frontendUrl = process.env.CLIENT_URL || 'http://localhost:5173';
             return res.status(200).json({
@@ -200,6 +259,7 @@ export const createInviteLink = async (req, res) => {
                 message: 'Existing invite link returned',
                 data: {
                     ...existingLink.toObject(),
+                    createdByName: creatorProfile?.name || existingLink.createdByName || 'Unknown User',
                     inviteUrl: `${frontendUrl}/join/${existingLink.token}`
                 }
             });
@@ -210,10 +270,12 @@ export const createInviteLink = async (req, res) => {
             projectId,
             projectName: project.name,
             projectColor: project.color,
-            createdBy: userId,
-            createdByName: createdByName || ''
+            createdBy: userId
         });
 
+        const { resolveProfiles } = createUserProfileResolver();
+        const profiles = await resolveProfiles([userId]);
+        const creatorProfile = profiles[userId];
         const frontendUrl = process.env.CLIENT_URL || 'http://localhost:5173';
 
         return res.status(201).json({
@@ -221,6 +283,7 @@ export const createInviteLink = async (req, res) => {
             message: 'Invite link created',
             data: {
                 ...inviteLink.toObject(),
+                createdByName: creatorProfile?.name || inviteLink.createdByName || 'Unknown User',
                 inviteUrl: `${frontendUrl}/join/${inviteLink.token}`
             }
         });
@@ -241,12 +304,18 @@ export const getInviteLinkInfo = async (req, res) => {
             return res.status(404).json({ message: 'Invite link not found or has been deactivated' });
         }
 
+        const { resolveProfiles, addFallback } = createUserProfileResolver();
+        const fallback = {};
+        addFallback(fallback, inviteLink.createdBy, { name: inviteLink.createdByName });
+        const profiles = await resolveProfiles([inviteLink.createdBy], fallback);
+        const creatorProfile = profiles[inviteLink.createdBy];
+
         return res.status(200).json({
             success: true,
             data: {
                 projectName: inviteLink.projectName,
                 projectColor: inviteLink.projectColor,
-                createdByName: inviteLink.createdByName
+                createdByName: creatorProfile?.name || inviteLink.createdByName || 'Unknown User'
             }
         });
     } catch (error) {
@@ -260,7 +329,6 @@ export const acceptInviteLink = async (req, res) => {
     try {
         const { token } = req.params;
         const userId = req.userId;
-        const { userEmail, userName, userImage } = req.body;
 
         const inviteLink = await ProjectInviteLink.findOne({ token, isActive: true });
 
@@ -287,10 +355,7 @@ export const acceptInviteLink = async (req, res) => {
         await Project.findByIdAndUpdate(inviteLink.projectId, {
             $push: {
                 collaborators: {
-                    id: userId,
-                    email: userEmail || '',
-                    name: userName || '',
-                    image: userImage || ''
+                    id: userId
                 }
             }
         });
@@ -299,7 +364,6 @@ export const acceptInviteLink = async (req, res) => {
         await ActivityLog.create({
             projectId: inviteLink.projectId,
             userId,
-            userName: userName || userEmail || 'New Member',
             action: 'MEMBER_ADDED',
             taskSnapshot: `User joined the project via invite link.`
         });

@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react'
-import { useUser } from '@clerk/clerk-react'
 import { getPendingInvites, acceptInvite, declineInvite } from '../utils/api'
 import useMutationLocks from '../hooks/useMutationLocks'
 
 const RequestsPage = ({ onClose, onInviteAccepted }) => {
     const [invites, setInvites] = useState([]);
     const [loading, setLoading] = useState(true);
-    const { user } = useUser();
     const { runLocked, isLocked } = useMutationLocks();
 
     useEffect(() => {
@@ -28,11 +26,7 @@ const RequestsPage = ({ onClose, onInviteAccepted }) => {
         const actionKey = `invite:accept:${inviteId}`;
         try {
             const { executed } = await runLocked(actionKey, async () => {
-                await acceptInvite(inviteId, {
-                    userEmail: user?.emailAddresses?.[0]?.emailAddress || '',
-                    userName: `${user?.firstName || ''} ${user?.lastName || ''}`.trim(),
-                    userImage: user?.imageUrl || ''
-                });
+                await acceptInvite(inviteId);
                 await loadInvites();
                 if (onInviteAccepted) onInviteAccepted();
             });
