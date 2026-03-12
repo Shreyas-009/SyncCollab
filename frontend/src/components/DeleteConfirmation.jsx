@@ -1,6 +1,6 @@
 import React from 'react'
 
-const DeleteConfirmation = ({ show, onClose, onConfirm, taskTitle, isProcessing = false }) => {
+const DeleteConfirmation = ({ show, onClose, onConfirm, taskTitle, isProcessing = false, title = 'Delete Task', message, confirmLabel = 'Delete', processingLabel = 'Deleting...' }) => {
     if (!show) return null;
 
     return (
@@ -20,14 +20,18 @@ const DeleteConfirmation = ({ show, onClose, onConfirm, taskTitle, isProcessing 
                         </svg>
                     </div>
                     <div>
-                        <h2 className="text-lg font-semibold text-stone-800 dark:text-gray-100">Delete Task</h2>
+                        <h2 className="text-lg font-semibold text-stone-800 dark:text-gray-100">{title}</h2>
                     </div>
                 </div>
 
                 {/* Content */}
                 <div className="px-6 py-5 bg-white dark:bg-slate-800">
                     <p className={"text-stone-600 dark:text-slate-300"}>
-                        Are you sure you want to delete <span className="font-semibold text-stone-800 dark:text-gray-100">"{taskTitle}"</span>?
+                        {message || (
+                            <>
+                                Are you sure you want to delete <span className="font-semibold text-stone-800 dark:text-gray-100">"{taskTitle}"</span>?
+                            </>
+                        )}
                     </p>
                     <p className="text-sm mt-2 text-stone-400 dark:text-slate-500">
                         This action cannot be undone.
@@ -51,7 +55,7 @@ const DeleteConfirmation = ({ show, onClose, onConfirm, taskTitle, isProcessing 
                         className='px-5 py-2 text-sm font-medium text-white bg-red-600 rounded-xl hover:bg-red-700 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2'
                     >
                         {isProcessing && <span className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />}
-                        {isProcessing ? 'Deleting...' : 'Delete'}
+                        {isProcessing ? processingLabel : confirmLabel}
                     </button>
                 </div>
             </div>

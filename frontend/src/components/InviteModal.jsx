@@ -72,6 +72,11 @@ const InviteModal = ({ show, onClose, project }) => {
     }
 
     const handleInviteNew = async () => {
+        if (!project) {
+            setMessage('No project selected')
+            setMessageType('error')
+            return
+        }
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
         if (!emailRegex.test(email)) {
             setMessage('Please enter a valid email address')
@@ -82,7 +87,7 @@ const InviteModal = ({ show, onClose, project }) => {
         const inviteKey = getEmailInviteKey(email)
         try {
             const { executed } = await runLocked(inviteKey, async () => {
-                await sendInvitation(email)
+                await sendInvitation(email, { projectId: project._id })
                 setMessage(`Invitation sent to ${email}!`)
                 setMessageType('success')
                 setTimeout(() => handleClose(), 2000)
@@ -142,7 +147,6 @@ const InviteModal = ({ show, onClose, project }) => {
     const inviteEmailKey = getEmailInviteKey(email)
     const isGeneratingLink = isLocked(inviteLinkKey)
     const isSendingEmailInvite = isLocked(inviteEmailKey)
-
     return (
         <div
             className='fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-50'
@@ -347,6 +351,7 @@ const InviteModal = ({ show, onClose, project }) => {
                                     </div>
                                 </div>
                             )}
+
                         </>
                     )}
 

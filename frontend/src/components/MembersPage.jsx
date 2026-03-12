@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { updateCollaboratorRole, removeCollaborator } from '../utils/api';
 import useMutationLocks from '../hooks/useMutationLocks';
+import DeleteConfirmation from './DeleteConfirmation';
 
 const ROLES = ['Team Lead', 'Frontend Developer', 'Backend Developer', 'Tester', 'Designer', 'Member'];
 
@@ -19,7 +20,7 @@ const MemberCardSkeleton = () => (
     </div>
 );
 
-const MemberCard = ({ member, isOwner, isCurrentUser, onUpdateRole, onRemove, isUpdatingRole, isRemoving }) => {
+const MemberCard = ({ member, isOwner, isCurrentUser, onUpdateRole, onRequestRemove, isUpdatingRole, isRemoving }) => {
     const [showRoleMenu, setShowRoleMenu] = useState(false);
     const isBusy = isUpdatingRole || isRemoving;
 
@@ -29,8 +30,8 @@ const MemberCard = ({ member, isOwner, isCurrentUser, onUpdateRole, onRemove, is
     };
 
     const handleRemove = async () => {
-        if (!window.confirm(`Are you sure you want to remove ${member.name || member.email} from the project?`)) return;
-        await onRemove(member.id);
+        if (isBusy) return;
+        onRequestRemove(member);
     };
 
     return (
@@ -148,6 +149,7 @@ const MembersPage = ({ selectedProject, onProjectUpdated, onShowInvite, isLoadin
     const { user } = useUser();
     const isOwner = selectedProject.ownerId === user?.id;
     const { runLocked, isLocked } = useMutationLocks();
+    const [memberToRemove, setMemberToRemove] = useState(null);
     const showSkeletons = isLoading || !selectedProject || !Array.isArray(selectedProject.collaborators);
 
     const getRoleUpdateKey = (collaboratorId) => `member:update-role:${selectedProject._id}:${collaboratorId}`;
@@ -174,6 +176,7 @@ const MembersPage = ({ selectedProject, onProjectUpdated, onShowInvite, isLoadin
                 if (onProjectUpdated) await onProjectUpdated(updatedProject);
             });
             if (!executed) return;
+            setMemberToRemove(null);
         } catch {
             alert('Failed to remove member');
         }
@@ -240,7 +243,7 @@ const MembersPage = ({ selectedProject, onProjectUpdated, onShowInvite, isLoadin
                                     isOwner={isOwner}
                                     isCurrentUser={member.id === user?.id}
                                     onUpdateRole={handleUpdateRole}
-                                    onRemove={handleRemoveMember}
+                                    onRequestRemove={(member) => setMemberToRemove(member)}
                                     isUpdatingRole={isLocked(getRoleUpdateKey(member.id))}
                                     isRemoving={isLocked(getRemoveMemberKey(member.id))}
                                 />
@@ -263,6 +266,23 @@ const MembersPage = ({ selectedProject, onProjectUpdated, onShowInvite, isLoadin
                     </div>
                 </div>
             </div>
+
+            {memberToRemove && (
+                <DeleteConfirmation
+                    show={true}
+                    onClose={() => setMemberToRemove(null)}
+                    onConfirm={() => handleRemoveMember(memberToRemove.id)}
+                    title="Remove Member"
+                    message={
+                        <>
+                            Are you sure you want to remove <span className="font-semibold text-stone-800 dark:text-gray-100">"{memberToRemove.name || memberToRemove.email}"</span> from this project?
+                        </>
+                    }
+                    confirmLabel="Remove"
+                    processingLabel="Removing..."
+                    isProcessing={isLocked(getRemoveMemberKey(memberToRemove.id))}
+                />
+            )}
         </div>
     );
 };

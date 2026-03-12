@@ -4,6 +4,15 @@ import Project from '../model/project-model.js';
 import ActivityLog from '../model/activity-log-model.js';
 import { createUserProfileResolver } from '../utils/user-profile-resolver.js';
 
+const resolveFrontendBaseUrl = (req) => {
+    const origin = req.get('origin') || req.headers?.origin;
+    if (origin && origin !== 'null') return origin;
+    if (process.env.CLIENT_URL) return process.env.CLIENT_URL;
+    const host = req.get('host');
+    if (host) return `${req.protocol}://${host}`;
+    return 'http://localhost:5173';
+};
+
 const hydrateInvitesWithProfiles = async (invites) => {
     if (!invites || invites.length === 0) return [];
 
@@ -220,6 +229,8 @@ export const createInviteLink = async (req, res) => {
     try {
         const { projectId } = req.body;
         const userId = req.userId;
+        const baseUrl = resolveFrontendBaseUrl(req);
+        const frontendUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
 
         if (!projectId) {
             return res.status(400).json({ message: 'Project ID is required' });
@@ -253,7 +264,6 @@ export const createInviteLink = async (req, res) => {
             const creatorProfile = profiles[existingLink.createdBy];
 
             // Return existing link
-            const frontendUrl = process.env.CLIENT_URL || 'http://localhost:5173';
             return res.status(200).json({
                 success: true,
                 message: 'Existing invite link returned',
@@ -276,7 +286,6 @@ export const createInviteLink = async (req, res) => {
         const { resolveProfiles } = createUserProfileResolver();
         const profiles = await resolveProfiles([userId]);
         const creatorProfile = profiles[userId];
-        const frontendUrl = process.env.CLIENT_URL || 'http://localhost:5173';
 
         return res.status(201).json({
             success: true,

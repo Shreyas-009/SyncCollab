@@ -183,9 +183,9 @@ export const searchTasks = async (query, projectId) => {
 
 // ============ USER API ============
 
-export const sendInvitation = async (email) => {
+export const sendInvitation = async (email, options = {}) => {
     try {
-        const response = await apiClient.post('/invite', { email });
+        const response = await apiClient.post('/invite', { email, ...options });
         return response.data;
     } catch (error) {
         console.error('Error sending invitation:', error);
