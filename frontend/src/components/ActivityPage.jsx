@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { Sun, Moon, Menu } from 'lucide-react';
 import { fetchActivityLogs } from '../utils/api';
+import { useTheme } from '../context/useTheme';
 
 const ACTION_STYLES = {
     'CREATED_TASK': { color: '#8B5CF6', bg: 'bg-violet-500', label: 'Created Task' },
@@ -25,10 +27,11 @@ const formatTime = (dateStr) => {
     return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
 };
 
-const ActivityPage = ({ selectedProject }) => {
+const ActivityPage = ({ selectedProject, onToggleSidebar }) => {
     const [logs, setLogs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const { isDark, toggleTheme } = useTheme();
 
     const load = useCallback(async () => {
         if (!selectedProject?._id) return;
@@ -50,9 +53,27 @@ const ActivityPage = ({ selectedProject }) => {
     return (
         <div className="flex-1 overflow-y-auto bg-stone-50/30 dark:bg-slate-950/30 custom-scrollbar">
             {/* Page Header */}
-            <div className="sticky top-0 z-10 px-6 md:px-10 py-5 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-stone-200/60 dark:border-slate-800">
-                <h1 className="text-2xl font-bold text-stone-800 dark:text-slate-100 tracking-tight">Activity Log</h1>
-                <p className="text-sm text-stone-500 dark:text-slate-400 mt-0.5">Recent project activity for {selectedProject.name}</p>
+            <div className="sticky top-0 z-10 px-4 md:px-10 h-[72px] flex items-center justify-between bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-stone-200/60 dark:border-slate-800">
+                <div className="flex items-center gap-3 min-w-0">
+                    <button
+                        onClick={onToggleSidebar}
+                        className="md:hidden p-2 -ml-2 rounded-xl text-stone-600 hover:bg-stone-100 dark:text-slate-300 dark:hover:bg-slate-800 transition-colors"
+                        title="Menu"
+                    >
+                        <Menu className="w-5 h-5" />
+                    </button>
+                    <div className="min-w-0">
+                    <h1 className="text-2xl font-bold text-stone-800 dark:text-slate-100 tracking-tight leading-tight">Activity Log</h1>
+                    <p className="text-sm text-stone-500 dark:text-slate-400">Recent project activity for {selectedProject.name}</p>
+                    </div>
+                </div>
+                <button
+                    onClick={toggleTheme}
+                    className="w-10 h-10 flex items-center justify-center rounded-xl transition-colors text-stone-500 hover:bg-stone-100 dark:text-amber-400 dark:hover:bg-slate-800"
+                    title="Toggle theme"
+                >
+                    {isDark ? <Sun className="w-5 h-5 text-amber-500" /> : <Moon className="w-5 h-5" />}
+                </button>
             </div>
 
             <div className="max-w-3xl mx-auto px-4 md:px-10 py-8">

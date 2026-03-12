@@ -161,7 +161,7 @@ const JoinProjectContent = () => {
             className="w-16 h-16 rounded-2xl flex items-center justify-center"
             style={{ backgroundColor: projectInfo?.projectColor || "#8B5CF6" }}
           >
-            <h1 className="text-3xl flont-bold">
+            <h1 className="text-3xl flont-bold text-white">
               {projectInfo?.projectName?.charAt(0).toUpperCase() || "P"}
             </h1>
           </div>

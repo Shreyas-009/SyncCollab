@@ -282,6 +282,7 @@ const HomePage = () => {
     const showActivity = currentPage === 'activity' && !!selectedProject
     const showNexus = currentPage === 'nexus' && !!selectedProject
     const showMembers = currentPage === 'members' && !!selectedProject
+    const showProjectHeader = !!selectedProject && !['activity', 'nexus', 'members'].includes(currentPage)
 
     return (
         <>
@@ -317,7 +318,7 @@ const HomePage = () => {
                 {/* Main Content */}
                 <div className="flex-1 flex flex-col overflow-hidden min-w-0">
                     {/* Header — shown when in a project view, or a custom one for hub */}
-                    {selectedProject ? (
+                    {showProjectHeader ? (
                         <Header
                             onOpen={() => setShowForm(true)}
                             onSearch={handleSearch}
@@ -326,7 +327,7 @@ const HomePage = () => {
                             onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
                             currentPage={currentPage}
                         />
-                    ) : (
+                    ) : !selectedProject ? (
                         <div className="flex items-center justify-between px-4 md:px-6 py-4 border-b bg-white border-stone-200/60 shadow-sm dark:bg-slate-900 dark:border-slate-800 z-30 h-[72px] shrink-0">
                             <div className="flex items-center gap-3">
                                 <button
@@ -343,7 +344,7 @@ const HomePage = () => {
                                 <ThemeToggle />
                             </div>
                         </div>
-                    )}
+                    ) : null}
 
                     {/* Page Rendering */}
                     {showHub ? (
@@ -372,17 +373,18 @@ const HomePage = () => {
                         </PageTransition>
                     ) : showActivity ? (
                         <PageTransition pageKey={`activity-${selectedProject._id}`}>
-                            <ActivityPage selectedProject={selectedProject} getToken={getToken} />
+                            <ActivityPage selectedProject={selectedProject} getToken={getToken} onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
                         </PageTransition>
                     ) : showNexus ? (
                         <PageTransition pageKey={`nexus-${selectedProject._id}`}>
-                            <NexusPage selectedProject={selectedProject} />
+                            <NexusPage selectedProject={selectedProject} onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
                         </PageTransition>
                     ) : showMembers ? (
                         <PageTransition pageKey={`members-${selectedProject._id}`}>
                             <MembersPage 
                                 selectedProject={selectedProject} 
                                 isLoading={membersLoading}
+                                onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
                                 onProjectUpdated={async (updatedProject) => {
                                     setMembersLoading(true)
                                     try {

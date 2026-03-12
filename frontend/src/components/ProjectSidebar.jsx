@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useUser, useClerk } from '@clerk/clerk-react';
 import { useTheme } from '../context/useTheme';
 import { getPendingInvites } from '../utils/api';
@@ -42,12 +42,25 @@ const ProjectSidebar = ({
     const [pendingCount, setPendingCount] = useState(0);
     const { isDark } = useTheme();
     const { user } = useUser();
-    const { openUserProfile } = useClerk();
+    const { openUserProfile, signOut } = useClerk();
+    const [accountMenuOpen, setAccountMenuOpen] = useState(false);
+    const accountMenuRef = useRef(null);
 
     useEffect(() => {
         loadPendingCount();
         const interval = setInterval(loadPendingCount, 30000);
         return () => clearInterval(interval);
+    }, []);
+
+    useEffect(() => {
+        const handleOutsideClick = (event) => {
+            if (!accountMenuRef.current) return;
+            if (!accountMenuRef.current.contains(event.target)) {
+                setAccountMenuOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleOutsideClick);
+        return () => document.removeEventListener('mousedown', handleOutsideClick);
     }, []);
 
     const loadPendingCount = async () => {
@@ -192,27 +205,62 @@ const ProjectSidebar = ({
 
                 {/* ── Footer / Account ── */}
                 <div className="px-3 pb-6 pt-4 border-t border-stone-200/50 dark:border-white/5 bg-[#f8f9fa] dark:bg-[#0c0c0e]">
-                    <button 
-                        onClick={() => openUserProfile()}
-                        className="w-full flex items-center gap-3 p-2.5 rounded-2xl border border-transparent hover:bg-white dark:hover:bg-slate-800 hover:border-stone-200/50 dark:hover:border-white/5 transition-all group"
-                    >
-                        {user?.imageUrl ? (
-                            <img src={user.imageUrl} className="w-10 h-10 rounded-xl shadow-sm object-cover group-hover:scale-105 transition-transform" alt="" />
-                        ) : (
-                            <div className="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-                                <i className="bi bi-person text-purple-600 dark:text-purple-400" />
+                    <div className="relative" ref={accountMenuRef}>
+                        <button 
+                            onClick={() => openUserProfile()}
+                            className="w-full flex items-center gap-3 p-2.5 pr-10 rounded-2xl border border-transparent hover:bg-white dark:hover:bg-slate-800 hover:border-stone-200/50 dark:hover:border-white/5 transition-all group"
+                        >
+                            {user?.imageUrl ? (
+                                <img src={user.imageUrl} className="w-10 h-10 rounded-xl shadow-sm object-cover group-hover:scale-105 transition-transform" alt="" />
+                            ) : (
+                                <div className="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                                    <i className="bi bi-person text-purple-600 dark:text-purple-400" />
+                                </div>
+                            )}
+                            <div className="flex-1 min-w-0">
+                                <h4 className="text-sm font-bold text-stone-800 dark:text-slate-100 truncate leading-tight text-left">
+                                    {user?.fullName || 'User'}
+                                </h4>
+                                <p className="text-xs text-stone-400 dark:text-slate-500 truncate text-left">
+                                    {user?.primaryEmailAddress?.emailAddress || 'Account Settings'}
+                                </p>
+                            </div>
+                        </button>
+
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setAccountMenuOpen((prev) => !prev);
+                            }}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-xl text-stone-400 hover:text-stone-600 hover:bg-stone-200/60 dark:hover:bg-slate-800 dark:text-slate-400 dark:hover:text-slate-200 transition-colors"
+                            title="Profile menu"
+                        >
+                            <i className="bi bi-three-dots-vertical" />
+                        </button>
+
+                        {accountMenuOpen && (
+                            <div className="absolute right-0 bottom-[60px] w-44 rounded-xl border border-stone-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-xl p-1 z-50">
+                                <button
+                                    onClick={() => {
+                                        setAccountMenuOpen(false);
+                                        openUserProfile();
+                                    }}
+                                    className="w-full text-left px-3 py-2 text-xs font-semibold rounded-lg hover:bg-stone-50 dark:hover:bg-slate-800 text-stone-700 dark:text-slate-200 transition-colors"
+                                >
+                                    Profile
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        setAccountMenuOpen(false);
+                                        signOut();
+                                    }}
+                                    className="w-full text-left px-3 py-2 text-xs font-semibold rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 transition-colors"
+                                >
+                                    Log out
+                                </button>
                             </div>
                         )}
-                        <div className="flex-1 min-w-0">
-                            <h4 className="text-sm font-bold text-stone-800 dark:text-slate-100 truncate leading-tight text-left">
-                                {user?.fullName || 'User'}
-                            </h4>
-                            <p className="text-xs text-stone-400 dark:text-slate-500 truncate text-left">
-                                {user?.primaryEmailAddress?.emailAddress || 'Account Settings'}
-                            </p>
-                        </div>
-                        <i className="bi bi-three-dots-vertical text-stone-400 group-hover:text-stone-600 dark:group-hover:text-slate-300 transition-colors" />
-                    </button>
+                    </div>
                 </div>
             </aside>
         </>

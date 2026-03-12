@@ -1,8 +1,10 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
+import { Sun, Moon, Menu } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { sendChatMessage } from '../utils/api';
 import { jsPDF } from 'jspdf';
+import { useTheme } from '../context/useTheme';
 
 const PROMPTS = [
     { text: 'Provide structured report', icon: 'bi-file-earmark-text', type: 'report' },
@@ -11,7 +13,7 @@ const PROMPTS = [
     { text: 'Identify any blockers', icon: 'bi-exclamation-triangle', type: 'blockers' },
 ];
 
-const NexusPage = ({ selectedProject }) => {
+const NexusPage = ({ selectedProject, onToggleSidebar }) => {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -19,6 +21,7 @@ const NexusPage = ({ selectedProject }) => {
     const messagesEndRef = useRef(null);
     const chatContainerRef = useRef(null);
     const inputRef = useRef(null);
+    const { isDark, toggleTheme } = useTheme();
 
     const hasConversation = messages.some(m => m.role === 'user');
 
@@ -168,19 +171,35 @@ const NexusPage = ({ selectedProject }) => {
     return (
         <div className="flex-1 flex flex-col overflow-hidden bg-[#fafafa] dark:bg-[#0c0c0e]">
             {/* Page Header */}
-            <div className="shrink-0 flex items-center gap-3 px-6 md:px-10 py-4 border-b border-stone-200/50 dark:border-white/5 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md">
-                <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-500 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-                    <svg className="w-4.5 h-4.5 text-white w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                </div>
-                <div>
-                    <div className="flex items-center gap-2">
-                        <h2 className="font-bold text-stone-800 dark:text-slate-100 leading-tight text-base">Nexus</h2>
-                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-gradient-to-r from-indigo-500 to-purple-600 text-white">AI</span>
+            <div className="shrink-0 h-[72px] flex items-center justify-between px-4 md:px-6 border-b border-stone-200/50 dark:border-white/5 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md">
+                <div className="flex items-center gap-3">
+                    <button
+                        onClick={onToggleSidebar}
+                        className="md:hidden p-2 -ml-2 rounded-xl text-stone-600 hover:bg-stone-100 dark:text-slate-300 dark:hover:bg-slate-800 transition-colors"
+                        title="Menu"
+                    >
+                        <Menu className="w-5 h-5" />
+                    </button>
+                    <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-500 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                        <svg className="w-4.5 h-4.5 text-white w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
                     </div>
-                    <p className="text-xs text-stone-500 dark:text-slate-400">Project activity analyst</p>
+                    <div>
+                        <div className="flex items-center gap-2">
+                            <h2 className="font-bold text-stone-800 dark:text-slate-100 leading-tight text-base">Nexus</h2>
+                            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-gradient-to-r from-indigo-500 to-purple-600 text-white">AI</span>
+                        </div>
+                        <p className="text-xs text-stone-500 dark:text-slate-400">Project activity analyst</p>
+                    </div>
                 </div>
+                <button
+                    onClick={toggleTheme}
+                    className="w-10 h-10 flex items-center justify-center rounded-xl transition-colors text-stone-500 hover:bg-stone-100 dark:text-amber-400 dark:hover:bg-slate-800"
+                    title="Toggle theme"
+                >
+                    {isDark ? <Sun className="w-5 h-5 text-amber-500" /> : <Moon className="w-5 h-5" />}
+                </button>
             </div>
 
             {/* Messages area */}
