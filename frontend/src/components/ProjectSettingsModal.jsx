@@ -295,7 +295,9 @@ const ProjectSettingsModal = ({ show, onClose, project, onProjectUpdated }) => {
                                     <button
                                         onClick={() => setConfirmDelete(false)}
                                         disabled={isLocked(deleteProjectKey)}
-                                        className="flex-1 py-3 text-xs font-bold rounded-xl bg-white dark:bg-slate-800 border border-stone-200 dark:border-white/5 text-stone-600 dark:text-slate-300 hover:bg-stone-50 transition-all active:scale-[0.98]"
+                                        className="flex-1 py-3 text-xs font-bold rounded-xl bg-white 
+                                        dark:bg-slate-600
+                                        border border-stone-200 dark:border-white/5 text-stone-600 dark:text-slate-300 hover:bg-stone-50 dark:hover:bg-slate-700  transition-all active:scale-[0.98]"
                                     >
                                         Cancel
                                     </button>

@@ -52,12 +52,14 @@ const HomePage = () => {
 
     // Tasks State
     const [tasks, setTasks] = useState([])
+    const [tasksLoading, setTasksLoading] = useState(false)
 
     // Global Modals State
     const [selectedTaskForEdit, setSelectedTaskForEdit] = useState(null)
     const [selectedTaskForDelete, setSelectedTaskForDelete] = useState(null)
     const [selectedTaskForView, setSelectedTaskForView] = useState(null)
     const [pendingDragAction, setPendingDragAction] = useState(null)
+    const [membersLoading, setMembersLoading] = useState(false)
 
     const { user } = useUser()
     const { getToken } = useAuth()
@@ -91,13 +93,19 @@ const HomePage = () => {
     }, [])
 
     const loadTasks = useCallback(async () => {
-        if (!selectedProject?._id) return
+        if (!selectedProject?._id) {
+            setTasksLoading(false)
+            return
+        }
+        setTasksLoading(true)
         try {
             const data = await fetchTasks(selectedProject._id)
             setTasks(data || [])
         } catch (err) {
             console.error('Error loading tasks:', err)
             setTasks([])
+        } finally {
+            setTasksLoading(false)
         }
     }, [selectedProject?._id])
 
@@ -107,10 +115,12 @@ const HomePage = () => {
 
     useEffect(() => {
         if (selectedProject) {
+            setTasks([])
             loadTasks()
         } else {
             setTasks([])
             setCurrentPage('hub')
+            setTasksLoading(false)
         }
     }, [selectedProject, loadTasks])
 
@@ -259,6 +269,7 @@ const HomePage = () => {
     const inProgressTasks = tasks.filter(t => t.status === 'in progress')
     const testingTasks = tasks.filter(t => t.status === 'testing')
     const completedTasks = tasks.filter(t => t.status === 'completed')
+    const showTaskSkeletons = tasksLoading && tasks.length === 0
 
     const projectAssignees = selectedProject ? [
         { id: selectedProject.ownerId, name: selectedProject.ownerName || 'Owner' },
@@ -335,16 +346,7 @@ const HomePage = () => {
                     )}
 
                     {/* Page Rendering */}
-                    {loading ? (
-                        <PageTransition pageKey="loading">
-                            <div className="flex-1 flex items-center justify-center bg-stone-50/10 dark:bg-slate-950/10">
-                                <div className="flex flex-col items-center">
-                                    <div className="w-10 h-10 rounded-full border-4 border-purple-200 border-t-purple-600 animate-spin mb-4" />
-                                    <p className="text-base font-semibold text-stone-500 dark:text-slate-400">Loading workspace...</p>
-                                </div>
-                            </div>
-                        </PageTransition>
-                    ) : showHub ? (
+                    {showHub ? (
                         <PageTransition pageKey="hub">
                             <ProjectsHub
                                 projects={projects}
@@ -360,10 +362,10 @@ const HomePage = () => {
                             <DragDropContext onDragEnd={handleDragEnd}>
                                 <main className="flex-1 flex py-6 px-[2%] gap-5 overflow-x-auto custom-scrollbar bg-stone-50/10 dark:bg-slate-950/10">
                                     <div className="flex gap-5 h-full pb-4">
-                                        <TaskColumn title='Pending' statusId='pending' img={Todo} tasks={pendingTasks} onDelete={setSelectedTaskForDelete} onEdit={setSelectedTaskForEdit} onView={setSelectedTaskForView} projectAssignees={projectAssignees} isTaskBusy={isTaskBusy} />
-                                        <TaskColumn title='In Progress' statusId='in progress' img={doing} tasks={inProgressTasks} onDelete={setSelectedTaskForDelete} onEdit={setSelectedTaskForEdit} onView={setSelectedTaskForView} projectAssignees={projectAssignees} isTaskBusy={isTaskBusy} />
-                                        <TaskColumn title='Testing' statusId='testing' img={null} tasks={testingTasks} onDelete={setSelectedTaskForDelete} onEdit={setSelectedTaskForEdit} onView={setSelectedTaskForView} projectAssignees={projectAssignees} isTaskBusy={isTaskBusy} />
-                                        <TaskColumn title='Completed' statusId='completed' img={completed} tasks={completedTasks} onDelete={setSelectedTaskForDelete} onEdit={setSelectedTaskForEdit} onView={setSelectedTaskForView} projectAssignees={projectAssignees} isTaskBusy={isTaskBusy} />
+                                        <TaskColumn title='Pending' statusId='pending' img={Todo} tasks={pendingTasks} onDelete={setSelectedTaskForDelete} onEdit={setSelectedTaskForEdit} onView={setSelectedTaskForView} projectAssignees={projectAssignees} isTaskBusy={isTaskBusy} isLoading={showTaskSkeletons} />
+                                        <TaskColumn title='In Progress' statusId='in progress' img={doing} tasks={inProgressTasks} onDelete={setSelectedTaskForDelete} onEdit={setSelectedTaskForEdit} onView={setSelectedTaskForView} projectAssignees={projectAssignees} isTaskBusy={isTaskBusy} isLoading={showTaskSkeletons} />
+                                        <TaskColumn title='Testing' statusId='testing' img={null} tasks={testingTasks} onDelete={setSelectedTaskForDelete} onEdit={setSelectedTaskForEdit} onView={setSelectedTaskForView} projectAssignees={projectAssignees} isTaskBusy={isTaskBusy} isLoading={showTaskSkeletons} />
+                                        <TaskColumn title='Completed' statusId='completed' img={completed} tasks={completedTasks} onDelete={setSelectedTaskForDelete} onEdit={setSelectedTaskForEdit} onView={setSelectedTaskForView} projectAssignees={projectAssignees} isTaskBusy={isTaskBusy} isLoading={showTaskSkeletons} />
                                     </div>
                                 </main>
                             </DragDropContext>
@@ -380,19 +382,25 @@ const HomePage = () => {
                         <PageTransition pageKey={`members-${selectedProject._id}`}>
                             <MembersPage 
                                 selectedProject={selectedProject} 
+                                isLoading={membersLoading}
                                 onProjectUpdated={async (updatedProject) => {
-                                    if (updatedProject?._id) {
-                                        setProjects((currentProjects) => currentProjects.map((project) => (
-                                            project._id === updatedProject._id ? updatedProject : project
-                                        )))
-                                        setSelectedProject(updatedProject)
-                                        return
-                                    }
+                                    setMembersLoading(true)
+                                    try {
+                                        if (updatedProject?._id) {
+                                            setProjects((currentProjects) => currentProjects.map((project) => (
+                                                project._id === updatedProject._id ? updatedProject : project
+                                            )))
+                                            setSelectedProject(updatedProject)
+                                            return
+                                        }
 
-                                    const refreshedProjects = await loadProjects()
-                                    const refreshedProject = refreshedProjects.find((project) => project._id === selectedProject._id)
-                                    if (refreshedProject) {
-                                        setSelectedProject(refreshedProject)
+                                        const refreshedProjects = await loadProjects()
+                                        const refreshedProject = refreshedProjects.find((project) => project._id === selectedProject._id)
+                                        if (refreshedProject) {
+                                            setSelectedProject(refreshedProject)
+                                        }
+                                    } finally {
+                                        setMembersLoading(false)
                                     }
                                 }} 
                                 onShowInvite={() => setShowInviteModal(true)}
@@ -460,7 +468,22 @@ const HomePage = () => {
                     show={true}
                     onClose={() => setShowSettingsModal(false)}
                     project={selectedProject}
-                    onProjectUpdated={() => { loadProjects(); setShowSettingsModal(false); }}
+                    onProjectUpdated={async () => {
+                        const currentProjectId = selectedProject?._id
+                        const refreshedProjects = await loadProjects()
+                        if (!currentProjectId) {
+                            setShowSettingsModal(false)
+                            return
+                        }
+                        const refreshedProject = refreshedProjects.find((project) => project._id === currentProjectId)
+                        if (refreshedProject) {
+                            setSelectedProject(refreshedProject)
+                        } else {
+                            setSelectedProject(null)
+                            setCurrentPage('hub')
+                        }
+                        setShowSettingsModal(false)
+                    }}
                 />
             )}
         </>

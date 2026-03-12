@@ -5,6 +5,20 @@ import useMutationLocks from '../hooks/useMutationLocks';
 
 const ROLES = ['Team Lead', 'Frontend Developer', 'Backend Developer', 'Tester', 'Designer', 'Member'];
 
+const MemberCardSkeleton = () => (
+    <div className="bg-white dark:bg-slate-800/80 border border-stone-200/60 dark:border-white/5 rounded-2xl p-4 flex items-center gap-4 animate-pulse">
+        <div className="w-12 h-12 rounded-xl bg-stone-100 dark:bg-slate-700" />
+        <div className="flex-1 min-w-0">
+            <div className="h-4 bg-stone-100 dark:bg-slate-700 rounded w-2/3 mb-2" />
+            <div className="h-3 bg-stone-100 dark:bg-slate-700 rounded w-1/2" />
+        </div>
+        <div className="flex items-center gap-2">
+            <div className="h-6 w-20 bg-stone-100 dark:bg-slate-700 rounded-lg" />
+            <div className="w-8 h-8 rounded-lg bg-stone-100 dark:bg-slate-700" />
+        </div>
+    </div>
+);
+
 const MemberCard = ({ member, isOwner, isCurrentUser, onUpdateRole, onRemove, isUpdatingRole, isRemoving }) => {
     const [showRoleMenu, setShowRoleMenu] = useState(false);
     const isBusy = isUpdatingRole || isRemoving;
@@ -95,6 +109,16 @@ const MemberCard = ({ member, isOwner, isCurrentUser, onUpdateRole, onRemove, is
     );
 };
 
+const OwnerCardSkeleton = () => (
+    <div className="bg-white/70 dark:bg-slate-800/60 border border-stone-200/60 dark:border-white/5 rounded-2xl p-5 flex items-center gap-4 mb-6 animate-pulse">
+        <div className="w-14 h-14 rounded-2xl bg-stone-100 dark:bg-slate-700" />
+        <div className="flex-1 min-w-0">
+            <div className="h-4 bg-stone-100 dark:bg-slate-700 rounded w-40 mb-2" />
+            <div className="h-3 bg-stone-100 dark:bg-slate-700 rounded w-56" />
+        </div>
+    </div>
+);
+
 const OwnerCard = ({ project, isCurrentUser }) => (
     <div className="bg-gradient-to-br from-purple-600/5 to-indigo-600/5 dark:from-purple-900/10 dark:to-indigo-900/10 border border-purple-100 dark:border-purple-900/20 rounded-2xl p-5 flex items-center gap-4 mb-6 shadow-sm">
         <div className="relative shrink-0">
@@ -120,10 +144,11 @@ const OwnerCard = ({ project, isCurrentUser }) => (
     </div>
 );
 
-const MembersPage = ({ selectedProject, onProjectUpdated, onShowInvite }) => {
+const MembersPage = ({ selectedProject, onProjectUpdated, onShowInvite, isLoading = false }) => {
     const { user } = useUser();
     const isOwner = selectedProject.ownerId === user?.id;
     const { runLocked, isLocked } = useMutationLocks();
+    const showSkeletons = isLoading || !selectedProject || !Array.isArray(selectedProject.collaborators);
 
     const getRoleUpdateKey = (collaboratorId) => `member:update-role:${selectedProject._id}:${collaboratorId}`;
     const getRemoveMemberKey = (collaboratorId) => `member:remove:${selectedProject._id}:${collaboratorId}`;
@@ -178,14 +203,22 @@ const MembersPage = ({ selectedProject, onProjectUpdated, onShowInvite }) => {
                 <div className="max-w-4xl mx-auto">
                     {/* Owner Section */}
                     <h3 className="text-[11px] font-bold uppercase tracking-[0.2em] text-stone-400 dark:text-slate-600 mb-4 px-1">Organization</h3>
-                    <OwnerCard project={selectedProject} isCurrentUser={isOwner} />
+                    {showSkeletons ? (
+                        <OwnerCardSkeleton />
+                    ) : (
+                        <OwnerCard project={selectedProject} isCurrentUser={isOwner} />
+                    )}
 
                     {/* Collaborators Section */}
                     <div className="flex items-center justify-between mb-4 px-1">
                         <h3 className="text-[11px] font-bold uppercase tracking-[0.2em] text-stone-400 dark:text-slate-600">
                             Team Members
                         </h3>
-                        {selectedProject.collaborators?.length > 0 && (
+                        {showSkeletons ? (
+                            <span className="text-[10px] font-bold text-stone-400 dark:text-slate-500 bg-stone-100 dark:bg-slate-800 px-2 py-0.5 rounded-full">
+                                <span className="inline-block w-6 h-3 rounded bg-stone-200/80 dark:bg-slate-600/70 animate-pulse" />
+                            </span>
+                        ) : selectedProject.collaborators?.length > 0 && (
                             <span className="text-[10px] font-bold text-stone-400 dark:text-slate-500 bg-stone-100 dark:bg-slate-800 px-2 py-0.5 rounded-full">
                                 {selectedProject.collaborators.length} Total
                             </span>
@@ -193,7 +226,13 @@ const MembersPage = ({ selectedProject, onProjectUpdated, onShowInvite }) => {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {selectedProject.collaborators?.length > 0 ? (
+                        {showSkeletons ? (
+                            <>
+                                {[...Array(4)].map((_, i) => (
+                                    <MemberCardSkeleton key={`member-skeleton-${i}`} />
+                                ))}
+                            </>
+                        ) : selectedProject.collaborators?.length > 0 ? (
                             selectedProject.collaborators.map(member => (
                                 <MemberCard
                                     key={member.id}

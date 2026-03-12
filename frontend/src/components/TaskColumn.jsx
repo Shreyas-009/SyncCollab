@@ -3,7 +3,31 @@ import TaskCard from './TaskCard';
 import { Droppable } from '@hello-pangea/dnd';
 import { Grid, Check, User, Filter, Inbox } from 'lucide-react';
 
-const TaskColumn = ({ title, statusId, img, icon, tasks, onDelete, onEdit, onView, projectAssignees, isTaskBusy = () => false }) => {
+const TaskCardSkeleton = () => (
+    <div className="w-full flex flex-col justify-between min-h-[90px] border rounded-xl p-3 my-2 mx-0 overflow-hidden shadow-sm bg-white dark:bg-gray-800/80 border-stone-200 dark:border-gray-700 animate-pulse">
+        <div className="flex items-start justify-between gap-3">
+            <div className="h-4 bg-stone-100 dark:bg-slate-700 rounded w-2/3" />
+            <div className="flex gap-1">
+                <div className="w-7 h-7 rounded-lg bg-stone-100 dark:bg-slate-700" />
+                <div className="w-7 h-7 rounded-lg bg-stone-100 dark:bg-slate-700" />
+            </div>
+        </div>
+        <div className="mt-2.5 space-y-1">
+            <div className="h-3 bg-stone-100 dark:bg-slate-700 rounded w-full" />
+            <div className="h-3 bg-stone-100 dark:bg-slate-700 rounded w-4/5" />
+        </div>
+        <div className="h-[1px] w-full bg-stone-100 dark:bg-gray-700/50 my-2.5"></div>
+        <div className="flex items-center justify-between mt-auto">
+            <div className="h-6 w-20 bg-stone-100 dark:bg-slate-700 rounded-lg" />
+            <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded-full bg-stone-100 dark:bg-slate-700" />
+                <div className="h-5 w-10 bg-stone-100 dark:bg-slate-700 rounded" />
+            </div>
+        </div>
+    </div>
+);
+
+const TaskColumn = ({ title, statusId, img, icon, tasks, onDelete, onEdit, onView, projectAssignees, isTaskBusy = () => false, isLoading = false }) => {
     const [priorityFilter, setPriorityFilter] = useState('all');
     const [assigneeFilter, setAssigneeFilter] = useState('all');
     const [showPriorityFilter, setShowPriorityFilter] = useState(false);
@@ -49,7 +73,11 @@ const TaskColumn = ({ title, statusId, img, icon, tasks, onDelete, onEdit, onVie
                     )}
                     <h3 className="font-bold text-lg text-stone-800 tracking-tight dark:text-gray-100">{title}</h3>
                     <span className="flex items-center justify-center w-6 h-6 text-xs font-bold rounded-full bg-stone-200/80 text-stone-600 dark:bg-slate-700 dark:text-slate-300 shadow-inner">
-                        {filteredTasks?.length || 0}
+                        {isLoading ? (
+                            <span className="inline-block w-3.5 h-3 rounded bg-stone-300/80 dark:bg-slate-600/60 animate-pulse" />
+                        ) : (
+                            filteredTasks?.length || 0
+                        )}
                     </span>
                 </div>
 
@@ -151,7 +179,13 @@ const TaskColumn = ({ title, statusId, img, icon, tasks, onDelete, onEdit, onVie
                         style={{ minHeight: '150px' }}
                     >
                         <div className="flex flex-col gap-0">
-                            {filteredTasks && filteredTasks.length > 0 ? (
+                            {isLoading ? (
+                                <>
+                                    {[...Array(3)].map((_, i) => (
+                                        <TaskCardSkeleton key={`task-skeleton-${statusId}-${i}`} />
+                                    ))}
+                                </>
+                            ) : filteredTasks && filteredTasks.length > 0 ? (
                                 filteredTasks.map((task, index) => (
                                     <TaskCard 
                                         key={task._id} 
