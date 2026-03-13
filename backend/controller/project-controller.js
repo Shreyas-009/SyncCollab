@@ -162,12 +162,21 @@ export const updateProject = async (req, res) => {
     try {
         const { projectId } = req.params;
         const userId = req.userId;
-        const { name, description, color } = req.body;
+        const { name, description, color, activityRetentionDays } = req.body;
+
+        const validRetentionValues = [30, 60, 90, -1];
+        const updateData = { name, description, color };
+        if (activityRetentionDays !== undefined) {
+            if (!validRetentionValues.includes(Number(activityRetentionDays))) {
+                return res.status(400).json({ message: 'Invalid activity retention value. Must be 30, 60, 90, or -1 (never).' });
+            }
+            updateData.activityRetentionDays = Number(activityRetentionDays);
+        }
 
         // Only owner can update project
         const project = await Project.findOneAndUpdate(
             { _id: projectId, ownerId: userId },
-            { name, description, color },
+            updateData,
             { new: true }
         );
 

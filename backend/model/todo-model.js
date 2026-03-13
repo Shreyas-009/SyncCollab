@@ -21,6 +21,19 @@ const todoSchema = new Schema({
         enum: ['high', 'medium', 'low'],
         default: 'medium'
     },
+    taskType: {
+        type: String,
+        enum: ['feature', 'bug-fix', 'design', 'refactor', 'testing', 'documentation', 'other'],
+        default: ''
+    },
+    startDate: {
+        type: Date,
+        default: null
+    },
+    dueDate: {
+        type: Date,
+        default: null
+    },
     projectId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Project',

@@ -1,11 +1,31 @@
 import React from 'react';
-import Priority from './Priority';
 import { Draggable } from '@hello-pangea/dnd';
-import { Edit2, Trash2 } from 'lucide-react';
+import { Edit2, Trash2, SignalHigh, SignalMedium, SignalLow } from 'lucide-react';
+import { TASK_TYPES } from './TaskForm';
+
+const TASK_TYPE_BADGE = {
+    'feature':       { bg: 'bg-purple-100 dark:bg-purple-900/30', text: 'text-purple-700 dark:text-purple-300' },
+    'bug-fix':       { bg: 'bg-red-100 dark:bg-red-900/30',       text: 'text-red-700 dark:text-red-300' },
+    'design':        { bg: 'bg-pink-100 dark:bg-pink-900/30',     text: 'text-pink-700 dark:text-pink-300' },
+    'refactor':      { bg: 'bg-amber-100 dark:bg-amber-900/30',   text: 'text-amber-700 dark:text-amber-300' },
+    'testing':       { bg: 'bg-emerald-100 dark:bg-emerald-900/30', text: 'text-emerald-700 dark:text-emerald-300' },
+    'documentation': { bg: 'bg-sky-100 dark:bg-sky-900/30',       text: 'text-sky-700 dark:text-sky-300' },
+    'other':         { bg: 'bg-stone-100 dark:bg-slate-700',      text: 'text-stone-500 dark:text-slate-400' },
+};
 
 const TaskCard = ({ task, index, onDelete, onEdit, onView, isBusy = false }) => {
   const priority = task.priority;
   const hasDescription = task.description && task.description.trim() !== '';
+  const typeInfo = TASK_TYPES.find(t => t.value === task.taskType);
+  const typeBadge = TASK_TYPE_BADGE[task.taskType] || TASK_TYPE_BADGE.other;
+
+  // Due date logic
+  const now = new Date();
+  const dueDate = task.dueDate ? new Date(task.dueDate) : null;
+  const isOverdue = dueDate && dueDate < now && task.status !== 'completed';
+  const dueDateLabel = dueDate
+    ? dueDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+    : null;
 
   return (
     <Draggable draggableId={task._id} index={index} isDragDisabled={isBusy}>
@@ -23,9 +43,11 @@ const TaskCard = ({ task, index, onDelete, onEdit, onView, isBusy = false }) => 
         >
           {/* Header Row */}
           <div className='flex items-start justify-between gap-3'>
-            <h4 className="text-base font-semibold wrap-break-word flex-1 text-stone-800 dark:text-gray-100 leading-snug">
-              {task.title}
-            </h4>
+            <div className="flex-1 min-w-0 pr-2">
+              <h4 className="text-base font-semibold wrap-break-word text-stone-800 dark:text-gray-100 leading-snug line-clamp-2">
+                {task.title}
+              </h4>
+            </div>
             
             {/* Action Buttons */}
             <div className={`flex gap-1 shrink-0 transition-opacity duration-200 ${snapshot.isDragging ? 'opacity-0' : 'md:opacity-0 group-hover:opacity-100 opacity-100'}`}>
@@ -60,6 +82,27 @@ const TaskCard = ({ task, index, onDelete, onEdit, onView, isBusy = false }) => 
           {/* Divider */}
           <div className="h-[1px] w-full bg-stone-100 dark:bg-gray-700/50 my-2.5"></div>
 
+          {/* Chips Row */}
+          <div className="flex flex-wrap items-center gap-2 mb-2.5">
+              {/* Task Type Badge */}
+              {typeInfo && (
+                <div className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${typeBadge.bg} ${typeBadge.text}`}>
+                  <span>{typeInfo.label}</span>
+                </div>
+              )}
+
+              {/* Due Date chip */}
+              {dueDateLabel && (
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                      isOverdue
+                        ? 'bg-red-100 text-red-600 dark:bg-red-900/40 dark:text-red-300'
+                        : 'bg-stone-100 text-stone-500 dark:bg-slate-700 dark:text-slate-400'
+                  }`}>
+                      {dueDateLabel} {isOverdue && '(Overdue)'}
+                  </span>
+              )}
+          </div>
+
           {/* Footer Row */}
           <div className='flex items-center justify-between mt-auto'>
             {/* View More Button */}
@@ -75,6 +118,18 @@ const TaskCard = ({ task, index, onDelete, onEdit, onView, isBusy = false }) => 
                 {isBusy && (
                     <span className="w-4 h-4 rounded-full border-2 border-purple-200 border-t-purple-600 animate-spin" />
                 )}
+
+{/* Priority Icon */}
+                <div title={`Priority: ${priority}`} className={`flex items-center ml-0.5 p-1 rounded-sm ${priority === 'high' ? 'bg-red-100 dark:bg-red-900/40' : priority === 'medium' ? 'bg-orange-100 dark:bg-orange-900/40' : 'bg-green-100 dark:bg-green-900/40'}`}>
+                    {priority === 'high' ? (
+                        <SignalHigh className="w-4 h-4 text-red-600 dark:text-red-400" strokeWidth={3} />
+                    ) : priority === 'medium' ? (
+                        <SignalMedium className="w-4 h-4 text-orange-600 dark:text-orange-400" strokeWidth={3} />
+                    ) : (
+                        <SignalLow className="w-4 h-4 text-green-600 dark:text-green-400" strokeWidth={3} />
+                    )}
+                </div>
+
                 {/* Assignee Avatar */}
                 {task.assignedTo && (
                     <div className="flex -space-x-1 overflow-hidden" title={`Assigned to ${task.assignedToName || 'Unknown'}`}>
@@ -90,10 +145,6 @@ const TaskCard = ({ task, index, onDelete, onEdit, onView, isBusy = false }) => 
                     </div>
                 )}
                 
-                {/* Priority Badge */}
-                <div className="scale-90 origin-right">
-                  <Priority name={priority} />
-                </div>
             </div>
           </div>
         </article>

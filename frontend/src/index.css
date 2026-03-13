@@ -146,3 +146,9 @@ body {
 .dark-gradient {
     background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
 }
+
+/* Custom Animations */
+@keyframes progress {
+    0% { width: 0%; }
+    100% { width: 100%; }
+}

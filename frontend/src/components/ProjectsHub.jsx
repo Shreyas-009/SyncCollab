@@ -22,7 +22,7 @@ const ProjectCard = ({ project, onClick, onEdit }) => {
     const extraCount = Math.max(0, ((project.collaborators?.length || 0) + 1) - members.length);
 
     return (
-        <div className="group relative bg-white dark:bg-slate-800/70 rounded-2xl border border-stone-200/60 dark:border-slate-700/50 overflow-hidden cursor-pointer hover:shadow-lg hover:shadow-stone-200/60 dark:hover:shadow-slate-900/60 hover:-translate-y-0.5 transition-all duration-200">
+        <div className="group relative bg-white dark:bg-slate-800/70 rounded-2xl border border-stone-200/60 dark:border-slate-700/50 overflow-hidden cursor-pointer hover:shadow-lg hover:shadow-stone-200/60 dark:hover:shadow-slate-900/60 hover:-translate-y-0.5 transition-all duration-200 ">
             <div className="h-1.5 w-full" style={{ backgroundColor: project.color || '#8B5CF6' }} />
             <div className="p-5" onClick={onClick}>
                 <div className="flex items-start gap-3 mb-4">

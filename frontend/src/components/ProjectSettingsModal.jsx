@@ -11,6 +11,7 @@ const ProjectSettingsModal = ({ show, onClose, project, onProjectUpdated }) => {
     // Project Info State
     const [name, setName] = useState(project?.name || '');
     const [description, setDescription] = useState(project?.description || '');
+    const [activityRetentionDays, setActivityRetentionDays] = useState(project?.activityRetentionDays ?? 30);
 
     if (!show || !project) return null;
 
@@ -92,7 +93,7 @@ const ProjectSettingsModal = ({ show, onClose, project, onProjectUpdated }) => {
         if (!name.trim()) return;
         try {
             const { executed } = await runLocked(updateProjectKey, async () => {
-                await updateProject(project._id, { name: name.trim(), description: description.trim() })
+                await updateProject(project._id, { name: name.trim(), description: description.trim(), activityRetentionDays })
                 if (onProjectUpdated) onProjectUpdated()
             })
             if (!executed) return
@@ -163,9 +164,35 @@ const ProjectSettingsModal = ({ show, onClose, project, onProjectUpdated }) => {
                                             className="w-full px-4 py-2.5 text-sm rounded-xl border border-stone-200 dark:border-white/5 bg-stone-50 dark:bg-slate-800/50 text-stone-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/50 transition-all resize-none font-medium"
                                         />
                                     </div>
+                                    {/* Activity Log Retention */}
+                                    <div className="space-y-2">
+                                        <label className="text-[11px] font-bold text-stone-500 dark:text-slate-400 ml-1 block">Activity Log Retention</label>
+                                        <p className="text-[10px] text-stone-400 dark:text-slate-500 ml-1">How many days of activity history to keep.</p>
+                                        <div className="grid grid-cols-4 gap-1.5">
+                                            {[{ label: '30 days', value: 30 }, { label: '60 days', value: 60 }, { label: '90 days', value: 90 }, { label: 'Never', value: -1 }].map(opt => (
+                                                <button
+                                                    key={opt.value}
+                                                    type="button"
+                                                    onClick={() => setActivityRetentionDays(opt.value)}
+                                                    className={`py-2 rounded-xl text-[10px] font-bold transition-all ${
+                                                        activityRetentionDays === opt.value
+                                                            ? 'bg-purple-600 text-white shadow-sm'
+                                                            : 'bg-stone-100 dark:bg-slate-800/50 text-stone-500 dark:text-slate-400 hover:bg-stone-200 dark:hover:bg-slate-700'
+                                                    }`}
+                                                >
+                                                    {opt.label}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+
                                     <button
                                         onClick={handleUpdateProject}
-                                        disabled={isLocked(updateProjectKey) || (name.trim() === project.name && description.trim() === (project.description || ''))}
+                                        disabled={isLocked(updateProjectKey) || (
+                                            name.trim() === project.name &&
+                                            description.trim() === (project.description || '') &&
+                                            activityRetentionDays === (project.activityRetentionDays ?? 30)
+                                        )}
                                         className="w-full py-3 bg-slate-900 dark:bg-purple-600 hover:opacity-90 disabled:opacity-30 text-white rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 active:scale-[0.98]"
                                     >
                                         {isLocked(updateProjectKey) ? (

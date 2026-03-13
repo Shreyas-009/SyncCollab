@@ -157,9 +157,18 @@ export const getActivityLogs = async (req, res) => {
             return res.status(403).json({ message: 'You do not have access to this project' });
         }
 
-        const logs = await ActivityLog.find({ projectId })
+        // Build query filter based on retention setting
+        const retentionDays = project.activityRetentionDays ?? 30;
+        const query = { projectId };
+        if (retentionDays !== -1) {
+            const cutoff = new Date();
+            cutoff.setDate(cutoff.getDate() - retentionDays);
+            query.createdAt = { $gte: cutoff };
+        }
+
+        const logs = await ActivityLog.find(query)
             .sort({ createdAt: -1 })
-            .limit(50); // Limit to last 50 activities for performance
+            .limit(200);
 
         const hydratedLogs = await hydrateActivityLogsWithProfiles(logs);
 
@@ -209,7 +218,7 @@ export const getSignleTasks = async (req, res) => {
 // Add task to project
 export const addTask = async (req, res) => {
     try {
-        const { title, description, status, priority, projectId, assignedTo } = req.body;
+        const { title, description, status, priority, taskType, startDate, dueDate, projectId, assignedTo } = req.body;
         const userId = req.userId;
 
         if (!title) {
@@ -235,17 +244,24 @@ export const addTask = async (req, res) => {
             description: description || '',
             status: status || 'pending',
             priority: priority || 'medium',
+            taskType: taskType || 'feature',
+            startDate: startDate || null,
+            dueDate: dueDate || null,
             projectId,
             assignedTo: assignedTo || '',
             createdBy: userId
         });
+
+        // Build snapshot with optional dates
+        const duePart = dueDate ? `, due ${new Date(dueDate).toLocaleDateString()}` : '';
+        const typePart = taskType ? ` [${taskType}]` : '';
 
         // Log the activity
         await ActivityLog.create({
             projectId,
             userId,
             action: 'CREATED_TASK',
-            taskSnapshot: `Task "${title}" created with status "${status || 'pending'}" and priority "${priority || 'medium'}".`
+            taskSnapshot: `${typePart} Task "${title}" created with status "${status || 'pending'}" and priority "${priority || 'medium'}"${duePart}.`
         });
 
         const [hydratedTask] = await hydrateTasksWithProfiles([newTask], project);
@@ -266,7 +282,7 @@ export const updateTask = async (req, res) => {
     try {
         const id = req.params.id;
         const userId = req.userId;
-        const { title, description, status, priority, assignedTo } = req.body;
+        const { title, description, status, priority, taskType, startDate, dueDate, assignedTo } = req.body;
 
         if (!id) {
             return res.status(400).json({ message: 'Please provide a task id' });
@@ -293,6 +309,9 @@ export const updateTask = async (req, res) => {
         if (description !== undefined) updateFields.description = description;
         if (status !== undefined) updateFields.status = status;
         if (priority !== undefined) updateFields.priority = priority;
+        if (taskType !== undefined) updateFields.taskType = taskType;
+        if (startDate !== undefined) updateFields.startDate = startDate || null;
+        if (dueDate !== undefined) updateFields.dueDate = dueDate || null;
         if (assignedTo !== undefined) updateFields.assignedTo = assignedTo;
 
         const updatedTask = await Todo.findByIdAndUpdate(
@@ -312,13 +331,15 @@ export const updateTask = async (req, res) => {
             action === 'UPDATED_STATUS'
                 ? ` from status "${task.status}" to "${status}"`
                 : '';
+        const nextType = taskType !== undefined ? taskType : task.taskType;
+        const typePart = nextType ? ` [${nextType}]` : '';
 
         // Log the activity
         await ActivityLog.create({
             projectId: task.projectId,
             userId,
             action,
-            taskSnapshot: `Task "${nextTitle}" updated${statusTransition}.`
+            taskSnapshot: `${typePart} Task "${nextTitle}" updated${statusTransition}.`
         });
 
         const [hydratedTask] = await hydrateTasksWithProfiles([updatedTask], project);

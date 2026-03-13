@@ -1,5 +1,6 @@
 import React, { useEffect, useId, useState } from 'react'
 import { X } from 'lucide-react'
+import { TASK_TYPES } from './TaskForm'
 
 const UpdateForm = ({ show, onClose, task, onUpdate, project, isSubmitting = false }) => {
     const [title, setTitle] = useState(task?.title || '');
@@ -7,6 +8,9 @@ const UpdateForm = ({ show, onClose, task, onUpdate, project, isSubmitting = fal
     const [priority, setPriority] = useState(task?.priority || 'medium');
     const [status, setStatus] = useState(task?.status || 'pending');
     const [assignedTo, setAssignedTo] = useState(task?.assignedTo || '');
+    const [taskType, setTaskType] = useState(task?.taskType || '');
+    const [startDate, setStartDate] = useState(task?.startDate ? task.startDate.split('T')[0] : '');
+    const [dueDate, setDueDate] = useState(task?.dueDate ? task.dueDate.split('T')[0] : '');
     const formId = useId();
 
     useEffect(() => {
@@ -15,6 +19,9 @@ const UpdateForm = ({ show, onClose, task, onUpdate, project, isSubmitting = fal
         setPriority(task?.priority || 'medium');
         setStatus(task?.status || 'pending');
         setAssignedTo(task?.assignedTo || '');
+        setTaskType(task?.taskType || '');
+        setStartDate(task?.startDate ? task.startDate.split('T')[0] : '');
+        setDueDate(task?.dueDate ? task.dueDate.split('T')[0] : '');
     }, [task]);
 
     if (!show) return null;
@@ -40,11 +47,18 @@ const UpdateForm = ({ show, onClose, task, onUpdate, project, isSubmitting = fal
             description, 
             priority, 
             status,
+            taskType,
+            startDate: startDate || null,
+            dueDate: dueDate || null,
             assignedTo: selectedAssignee ? selectedAssignee.id : ''
         };
         
         await onUpdate(task._id, updatedData);
     }
+
+    const inputCls = "w-full px-4 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all bg-stone-50 text-stone-800 border-stone-200 placeholder-stone-400 dark:bg-slate-900 dark:text-gray-100 dark:border-slate-600 dark:placeholder-slate-500 dark:[color-scheme:dark]";
+    const selectCls = "w-full px-4 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all cursor-pointer bg-stone-50 text-stone-700 border-stone-200 dark:bg-slate-900 dark:text-gray-100 dark:border-slate-600";
+    const labelCls = "block text-sm font-medium mb-2 text-stone-700 dark:text-slate-300";
 
     return (
         <div
@@ -71,29 +85,30 @@ const UpdateForm = ({ show, onClose, task, onUpdate, project, isSubmitting = fal
                 <form
                     id={formId}
                     onSubmit={handleSubmit}
-                    className="px-6 py-5 space-y-4 max-h-[65vh] overflow-y-auto bg-white custom-scrollbar dark:bg-slate-900"
+                    className="px-6 py-5 space-y-4 max-h-[70vh] overflow-y-auto bg-white custom-scrollbar dark:bg-slate-900"
                 >
+                    {/* Title */}
                     <div>
-                        <label className="block text-sm font-medium mb-2 text-stone-700 dark:text-slate-300">
-                            Task Title
-                        </label>
+                        <label className={labelCls}>Task Title</label>
                         <input
                             type="text"
-                            className="w-full px-4 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all bg-stone-50 text-stone-800 border-stone-200 placeholder-stone-400 dark:bg-slate-900 dark:text-gray-100 dark:border-slate-600 dark:placeholder-slate-500"
+                            className={inputCls}
                             placeholder='Enter your task...'
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
                             disabled={isSubmitting}
+                            maxLength={100}
                             required
                         />
                     </div>
 
+                    {/* Description */}
                     <div>
-                        <label className="block text-sm font-medium mb-2 text-stone-700 dark:text-slate-300">
+                        <label className={labelCls}>
                             Description <span className="text-xs font-normal text-stone-400 dark:text-slate-500">(optional)</span>
                         </label>
                         <textarea
-                            className="w-full px-4 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none bg-stone-50 text-stone-800 border-stone-200 placeholder-stone-400 dark:bg-slate-900 dark:text-gray-100 dark:border-slate-600 dark:placeholder-slate-500"
+                            className={`${inputCls} resize-none`}
                             placeholder='Add more details...'
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
@@ -102,57 +117,70 @@ const UpdateForm = ({ show, onClose, task, onUpdate, project, isSubmitting = fal
                         />
                     </div>
 
+                    {/* Task Type */}
                     <div>
-                        <label className="block text-sm font-medium mb-2 text-stone-700 dark:text-slate-300">
-                            Assign To
-                        </label>
-                        <select
-                            className="w-full px-4 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all cursor-pointer bg-stone-50 text-stone-700 border-stone-200 dark:bg-slate-900 dark:text-gray-100 dark:border-slate-600"
-                            value={assignedTo}
-                            onChange={(e) => setAssignedTo(e.target.value)}
-                            disabled={isSubmitting}
-                        >
-                            <option value="">Unassigned</option>
-                            {assignees.map(a => (
-                                <option key={a.id} value={a.id}>
-                                    {a.name} ({a.role})
-                                </option>
+                        <label className={labelCls}>Task Type</label>
+                        <select className={selectCls} value={taskType} onChange={(e) => setTaskType(e.target.value)} disabled={isSubmitting}>
+                            <option value="">No Type</option>
+                            {TASK_TYPES.map(t => (
+                                <option key={t.value} value={t.value}>{t.label}</option>
                             ))}
                         </select>
                     </div>
 
+                    {/* Assign To */}
+                    <div>
+                        <label className={labelCls}>Assign To</label>
+                        <select className={selectCls} value={assignedTo} onChange={(e) => setAssignedTo(e.target.value)} disabled={isSubmitting}>
+                            <option value="">Unassigned</option>
+                            {assignees.map(a => (
+                                <option key={a.id} value={a.id}>{a.name} ({a.role})</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {/* Priority + Status */}
                     <div className='grid grid-cols-2 gap-4'>
                         <div>
-                            <label className="block text-sm font-medium mb-2 text-stone-700 dark:text-slate-300">
-                                Priority
-                            </label>
-                            <select
-                                className="w-full px-4 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all cursor-pointer bg-stone-50 text-stone-700 border-stone-200 dark:bg-slate-900 dark:text-gray-100 dark:border-slate-600"
-                                value={priority}
-                                onChange={(e) => setPriority(e.target.value)}
-                                disabled={isSubmitting}
-                            >
+                            <label className={labelCls}>Priority</label>
+                            <select className={selectCls} value={priority} onChange={(e) => setPriority(e.target.value)} disabled={isSubmitting}>
                                 <option value='low'>Low</option>
                                 <option value='medium'>Medium</option>
                                 <option value='high'>High</option>
                             </select>
                         </div>
-
                         <div>
-                            <label className="block text-sm font-medium mb-2 text-stone-700 dark:text-slate-300">
-                                Status
-                            </label>
-                            <select
-                                className="w-full px-4 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all cursor-pointer bg-stone-50 text-stone-700 border-stone-200 dark:bg-slate-900 dark:text-gray-100 dark:border-slate-600"
-                                value={status}
-                                onChange={(e) => setStatus(e.target.value)}
-                                disabled={isSubmitting}
-                            >
+                            <label className={labelCls}>Status</label>
+                            <select className={selectCls} value={status} onChange={(e) => setStatus(e.target.value)} disabled={isSubmitting}>
                                 <option value='pending'>Pending</option>
                                 <option value='in progress'>In Progress</option>
                                 <option value='testing'>Testing</option>
                                 <option value='completed'>Completed</option>
                             </select>
+                        </div>
+                    </div>
+
+                    {/* Start Date + Due Date */}
+                    <div className='grid grid-cols-2 gap-4'>
+                        <div>
+                            <label className={labelCls}>Start Date <span className="text-xs font-normal text-stone-400 dark:text-slate-500">(optional)</span></label>
+                            <input
+                                type="date"
+                                className={inputCls}
+                                value={startDate}
+                                onChange={(e) => setStartDate(e.target.value)}
+                                disabled={isSubmitting}
+                            />
+                        </div>
+                        <div>
+                            <label className={labelCls}>Due Date <span className="text-xs font-normal text-stone-400 dark:text-slate-500">(optional)</span></label>
+                            <input
+                                type="date"
+                                className={inputCls}
+                                value={dueDate}
+                                onChange={(e) => setDueDate(e.target.value)}
+                                disabled={isSubmitting}
+                            />
                         </div>
                     </div>
                 </form>

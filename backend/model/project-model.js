@@ -43,6 +43,11 @@ const projectSchema = new Schema({
     color: {
         type: String,
         default: '#8B5CF6' // Purple default
+    },
+    activityRetentionDays: {
+        type: Number,
+        enum: [30, 60, 90, -1], // -1 = never delete / always show all
+        default: 30
     }
 }, { timestamps: true });
 

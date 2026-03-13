@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useUser, useClerk } from '@clerk/clerk-react';
 import { useTheme } from '../context/useTheme';
 import { getPendingInvites } from '../utils/api';
+import { Settings, Monitor, LogOut, Sun, Moon, ChevronRight } from 'lucide-react';
 
 const NavItem = ({ icon, label, active, onClick, badge, variant = 'default' }) => (
     <button
@@ -40,10 +41,11 @@ const ProjectSidebar = ({
     onShowInvite,
 }) => {
     const [pendingCount, setPendingCount] = useState(0);
-    const { isDark } = useTheme();
+    const { isDark, toggleTheme } = useTheme();
     const { user } = useUser();
     const { openUserProfile, signOut } = useClerk();
     const [accountMenuOpen, setAccountMenuOpen] = useState(false);
+    const [displayMenuOpen, setDisplayMenuOpen] = useState(false);
     const accountMenuRef = useRef(null);
 
     useEffect(() => {
@@ -57,6 +59,7 @@ const ProjectSidebar = ({
             if (!accountMenuRef.current) return;
             if (!accountMenuRef.current.contains(event.target)) {
                 setAccountMenuOpen(false);
+                setDisplayMenuOpen(false);
             }
         };
         document.addEventListener('mousedown', handleOutsideClick);
@@ -197,27 +200,26 @@ const ProjectSidebar = ({
                     ) : (
                         <>
                             <p className="text-[10px] font-bold uppercase tracking-widest text-stone-400 dark:text-slate-600 px-3 mt-2 mb-2">Workspace</p>
-                            <NavItem icon="bi-grid-fill" label="Projects Hub" active={currentPage === 'hub'} onClick={() => { onNavigate('hub'); if (window.innerWidth < 768) onToggle(); }} />
-                            <NavItem icon="bi-inbox-fill" label="Requests" active={false} onClick={onShowRequests} badge={pendingCount > 0 ? pendingCount : null} />
+                                   <NavItem icon="bi-inbox-fill" label="Requests" active={false} onClick={onShowRequests} badge={pendingCount > 0 ? pendingCount : null} />
                         </>
                     )}
                 </div>
 
                 {/* ── Footer / Account ── */}
-                <div className="px-3 pb-6 pt-4 border-t border-stone-200/50 dark:border-white/5 bg-[#f8f9fa] dark:bg-[#0c0c0e]">
+                <div className="p-3 border-t border-stone-200/50 dark:border-white/5 bg-[#f8f9fa] dark:bg-[#0c0c0e]">
                     <div className="relative" ref={accountMenuRef}>
                         <button 
-                            onClick={() => openUserProfile()}
-                            className="w-full flex items-center gap-3 p-2.5 pr-10 rounded-2xl border border-transparent hover:bg-white dark:hover:bg-slate-800 hover:border-stone-200/50 dark:hover:border-white/5 transition-all group"
+                            onClick={() => setAccountMenuOpen(!accountMenuOpen)}
+                            className={`w-full flex items-center gap-3 p-2.5 rounded-2xl border transition-all group ${accountMenuOpen ? 'bg-stone-200/50 dark:bg-slate-800 border-stone-200/50 dark:border-white/5' : 'border-transparent hover:bg-stone-200/50 dark:hover:bg-slate-800 hover:border-stone-200/50 dark:hover:border-white/5'}`}
                         >
                             {user?.imageUrl ? (
-                                <img src={user.imageUrl} className="w-10 h-10 rounded-xl shadow-sm object-cover group-hover:scale-105 transition-transform" alt="" />
+                                <img src={user.imageUrl} className="w-10 h-10 rounded-xl shadow-sm object-cover group-hover:scale-105 transition-transform shrink-0" alt="" />
                             ) : (
-                                <div className="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                                <div className="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center shrink-0">
                                     <i className="bi bi-person text-purple-600 dark:text-purple-400" />
                                 </div>
                             )}
-                            <div className="flex-1 min-w-0">
+                            <div className="flex-1 min-w-0 pr-1">
                                 <h4 className="text-sm font-bold text-stone-800 dark:text-slate-100 truncate leading-tight text-left">
                                     {user?.fullName || 'User'}
                                 </h4>
@@ -227,36 +229,65 @@ const ProjectSidebar = ({
                             </div>
                         </button>
 
-                        <button
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                setAccountMenuOpen((prev) => !prev);
-                            }}
-                            className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-xl text-stone-400 hover:text-stone-600 hover:bg-stone-200/60 dark:hover:bg-slate-800 dark:text-slate-400 dark:hover:text-slate-200 transition-colors"
-                            title="Profile menu"
-                        >
-                            <i className="bi bi-three-dots-vertical" />
-                        </button>
-
                         {accountMenuOpen && (
-                            <div className="absolute right-0 bottom-[60px] w-44 rounded-xl border border-stone-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-xl p-1 z-50">
+                            <div className="absolute left-0 bottom-[calc(100%+8px)] w-full rounded-2xl border border-stone-200 dark:border-slate-700 bg-white dark:bg-[#1a1b1e] shadow-xl py-2 px-1.5 z-50 flex flex-col gap-0.5">
                                 <button
                                     onClick={() => {
                                         setAccountMenuOpen(false);
                                         openUserProfile();
                                     }}
-                                    className="w-full text-left px-3 py-2 text-xs font-semibold rounded-lg hover:bg-stone-50 dark:hover:bg-slate-800 text-stone-700 dark:text-slate-200 transition-colors"
+                                    className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-xl hover:bg-stone-100 dark:hover:bg-white/5 text-stone-700 dark:text-slate-200 transition-colors"
                                 >
-                                    Profile
+                                    <Settings className="w-4 h-4 shrink-0" />
+                                    Settings
                                 </button>
+                                
+                                <div className="relative">
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setDisplayMenuOpen(!displayMenuOpen);
+                                        }}
+                                        className="w-full flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-xl hover:bg-stone-100 dark:hover:bg-white/5 text-stone-700 dark:text-slate-200 transition-colors"
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <Monitor className="w-4 h-4 shrink-0" />
+                                            Display
+                                        </div>
+                                        <ChevronRight className={`w-4 h-4 transition-transform ${displayMenuOpen ? 'text-stone-500' : 'text-stone-400'}`} />
+                                    </button>
+
+                                    {displayMenuOpen && (
+                                        <div className="absolute left-full top-0 ml-3 w-26 sm:w-32 rounded-2xl border border-stone-200 dark:border-slate-700 bg-white dark:bg-[#1a1b1e] shadow-xl py-2 px-1.5 z-[60] flex flex-col gap-0.5 animate-in fade-in slide-in-from-left-2 duration-200">
+                                            <button
+                                                onClick={() => { if(isDark) toggleTheme(); setDisplayMenuOpen(false); setAccountMenuOpen(false); }}
+                                                className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-xl transition-colors ${!isDark ? 'bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-400' : 'hover:bg-stone-100 dark:hover:bg-white/5 text-stone-700 dark:text-slate-200'}`}
+                                            >
+                                                <Sun className="w-4 h-4 shrink-0" />
+                                                Light
+                                            </button>
+                                            <button
+                                                onClick={() => { if(!isDark) toggleTheme(); setDisplayMenuOpen(false); setAccountMenuOpen(false); }}
+                                                className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-xl transition-colors ${isDark ? 'bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-400' : 'hover:bg-stone-100 dark:hover:bg-white/5 text-stone-700 dark:text-slate-200'}`}
+                                            >
+                                                <Moon className="w-4 h-4 shrink-0" />
+                                                Dark
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="h-px bg-stone-200 dark:bg-slate-700/50 my-1 mx-2" />
+                                
                                 <button
                                     onClick={() => {
                                         setAccountMenuOpen(false);
                                         signOut();
                                     }}
-                                    className="w-full text-left px-3 py-2 text-xs font-semibold rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 transition-colors"
+                                    className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-xl hover:bg-stone-100 dark:hover:bg-white/5 text-stone-700 dark:text-slate-200 transition-colors group"
                                 >
-                                    Log out
+                                    <LogOut className="w-4 h-4 shrink-0 group-hover:text-stone-900 dark:group-hover:text-white" />
+                                    Log Out
                                 </button>
                             </div>
                         )}

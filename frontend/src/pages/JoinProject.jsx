@@ -73,11 +73,17 @@ const JoinProjectContent = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-stone-50 dark:bg-slate-900">
+      <div className="min-h-screen flex items-center justify-center bg-stone-50/50 dark:bg-slate-950">
         <div className="text-center">
-          <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-sm text-stone-500 dark:text-slate-400">
-            Loading invite...
+          <div className="relative w-16 h-16 mx-auto mb-6">
+            <div className="absolute inset-0 border-4 border-purple-500/10 rounded-full"></div>
+            <div className="absolute inset-0 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+            <div className="absolute inset-0 flex items-center justify-center">
+               <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
+            </div>
+          </div>
+          <p className="text-sm font-bold text-stone-400 dark:text-slate-500 uppercase tracking-[0.2em] animate-pulse">
+            Validating...
           </p>
         </div>
       </div>
@@ -86,11 +92,11 @@ const JoinProjectContent = () => {
 
   if (error && !projectInfo) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-stone-50 dark:bg-slate-900">
-        <div className="max-w-md w-full mx-4 p-4 rounded-2xl shadow-xl bg-white dark:bg-slate-800">
-          <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-red-50 dark:bg-red-900/30">
+      <div className="min-h-screen flex items-center justify-center bg-stone-50/50 dark:bg-slate-950 p-6">
+        <div className="max-w-md w-full bg-white dark:bg-slate-900 rounded-3xl shadow-2xl shadow-red-500/10 border border-stone-200/50 dark:border-slate-800 p-8 text-center ring-1 ring-black/5">
+          <div className="w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 bg-red-50 dark:bg-red-500/10">
             <svg
-              className="w-8 h-8 text-red-500"
+              className="w-10 h-10 text-red-500"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -98,22 +104,22 @@ const JoinProjectContent = () => {
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                strokeWidth={2}
+                strokeWidth={2.5}
                 d="M6 18L18 6M6 6l12 12"
               />
             </svg>
           </div>
-          <h1 className="text-xl font-semibold text-center mb-2 text-stone-800 dark:text-gray-100">
+          <h1 className="text-2xl font-bold mb-2 text-stone-800 dark:text-gray-100 tracking-tight">
             Invalid Invite Link
           </h1>
-          <p className="text-center mb-6 text-stone-500 dark:text-slate-400">
-            {error}
+          <p className="mb-8 text-stone-500 dark:text-slate-400 leading-relaxed">
+            {error || "This invitation link has expired or is no longer valid."}
           </p>
           <button
             onClick={() => navigate("/")}
-            className="w-full py-3 bg-purple-600 text-white font-medium rounded-xl hover:bg-purple-700 transition-colors"
+            className="w-full py-4 bg-stone-900 dark:bg-white text-white dark:text-slate-950 font-bold rounded-2xl hover:opacity-90 transition-all active:scale-[0.98] shadow-lg"
           >
-            Go Home
+            Return Home
           </button>
         </div>
       </div>
@@ -122,11 +128,11 @@ const JoinProjectContent = () => {
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-stone-50 dark:bg-slate-900">
-        <div className="max-w-md w-full mx-4 p-4 rounded-2xl shadow-xl bg-white dark:bg-slate-800">
-          <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-emerald-50 dark:bg-emerald-900/30">
+      <div className="min-h-screen flex items-center justify-center bg-stone-50/50 dark:bg-slate-950 p-6">
+        <div className="max-w-md w-full bg-white dark:bg-slate-900 rounded-3xl shadow-2xl shadow-emerald-500/10 border border-stone-200/50 dark:border-slate-800 p-8 text-center ring-1 ring-black/5">
+          <div className="w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 bg-emerald-50 dark:bg-emerald-500/10">
             <svg
-              className="w-8 h-8 text-emerald-500"
+              className="w-10 h-10 text-emerald-500"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -134,82 +140,99 @@ const JoinProjectContent = () => {
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                strokeWidth={2}
+                strokeWidth={2.5}
                 d="M5 13l4 4L19 7"
               />
             </svg>
           </div>
-          <h1 className="text-xl font-semibold text-center mb-2 text-stone-800 dark:text-gray-100">
+          <h1 className="text-2xl font-bold mb-2 text-stone-800 dark:text-gray-100 tracking-tight">
             Successfully Joined!
           </h1>
-          <p className="text-center text-stone-500 dark:text-slate-400">
-            You have joined{" "}
-            <span className="font-medium">{projectInfo?.projectName}</span>.
-            Redirecting...
+          <p className="text-stone-500 dark:text-slate-400 mb-8 px-4 leading-relaxed">
+            You are now a member of <span className="font-bold text-stone-700 dark:text-slate-200">{projectInfo?.projectName}</span>. 
+            Taking you to your dashboard...
           </p>
+          <div className="w-full bg-stone-100 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden">
+            <div className="bg-emerald-500 h-full animate-[progress_2s_ease-in-out]"></div>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-stone-50 dark:bg-slate-900">
-      <div className="max-w-md w-full mx-4 p-4 rounded-2xl shadow-xl bg-white dark:bg-slate-800 flex flex-col items-start gap-2">
-        {/* Project Icon */}
-        <div className="flex gap-2 justify-center">
+    <div className="min-h-screen flex items-center justify-center bg-stone-50/30 dark:bg-slate-950 p-6">
+      <div className="max-w-md w-full bg-white dark:bg-slate-900 rounded-[2rem] shadow-2xl shadow-purple-500/5 border border-stone-200/50 dark:border-slate-800 overflow-hidden ring-1 ring-black/5">
+        {/* Top Gradient Header */}
+        <div 
+           className="h-32 w-full relative overflow-hidden"
+           style={{ backgroundColor: projectInfo?.projectColor || '#8B5CF6' }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-br from-black/20 to-transparent"></div>
+          <div className="absolute -bottom-12 -left-12 w-48 h-48 bg-white/10 rounded-full blur-3xl"></div>
+          <div className="absolute -top-12 -right-12 w-48 h-48 bg-black/10 rounded-full blur-3xl"></div>
+        </div>
+
+        <div className="px-8 pb-8 pt-0 -mt-10 relative">
+          {/* Project Icon */}
           <div
-            className="w-16 h-16 rounded-2xl flex items-center justify-center"
-            style={{ backgroundColor: projectInfo?.projectColor || "#8B5CF6" }}
+            className="w-20 h-20 rounded-2xl border-4 border-white dark:border-slate-900 flex items-center justify-center shadow-2xl mb-6 mx-auto transition-transform hover:scale-105 duration-300"
+            style={{ backgroundColor: projectInfo?.projectColor || '#8B5CF6' }}
           >
-            <h1 className="text-3xl flont-bold text-white">
-              {projectInfo?.projectName?.charAt(0).toUpperCase() || "P"}
+            <h1 className="text-4xl font-black uppercase text-white drop-shadow-sm">
+              {projectInfo?.projectName?.charAt(0) || "P"}
             </h1>
           </div>
 
-          <div className="flex flex-col gap-1 justify-start">
-            {" "}
-            <p className="text-lg font-semibold text-center text-stone-800 dark:text-gray-100 text-start">
-              {projectInfo?.projectName}
+          <div className="text-center mb-8">
+            <h1 className="text-2xl font-black text-stone-800 dark:text-white tracking-tight mb-1">
+              Join Project
+            </h1>
+            <p className="text-sm font-medium text-stone-400 dark:text-slate-500 uppercase tracking-widest mb-4">
+              Collaboration Invite
             </p>
-            {projectInfo?.createdByName && (
-              <p className="text-sm text-center text-stone-400 dark:text-slate-500">
-                Invited by {projectInfo.createdByName}
-              </p>
-            )}
+            
+            <div className="inline-flex items-center gap-3 px-4 py-2 rounded-2xl bg-stone-50 dark:bg-slate-800/50 border border-stone-100 dark:border-slate-700/50">
+               <div className="text-left">
+                  <p className="text-[11px] text-stone-400 dark:text-slate-500 font-bold uppercase">Project Name</p>
+                  <p className="text-sm font-bold text-stone-700 dark:text-slate-200">{projectInfo?.projectName}</p>
+               </div>
+               <div className="w-px h-6 bg-stone-200 dark:bg-slate-700 mx-1"></div>
+               <div className="text-left">
+                  <p className="text-[11px] text-stone-400 dark:text-slate-500 font-bold uppercase">Invited By</p>
+                  <p className="text-sm font-bold text-stone-700 dark:text-slate-200">{projectInfo?.createdByName || "Owner"}</p>
+               </div>
+            </div>
           </div>
-        </div>
 
-        <div className="flex flex-col gap-1">
-          <h1 className="text-xl font-semibold text-center  text-stone-800 dark:text-gray-100 text-start">
-            Join Project
-          </h1>
+          {error && (
+            <div className="mb-6 p-4 rounded-2xl text-sm font-medium bg-red-50 text-red-700 border border-red-100 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20 text-center">
+              {error}
+            </div>
+          )}
 
-          <p className="text-center  text-stone-500 dark:text-slate-400">
-            You've been invited to join
-          </p>
-        </div>
+          <div className="flex flex-col gap-3">
+            <button
+              onClick={handleJoin}
+              disabled={joining}
+              className="group relative w-full py-4 bg-purple-600 text-white font-bold rounded-2xl overflow-hidden hover:bg-purple-700 transition-all active:scale-[0.98] shadow-lg shadow-purple-500/20 disabled:opacity-50 disabled:active:scale-100"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+              {joining ? (
+                <span className="flex items-center justify-center gap-2">
+                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                   Joining Project...
+                </span>
+              ) : "Accept Invitation"}
+            </button>
 
-        {error && (
-          <div className="p-3 rounded-xl text-sm mb-4 bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300">
-            {error}
+            <button
+              onClick={() => navigate("/dashboard")}
+              className="w-full py-4 text-sm font-bold text-stone-500 dark:text-slate-400 hover:text-stone-700 dark:hover:text-slate-200 transition-colors uppercase tracking-widest"
+            >
+              Decline Invite
+            </button>
           </div>
-        )}
-
-        <div className="flex p-1 gap-2 w-full">
-          <button
-            onClick={handleJoin}
-            disabled={joining}
-            className="w-full py-3 bg-purple-600 text-white font-medium rounded-xl hover:bg-purple-700 transition-colors disabled:opacity-50 "
-          >
-            {joining ? "Joining..." : "Join Project"}
-          </button>
-
-          <button
-            onClick={() => navigate("/dashboard")}
-            className="w-full py-3 font-medium rounded-xl transition-colors bg-stone-100 text-stone-600 hover:bg-stone-200 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600"
-          >
-            Decline Invite
-          </button>
         </div>
       </div>
     </div>
