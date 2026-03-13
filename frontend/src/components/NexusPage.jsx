@@ -56,9 +56,12 @@ const NexusPage = ({ selectedProject, onToggleSidebar }) => {
         ol: ({ node, ...props }) => <ol className="list-decimal pl-5 mb-3 space-y-1" {...props} />,
         li: ({ node, ...props }) => <li className="" {...props} />,
         strong: ({ node, ...props }) => <strong className="font-semibold text-indigo-700 dark:text-indigo-300" {...props} />,
-        code: ({ node, inline, ...props }) => inline
-            ? <code className="bg-stone-100 dark:bg-slate-900 px-1 py-0.5 rounded text-[13px] text-pink-600 dark:text-pink-400 font-mono" {...props} />
-            : <div className="bg-stone-100 dark:bg-slate-900 p-3 rounded-lg overflow-x-auto mb-3 border border-stone-200 dark:border-slate-700"><code className="text-[13px] font-mono" {...props} /></div>,
+        code: ({ node, className, children, ...props }) => {
+            const match = /language-(\w+)/.exec(className || '');
+            return !match
+                ? <code className={`bg-stone-100 dark:bg-slate-900 px-1 py-0.5 rounded text-[13px] text-pink-600 dark:text-pink-400 font-mono ${className || ''}`} {...props}>{children}</code>
+                : <div className="bg-stone-100 dark:bg-slate-900 p-3 rounded-lg overflow-x-auto mb-3 border border-stone-200 dark:border-slate-700"><code className={`text-[13px] font-mono ${className || ''}`} {...props}>{children}</code></div>;
+        },
         h2: ({ node, ...props }) => <h2 className="text-base font-bold text-stone-800 dark:text-slate-100 mt-4 mb-2" {...props} />,
         h3: ({ node, ...props }) => <h3 className="text-sm font-semibold text-stone-700 dark:text-slate-300 mt-3 mb-1.5" {...props} />,
     }), []);
@@ -291,16 +294,16 @@ const NexusPage = ({ selectedProject, onToggleSidebar }) => {
             <div className="shrink-0 border-t border-stone-200/50 dark:border-white/5 bg-[#fafafa] dark:bg-[#0c0c0e] px-4 sm:px-6 py-4">
                 <div className="max-w-2xl mx-auto flex flex-col gap-3">
                     {/* Prompt suggestion chips — always visible */}
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className={hasConversation ? "flex overflow-x-auto gap-2 pb-2 custom-scrollbar w-full" : "grid grid-cols-2 gap-2"}>
                         {PROMPTS.map((p) => (
                             <button
                                 key={p.type}
                                 onClick={() => handlePromptClick(p)}
                                 disabled={isLoading || !selectedProject}
-                                className="flex items-center gap-2 px-3 py-2.5 text-xs font-medium rounded-xl bg-white dark:bg-slate-800/70 border border-stone-200 dark:border-slate-700 text-stone-600 dark:text-slate-300 hover:border-indigo-400 dark:hover:border-indigo-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50/50 dark:hover:bg-indigo-900/10 transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed text-left"
+                                className={`flex items-center gap-2 px-3 py-2.5 text-xs font-medium rounded-xl bg-white dark:bg-slate-800/70 border border-stone-200 dark:border-slate-700 text-stone-600 dark:text-slate-300 hover:border-indigo-400 dark:hover:border-indigo-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50/50 dark:hover:bg-indigo-900/10 transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed text-left shrink-0 ${hasConversation ? 'py-1.5 rounded-lg whitespace-nowrap flex-shrink-0' : ''}`}
                             >
                                 <i className={`bi ${p.icon} text-stone-400 dark:text-slate-500 text-sm shrink-0`} />
-                                {p.text}
+                                <span>{p.text}</span>
                             </button>
                         ))}
                     </div>

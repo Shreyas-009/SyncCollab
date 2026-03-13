@@ -53,9 +53,12 @@ const ChatInterface = ({ isOpen, onClose, selectedProject }) => {
         ol: ({ node, ...props }) => <ol className="list-decimal pl-5 mb-3 space-y-1" {...props} />,
         li: ({ node, ...props }) => <li className="" {...props} />,
         strong: ({ node, ...props }) => <strong className="font-semibold text-indigo-700 dark:text-indigo-300" {...props} />,
-        code: ({ node, inline, ...props }) => inline
-            ? <code className="bg-stone-100 dark:bg-slate-900 px-1 py-0.5 rounded text-[13px] text-pink-600 dark:text-pink-400 font-mono" {...props} />
-            : <div className="bg-stone-100 dark:bg-slate-900 p-3 rounded-lg overflow-x-auto mb-3 border border-stone-200 dark:border-slate-700"><code className="text-[13px] font-mono" {...props} /></div>,
+        code: ({ node, className, children, ...props }) => {
+            const match = /language-(\w+)/.exec(className || '');
+            return !match
+                ? <code className={`bg-stone-100 dark:bg-slate-900 px-1 py-0.5 rounded text-[13px] text-pink-600 dark:text-pink-400 font-mono ${className || ''}`} {...props}>{children}</code>
+                : <div className="bg-stone-100 dark:bg-slate-900 p-3 rounded-lg overflow-x-auto mb-3 border border-stone-200 dark:border-slate-700"><code className={`text-[13px] font-mono ${className || ''}`} {...props}>{children}</code></div>;
+        },
         h2: ({ node, ...props }) => <h2 className="text-base font-bold text-stone-800 dark:text-slate-100 mt-4 mb-2" {...props} />,
         h3: ({ node, ...props }) => <h3 className="text-sm font-semibold text-stone-700 dark:text-slate-300 mt-3 mb-1.5" {...props} />,
     }), []);

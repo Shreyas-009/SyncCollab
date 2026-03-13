@@ -5,6 +5,8 @@ import useMutationLocks from '../hooks/useMutationLocks'
 
 const ProjectSettingsModal = ({ show, onClose, project, onProjectUpdated }) => {
     const [confirmDelete, setConfirmDelete] = useState(false);
+    const [confirmLeave, setConfirmLeave] = useState(false);
+    const [memberToDelete, setMemberToDelete] = useState(null);
     const { user } = useUser();
     const { runLocked, isLocked } = useMutationLocks()
     
@@ -33,13 +35,12 @@ const ProjectSettingsModal = ({ show, onClose, project, onProjectUpdated }) => {
         ))
 
     const handleRemoveCollaborator = async (collaboratorId) => {
-        if (!confirm('Remove this collaborator from the project?')) return;
-
         const actionKey = getRemoveCollaboratorKey(collaboratorId)
         try {
             const { executed } = await runLocked(actionKey, async () => {
                 await removeProjectCollaborator(project._id, collaboratorId)
                 if (onProjectUpdated) onProjectUpdated()
+                setMemberToDelete(null)
             })
             if (!executed) return
         } catch (error) {
@@ -61,13 +62,12 @@ const ProjectSettingsModal = ({ show, onClose, project, onProjectUpdated }) => {
     };
 
     const handleLeaveProject = async () => {
-        if (!confirm('Are you sure you want to leave this project? You will lose access to all its tasks.')) return;
-
         try {
             const { executed } = await runLocked(leaveProjectKey, async () => {
                 await leaveProject(project._id)
                 onClose()
                 if (onProjectUpdated) onProjectUpdated()
+                setConfirmLeave(false)
             })
             if (!executed) return
         } catch (error) {
@@ -249,54 +249,55 @@ const ProjectSettingsModal = ({ show, onClose, project, onProjectUpdated }) => {
                                         return (
                                             <div
                                                 key={c.id}
-                                                className="flex items-center justify-between p-4 rounded-2xl border border-stone-100 dark:border-white/5 bg-white dark:bg-slate-800/30 group"
+                                                className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl border border-stone-100 dark:border-white/5 bg-white dark:bg-slate-800/30 group"
                                             >
-                                                <div className="flex items-center gap-3 min-w-0">
+                                                <div className="flex items-center gap-3 min-w-0 flex-1">
                                                     <div className="w-10 h-10 rounded-full bg-stone-100 dark:bg-slate-700 flex items-center justify-center text-sm font-bold text-stone-400 overflow-hidden shrink-0">
                                                         {c.image ? <img src={c.image} className="w-full h-full object-cover" /> : c.name?.[0] || '?'}
                                                     </div>
                                                     <div className="min-w-0">
-                                                        <div className="flex items-center lg:gap-2 gap-1 flex-wrap">
-                                                            <p className="text-sm font-bold text-stone-800 dark:text-slate-100 truncate">{c.name || 'User'}</p>
-                                                            {isOwner ? (
-                                                                <div className="relative">
-                                                                    <select
-                                                                        disabled={isBusy}
-                                                                        value={c.role || 'Member'}
-                                                                        onChange={(e) => handleRoleChange(c.id, e.target.value)}
-                                                                        className="text-[9px] font-black uppercase tracking-widest bg-stone-100 dark:bg-slate-800 text-stone-500 dark:text-slate-400 px-2 py-0.5 rounded-md cursor-pointer hover:bg-stone-200 dark:hover:bg-slate-700 focus:outline-none appearance-none pr-5 transition-colors"
-                                                                    >
-                                                                        <option value="Team Lead">Team Lead</option>
-                                                                        <option value="Frontend Developer">Frontend Developer</option>
-                                                                        <option value="Backend Developer">Backend Developer</option>
-                                                                        <option value="Tester">Tester</option>
-                                                                        <option value="Designer">Designer</option>
-                                                                        <option value="Member">Member</option>
-                                                                    </select>
-                                                                    <i className="bi bi-chevron-down absolute right-1.5 top-1/2 -translate-y-1/2 text-[7px] pointer-events-none text-stone-400" />
-                                                                </div>
-                                                            ) : (
-                                                                <span className="text-[9px] font-black uppercase tracking-widest bg-stone-50 dark:bg-slate-800 text-stone-400 px-2 py-0.5 rounded">
-                                                                    {c.role || 'Member'}
-                                                                </span>
-                                                            )}
-                                                        </div>
+                                                        <p className="text-sm font-bold text-stone-800 dark:text-slate-100 truncate">{c.name || 'User'}</p>
                                                         <p className="text-[11px] text-stone-400 dark:text-slate-600 truncate">{c.email}</p>
                                                     </div>
                                                 </div>
 
-                                                {isOwner && (
-                                                    <button
-                                                        onClick={() => handleRemoveCollaborator(c.id)}
-                                                        disabled={isBusy}
-                                                        className="w-8 h-8 flex items-center justify-center rounded-xl bg-red-50 dark:bg-red-900/10 text-red-500 hover:bg-red-500 hover:text-white transition-all disabled:opacity-50 shrink-0"
-                                                        title="Remove member"
-                                                    >
-                                                        {isRemoving ? (
-                                                            <div className="w-3 h-3 rounded-full border border-red-500/30 border-t-red-500 animate-spin" />
-                                                        ) : <i className="bi bi-trash-fill text-xs" />}
-                                                    </button>
-                                                )}
+                                                <div className="flex items-center gap-2 pl-[52px] sm:pl-0 shrink-0">
+                                                    {isOwner ? (
+                                                        <div className="relative w-[130px] sm:w-[140px]">
+                                                            <select
+                                                                disabled={isBusy}
+                                                                value={c.role || 'Member'}
+                                                                onChange={(e) => handleRoleChange(c.id, e.target.value)}
+                                                                className="text-[10px] w-full font-bold tracking-wide bg-stone-100 dark:bg-slate-800 text-stone-600 dark:text-slate-300 px-3 py-1.5 rounded-lg cursor-pointer hover:bg-stone-200 dark:hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-purple-500/20 appearance-none pr-7 transition-all truncate"
+                                                            >
+                                                                <option value="Team Lead">Team Lead</option>
+                                                                <option value="Frontend Developer">Frontend Developer</option>
+                                                                <option value="Backend Developer">Backend Developer</option>
+                                                                <option value="Tester">Tester</option>
+                                                                <option value="Designer">Designer</option>
+                                                                <option value="Member">Member</option>
+                                                            </select>
+                                                            <i className="bi bi-chevron-down absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] pointer-events-none text-stone-500 dark:text-stone-400" />
+                                                        </div>
+                                                    ) : (
+                                                        <span className="text-[9px] font-black uppercase tracking-widest bg-stone-50 dark:bg-slate-800 text-stone-400 px-2 py-0.5 rounded">
+                                                            {c.role || 'Member'}
+                                                        </span>
+                                                    )}
+
+                                                    {isOwner && (
+                                                        <button
+                                                            onClick={() => setMemberToDelete(c.id)}
+                                                            disabled={isBusy}
+                                                            className="w-8 h-8 flex items-center justify-center rounded-xl bg-red-50 dark:bg-red-900/10 text-red-500 hover:bg-red-500 hover:text-white transition-all disabled:opacity-50 shrink-0"
+                                                            title="Remove member"
+                                                        >
+                                                            {isRemoving ? (
+                                                                <div className="w-3 h-3 rounded-full border border-red-500/30 border-t-red-500 animate-spin" />
+                                                            ) : <i className="bi bi-trash-fill text-xs" />}
+                                                        </button>
+                                                    )}
+                                                </div>
                                             </div>
                                         )
                                     })
@@ -313,49 +314,68 @@ const ProjectSettingsModal = ({ show, onClose, project, onProjectUpdated }) => {
                 {/* Footer - Fixed */}
                 <div className="px-6 py-5 border-t border-stone-100 dark:border-white/5 bg-stone-50/50 dark:bg-slate-900/50 shrink-0">
                     {isOwner ? (
-                        confirmDelete ? (
-                            <div className="animate-in fade-in slide-in-from-bottom-2 duration-200">
-                                <p className="text-[11px] font-bold text-red-500 dark:text-red-400 text-center mb-4 uppercase tracking-tighter">
-                                    Caution: Delete Project and all tasks?
-                                </p>
-                                <div className="flex gap-2">
-                                    <button
-                                        onClick={() => setConfirmDelete(false)}
-                                        disabled={isLocked(deleteProjectKey)}
-                                        className="flex-1 py-3 text-xs font-bold rounded-xl bg-white 
-                                        dark:bg-slate-600
-                                        border border-stone-200 dark:border-white/5 text-stone-600 dark:text-slate-300 hover:bg-stone-50 dark:hover:bg-slate-700  transition-all active:scale-[0.98]"
-                                    >
-                                        Cancel
-                                    </button>
-                                    <button
-                                        onClick={handleDeleteProject}
-                                        disabled={isLocked(deleteProjectKey)}
-                                        className='flex-1 py-3 text-xs font-bold text-white bg-red-500 hover:bg-red-600 rounded-xl disabled:opacity-50 flex items-center justify-center gap-2 transition-all active:scale-[0.98]'
-                                    >
-                                        {isLocked(deleteProjectKey) ? <div className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin"></div> : 'Confirm Delete'}
-                                    </button>
-                                </div>
-                            </div>
-                        ) : (
-                            <button
-                                onClick={() => setConfirmDelete(true)}
-                                className="w-full py-3 text-xs font-bold rounded-xl text-red-400 hover:bg-red-500/10 dark:hover:bg-red-500/5 border border-red-400/20 transition-all uppercase tracking-widest"
-                            >
-                                Danger Zone: Delete Project
-                            </button>
-                        )
+                        <button
+                            onClick={() => setConfirmDelete(true)}
+                            className="w-full py-3 text-xs font-bold rounded-xl text-red-500 hover:bg-red-500 hover:text-white dark:text-red-400 dark:hover:bg-red-500/10 border border-red-500/20 transition-all uppercase tracking-widest active:scale-[0.98]"
+                        >
+                            Danger Zone: Delete Project
+                        </button>
                     ) : (
                         <button
-                            onClick={handleLeaveProject}
-                            disabled={isLocked(leaveProjectKey)}
-                            className="w-full py-3.5 text-xs font-bold rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                            onClick={() => setConfirmLeave(true)}
+                            className="w-full py-3.5 text-xs font-bold rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all disabled:opacity-50 flex items-center justify-center gap-2 active:scale-[0.98]"
                         >
-                            {isLocked(leaveProjectKey) ? <div className="w-4 h-4 rounded-full border-2 border-red-500/30 border-t-red-500 animate-spin"></div> : 'Exit Project'}
+                            Exit Project
                         </button>
                     )}
                 </div>
             </div>
+
+            {/* Separate Confirm Modal Overlays */}
+            {(confirmDelete || confirmLeave || memberToDelete) && (
+                <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200" onClick={(e) => e.stopPropagation()}>
+                    <div className="w-full max-w-sm bg-white dark:bg-slate-900 rounded-3xl shadow-2xl overflow-hidden border border-stone-100 dark:border-white/10 animate-in zoom-in-95 duration-200">
+                        <div className="p-6 text-center">
+                            <div className="w-16 h-16 rounded-full bg-red-50 dark:bg-red-500/10 flex items-center justify-center mx-auto mb-4 border-4 border-white dark:border-slate-900 shadow-sm">
+                                <i className="bi bi-exclamation-triangle-fill text-2xl text-red-500"></i>
+                            </div>
+                            <h3 className="text-lg font-bold text-stone-900 dark:text-slate-100 mb-2">
+                                {confirmDelete && "Delete Project?"}
+                                {confirmLeave && "Leave Project?"}
+                                {memberToDelete && "Remove Member?"}
+                            </h3>
+                            <p className="text-sm text-stone-500 dark:text-slate-400 mb-6">
+                                {confirmDelete && "This action cannot be undone. All tasks, files, and members will be permanently removed from this project."}
+                                {confirmLeave && "You will lose access to this project and all its tasks until you are invited back."}
+                                {memberToDelete && "This member will instantly lose access to the project and all associated tasks."}
+                            </p>
+                            
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => { setConfirmDelete(false); setConfirmLeave(false); setMemberToDelete(null); }}
+                                    disabled={isLocked(deleteProjectKey) || isLocked(leaveProjectKey) || (memberToDelete && isLocked(getRemoveCollaboratorKey(memberToDelete)))}
+                                    className="flex-1 py-3 text-sm font-bold rounded-xl bg-stone-100 dark:bg-slate-800 text-stone-600 dark:text-slate-300 hover:bg-stone-200 dark:hover:bg-slate-700 transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        if (confirmDelete) handleDeleteProject();
+                                        if (confirmLeave) handleLeaveProject();
+                                        if (memberToDelete) handleRemoveCollaborator(memberToDelete);
+                                    }}
+                                    disabled={isLocked(deleteProjectKey) || isLocked(leaveProjectKey) || (memberToDelete && isLocked(getRemoveCollaboratorKey(memberToDelete)))}
+                                    className="flex-1 py-3 text-sm font-bold rounded-xl bg-red-500 text-white hover:bg-red-600 transition-colors flex items-center justify-center gap-2"
+                                >
+                                    {isLocked(deleteProjectKey) || isLocked(leaveProjectKey) || (memberToDelete && isLocked(getRemoveCollaboratorKey(memberToDelete))) ? (
+                                        <div className="w-5 h-5 rounded-full border-2 border-white/30 border-t-white animate-spin"></div>
+                                    ) : 'Confirm'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

@@ -76,47 +76,141 @@ const ProjectSidebar = ({
     // ── COLLAPSED sidebar (16) ──────────────────────────────────────────
     if (!isOpen) {
         return (
-            <aside className="hidden md:flex w-16 h-full flex-col items-center py-4 border-r bg-white border-stone-200 dark:bg-slate-900 dark:border-slate-700 z-50">
+            <aside className="hidden md:flex w-16 h-full flex-col items-center pt-4 border-r bg-[#f8f9fa] dark:bg-[#0c0c0e] border-stone-200 dark:border-white/5 z-50 transition-colors">
                 <button
                     onClick={onToggle}
-                    className="p-2 rounded-xl mb-6 hover:bg-stone-100 text-stone-500 dark:hover:bg-slate-800 dark:text-slate-400"
+                    className="p-2 px-3 rounded-xl mb-6 hover:bg-stone-200/50 text-stone-500 dark:hover:bg-slate-800 dark:text-slate-400"
+                    title="Expand"
                 >
-                    <i className="bi bi-layout-sidebar text-lg" />
+                    <i className="bi bi-layout-sidebar text-lg " size={24} />
                 </button>
 
-                <div className="flex flex-col gap-4">
-                    <button
-                        onClick={() => onNavigate('hub')}
-                        className={`p-2.5 rounded-xl transition-all ${currentPage === 'hub' ? 'bg-purple-600 text-white shadow-lg' : 'text-stone-500 hover:bg-stone-100 dark:text-slate-400 dark:hover:bg-slate-800'}`}
-                        title="Projects Hub"
-                    >
-                        <i className="bi bi-grid-fill text-lg" />
-                    </button>
-                    {selectedProject && (
+                <div className="flex-1 overflow-y-auto custom-scrollbar w-full flex flex-col gap-2 px-2 items-center">
+                    {selectedProject ? (
                         <>
-                            <div className="w-8 h-px bg-stone-200 dark:bg-slate-800 my-1 mx-auto" />
+                            <button
+                                onClick={() => { onSelectProject(null); onNavigate('hub'); }}
+                                className="w-10 h-10 flex items-center justify-center rounded-xl transition-all text-stone-500 hover:bg-stone-200/50 dark:text-slate-400 dark:hover:bg-slate-800 mb-2 shrink-0 group"
+                                title="All Projects"
+                            >
+                                <i className="bi bi-chevron-left text-lg transition-transform" />
+                            </button>
+                            
+                            <div className="relative group shrink-0 mb-2 w-10 h-10">
+                                <div
+                                    className="w-10 h-10 rounded-xl flex items-center justify-center text-white text-base font-bold shadow-md cursor-help"
+                                    style={{ backgroundColor: selectedProject.color || '#8B5CF6' }}
+                                    title={selectedProject.name}
+                                >
+                                    {selectedProject.name?.[0]?.toUpperCase()}
+                                </div>
+                            </div>
+
                             <button
                                 onClick={() => onNavigate('board')}
-                                className={`p-2.5 rounded-xl transition-all ${currentPage === 'board' ? 'bg-purple-600 text-white shadow-lg' : 'text-stone-500 hover:bg-stone-100 dark:text-slate-400 dark:hover:bg-slate-800'}`}
+                                className={`w-10 h-10 flex items-center justify-center rounded-xl transition-all shrink-0 ${currentPage === 'board' ? 'bg-purple-600 text-white shadow-md shadow-purple-600/20' : 'text-stone-500 hover:bg-stone-200/50 dark:text-slate-400 dark:hover:bg-slate-800'}`}
                                 title="Board"
                             >
                                 <i className="bi bi-kanban text-lg" />
                             </button>
                             <button
+                                onClick={() => onNavigate('activity')}
+                                className={`w-10 h-10 flex items-center justify-center rounded-xl transition-all shrink-0 ${currentPage === 'activity' ? 'bg-purple-600 text-white shadow-md shadow-purple-600/20' : 'text-stone-500 hover:bg-stone-200/50 dark:text-slate-400 dark:hover:bg-slate-800'}`}
+                                title="Activity"
+                            >
+                                <i className="bi bi-activity text-lg" />
+                            </button>
+                            <button
+                                onClick={() => onNavigate('members')}
+                                className={`w-10 h-10 flex items-center justify-center rounded-xl transition-all shrink-0 ${currentPage === 'members' ? 'bg-purple-600 text-white shadow-md shadow-purple-600/20' : 'text-stone-500 hover:bg-stone-200/50 dark:text-slate-400 dark:hover:bg-slate-800'}`}
+                                title="Members"
+                            >
+                                <i className="bi bi-people text-lg" />
+                            </button>
+                            <button
                                 onClick={() => onNavigate('nexus')}
-                                className={`p-2.5 rounded-xl transition-all ${currentPage === 'nexus' ? 'bg-indigo-600 text-white shadow-lg' : 'text-stone-500 hover:bg-stone-100 dark:text-slate-400 dark:hover:bg-slate-800'}`}
+                                className={`w-10 h-10 flex items-center justify-center rounded-xl transition-all shrink-0 ${currentPage === 'nexus' ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md shadow-indigo-600/20' : 'text-stone-500 hover:bg-stone-200/50 dark:text-slate-400 dark:hover:bg-slate-800'}`}
                                 title="Nexus AI"
                             >
                                 <i className="bi bi-lightning-charge-fill text-lg" />
+                            </button>
+                            
+                            <div className="w-6 h-px bg-stone-200 dark:bg-slate-800/80 my-2 shrink-0" />
+                            
+                            <button
+                                onClick={onShowInvite}
+                                className="w-10 h-10 flex items-center justify-center rounded-xl transition-all shrink-0 text-stone-500 hover:bg-stone-200/50 dark:text-slate-400 dark:hover:bg-slate-800"
+                                title="Invite People"
+                            >
+                                <i className="bi bi-person-plus text-lg" />
+                            </button>
+                            <button
+                                onClick={onShowSettings}
+                                className="w-10 h-10 flex items-center justify-center rounded-xl transition-all shrink-0 text-stone-500 hover:bg-stone-200/50 dark:text-slate-400 dark:hover:bg-slate-800"
+                                title="Project Settings"
+                            >
+                                <i className="bi bi-gear text-lg" />
+                            </button>
+                        </>
+                    ) : (
+                        <>
+                            <button
+                                onClick={onShowRequests}
+                                className={`w-10 h-10 flex items-center justify-center rounded-xl transition-all relative shrink-0 ${pendingCount > 0 ? 'text-stone-500 hover:bg-stone-200/50 dark:text-slate-400 dark:hover:bg-slate-800' : 'text-stone-500 hover:bg-stone-200/50 dark:text-slate-400 dark:hover:bg-slate-800'}`}
+                                title="Requests"
+                            >
+                                <i className="bi bi-inbox-fill text-lg" />
+                                {pendingCount > 0 && (
+                                    <span className="absolute top-2 right-2 w-2 h-2 bg-indigo-500 rounded-full border border-[#f8f9fa] dark:border-[#0c0c0e]" />
+                                )}
                             </button>
                         </>
                     )}
                 </div>
 
-                <div className="mt-auto pb-4">
-                    <button onClick={() => openUserProfile()} className="w-10 h-10 rounded-xl overflow-hidden shadow-sm hover:scale-105 transition-transform">
-                        <img src={user?.imageUrl} className="w-full h-full object-cover" alt="" />
+                <div className="mt-auto p-2 relative" ref={accountMenuRef}>
+                    <button 
+                        onClick={() => setAccountMenuOpen(!accountMenuOpen)}
+                        className={`w-10 h-10 rounded-xl overflow-hidden shadow-sm transition-all border ${accountMenuOpen ? 'border-stone-300 dark:border-slate-600 ring-2 ring-purple-500/20' : 'border-transparent'}`}
+                        title={user?.fullName || 'User Profile'}
+                    >
+                        {user?.imageUrl ? (
+                            <img src={user.imageUrl} className="w-full h-full object-cover" alt="" />
+                        ) : (
+                            <div className="w-full h-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                                <i className="bi bi-person text-purple-600 dark:text-purple-400 text-lg" />
+                            </div>
+                        )}
                     </button>
+                    {accountMenuOpen && (
+                        <div className="absolute left-full bottom-4 ml-3 w-56 rounded-2xl border border-stone-200 dark:border-slate-700 bg-white dark:bg-[#1a1b1e] shadow-xl py-2 px-1.5 z-[60] flex flex-col gap-0.5">
+                            <button
+                                onClick={() => { setAccountMenuOpen(false); openUserProfile(); }}
+                                className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-xl hover:bg-stone-100 dark:hover:bg-white/5 text-stone-700 dark:text-slate-200 transition-colors"
+                            >
+                                <Settings className="w-4 h-4 shrink-0" /> Settings
+                            </button>
+                            <div className="relative">
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); setDisplayMenuOpen(!displayMenuOpen); }}
+                                    className="w-full flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-xl hover:bg-stone-100 dark:hover:bg-white/5 text-stone-700 dark:text-slate-200 transition-colors"
+                                >
+                                    <div className="flex items-center gap-3"><Monitor className="w-4 h-4 shrink-0" /> Display</div>
+                                    <ChevronRight className={`w-4 h-4 transition-transform ${displayMenuOpen ? 'text-stone-500' : 'text-stone-400'}`} />
+                                </button>
+                                {displayMenuOpen && (
+                                    <div className="absolute left-full top-0 ml-3 w-32 rounded-2xl border border-stone-200 dark:border-slate-700 bg-white dark:bg-[#1a1b1e] shadow-xl py-2 px-1.5 z-[70] flex flex-col gap-0.5">
+                                        <button onClick={() => { if(isDark) toggleTheme(); setDisplayMenuOpen(false); setAccountMenuOpen(false); }} className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-xl transition-colors ${!isDark ? 'bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-400' : 'hover:bg-stone-100 dark:hover:bg-white/5 text-stone-700 dark:text-slate-200'}`}><Sun className="w-4 h-4 shrink-0" /> Light</button>
+                                        <button onClick={() => { if(!isDark) toggleTheme(); setDisplayMenuOpen(false); setAccountMenuOpen(false); }} className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-xl transition-colors ${isDark ? 'bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-400' : 'hover:bg-stone-100 dark:hover:bg-white/5 text-stone-700 dark:text-slate-200'}`}><Moon className="w-4 h-4 shrink-0" /> Dark</button>
+                                    </div>
+                                )}
+                            </div>
+                            <div className="h-px bg-stone-200 dark:bg-slate-700/50 my-1 mx-2" />
+                            <button onClick={() => { setAccountMenuOpen(false); signOut(); }} className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-xl hover:bg-stone-100 dark:hover:bg-white/5 text-stone-700 dark:text-slate-200 transition-colors group">
+                                <LogOut className="w-4 h-4 shrink-0 group-hover:text-stone-900 dark:group-hover:text-white" /> Log Out
+                            </button>
+                        </div>
+                    )}
                 </div>
             </aside>
         );
@@ -143,7 +237,7 @@ const ProjectSidebar = ({
                     </div>
                     <button
                         onClick={onToggle}
-                        className="p-1.5 rounded-xl hover:bg-stone-200/50 text-stone-500 dark:hover:bg-slate-800 dark:text-slate-400 transition-colors md:flex hidden"
+                        className="py-2 px-3 rounded-xl hover:bg-stone-200/50 text-stone-500 dark:hover:bg-slate-800 dark:text-slate-400 transition-colors md:flex hidden"
                         title="Collapse"
                     >
                         <i className="bi bi-layout-sidebar-inset text-lg" />
