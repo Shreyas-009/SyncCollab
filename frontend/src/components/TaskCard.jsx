@@ -1,6 +1,6 @@
 import React from 'react';
 import { Draggable } from '@hello-pangea/dnd';
-import { Edit2, Trash2, SignalHigh, SignalMedium, SignalLow } from 'lucide-react';
+import { Edit2, Trash2, SignalHigh, SignalMedium, SignalLow, MessageCircle } from 'lucide-react';
 import { TASK_TYPES } from './TaskForm';
 
 const TASK_TYPE_BADGE = {
@@ -13,7 +13,7 @@ const TASK_TYPE_BADGE = {
     'other':         { bg: 'bg-stone-100 dark:bg-slate-700',      text: 'text-stone-500 dark:text-slate-400' },
 };
 
-const TaskCard = ({ task, index, onDelete, onEdit, onView, isBusy = false }) => {
+const TaskCard = ({ task, index, onDelete, onEdit, onView, onComments, isBusy = false }) => {
   const priority = task.priority;
   const hasDescription = task.description && task.description.trim() !== '';
   const typeInfo = TASK_TYPES.find(t => t.value === task.taskType);
@@ -35,9 +35,9 @@ const TaskCard = ({ task, index, onDelete, onEdit, onView, isBusy = false }) => 
           {...provided.draggableProps}
           {...provided.dragHandleProps}
           style={{ ...provided.draggableProps.style }}
-          className={`w-full flex flex-col justify-between min-h-[90px] border rounded-xl p-3 my-2 mx-0 overflow-hidden shadow-sm transition-all duration-[0ms] group 
-            ${snapshot.isDragging 
-              ? 'bg-white border-purple-500 ring-2 ring-purple-500/20 dark:bg-slate-800 dark:border-purple-500 scale-[1.05] shadow-2xl z-[9999]' 
+          className={`w-full flex flex-col justify-between min-h-[90px] border rounded-xl p-3 my-2 mx-0 overflow-hidden shadow-sm transition-all duration-[0ms] group
+            ${snapshot.isDragging
+              ? 'bg-white border-purple-500 ring-2 ring-purple-500/20 dark:bg-slate-800 dark:border-purple-500 scale-[1.05] shadow-2xl z-[9999]'
               : 'bg-white border-stone-200 hover:border-stone-300 dark:bg-gray-800/80 dark:border-gray-700 dark:hover:border-gray-600'
             }`}
         >
@@ -48,7 +48,7 @@ const TaskCard = ({ task, index, onDelete, onEdit, onView, isBusy = false }) => 
                 {task.title}
               </h4>
             </div>
-            
+
             {/* Action Buttons */}
             <div className={`flex gap-1 shrink-0 transition-opacity duration-200 ${snapshot.isDragging ? 'opacity-0' : 'md:opacity-0 group-hover:opacity-100 opacity-100'}`}>
               <button
@@ -113,11 +113,22 @@ const TaskCard = ({ task, index, onDelete, onEdit, onView, isBusy = false }) => 
             >
                 View details
             </button>
-            
+
             <div className="flex items-center gap-2">
                 {isBusy && (
                     <span className="w-4 h-4 rounded-full border-2 border-purple-200 border-t-purple-600 animate-spin" />
                 )}
+
+                {/* Comments Button */}
+                <button
+                    onClick={(e) => { e.stopPropagation(); onComments(task); }}
+                    disabled={isBusy}
+                    className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-purple-100 text-purple-700 hover:bg-purple-200 dark:bg-purple-600/20 dark:text-purple-300 dark:hover:bg-purple-600/30 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed group"
+                    title="View Comments"
+                >
+                    <MessageCircle className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
+                    {/* <span>Comments</span> */}
+                </button>
 
 {/* Priority Icon */}
                 <div title={`Priority: ${priority}`} className={`flex items-center ml-0.5 p-1 rounded-sm ${priority === 'high' ? 'bg-red-100 dark:bg-red-900/40' : priority === 'medium' ? 'bg-orange-100 dark:bg-orange-900/40' : 'bg-green-100 dark:bg-green-900/40'}`}>
@@ -144,7 +155,7 @@ const TaskCard = ({ task, index, onDelete, onEdit, onView, isBusy = false }) => 
                         )}
                     </div>
                 )}
-                
+
             </div>
           </div>
         </article>
