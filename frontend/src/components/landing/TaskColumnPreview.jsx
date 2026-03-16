@@ -4,24 +4,24 @@ import { Droppable } from "@hello-pangea/dnd";
 import { Grid, Check, User, Filter, Inbox } from "lucide-react";
 
 const TaskCardSkeleton = () => (
-  <div className="w-full flex flex-col justify-between min-h-[90px] border rounded-xl p-3 my-2 mx-0 overflow-hidden shadow-sm bg-white dark:bg-gray-800/80 border-stone-200 dark:border-gray-700 animate-pulse">
+  <div className="w-full flex flex-col justify-between min-h-[90px] border rounded-xl p-3 my-2 mx-0 overflow-hidden shadow-sm bg-white dark:bg-[#16161a] border-stone-200 dark:border-white/5 animate-pulse">
     <div className="flex items-start justify-between gap-3">
-      <div className="h-4 bg-stone-100 dark:bg-slate-700 rounded w-2/3" />
+      <div className="h-4 bg-stone-100 dark:bg-white/10 rounded w-2/3" />
       <div className="flex gap-1">
-        <div className="w-7 h-7 rounded-lg bg-stone-100 dark:bg-slate-700" />
-        <div className="w-7 h-7 rounded-lg bg-stone-100 dark:bg-slate-700" />
+        <div className="w-7 h-7 rounded-lg bg-stone-100 dark:bg-white/5" />
+        <div className="w-7 h-7 rounded-lg bg-stone-100 dark:bg-white/5" />
       </div>
     </div>
     <div className="mt-2.5 space-y-1">
-      <div className="h-3 bg-stone-100 dark:bg-slate-700 rounded w-full" />
-      <div className="h-3 bg-stone-100 dark:bg-slate-700 rounded w-4/5" />
+      <div className="h-3 bg-stone-100 dark:bg-white/10 rounded w-full" />
+      <div className="h-3 bg-stone-100 dark:bg-white/10 rounded w-4/5" />
     </div>
-    <div className="h-[1px] w-full bg-stone-100 dark:bg-gray-700/50 my-2.5"></div>
+    <div className="h-[1px] w-full bg-stone-100 dark:bg-white/5 my-2.5"></div>
     <div className="flex items-center justify-between mt-auto">
-      <div className="h-6 w-20 bg-stone-100 dark:bg-slate-700 rounded-lg" />
+      <div className="h-6 w-20 bg-stone-100 dark:bg-white/5 rounded-lg" />
       <div className="flex items-center gap-2">
-        <div className="w-6 h-6 rounded-full bg-stone-100 dark:bg-slate-700" />
-        <div className="h-5 w-10 bg-stone-100 dark:bg-slate-700 rounded" />
+        <div className="w-6 h-6 rounded-full bg-stone-100 dark:bg-white/5" />
+        <div className="h-5 w-10 bg-stone-100 dark:bg-white/5 rounded" />
       </div>
     </div>
   </div>
@@ -71,16 +71,16 @@ const TaskColumn = ({
   });
 
   return (
-    <section className="flex flex-col flex-1 min-w-[280px] max-w-sm h-full rounded-[24px] bg-stone-100/50 border border-stone-200/60 shadow-sm dark:bg-slate-800/30 dark:border-slate-700/50 overflow-hidden">
+    <section className="flex flex-col flex-1 min-w-[280px] max-w-sm h-full rounded-[24px] bg-stone-100/50 border border-stone-200/60 shadow-sm dark:bg-[#111114] dark:border-white/5 overflow-hidden">
       {/* Column Header */}
-      <div className="flex items-center justify-between p-4 bg-white/40 dark:bg-slate-800/40 border-b border-stone-200/50 dark:border-slate-700/50 z-10 sticky top-0">
+      <div className="flex items-center justify-between p-4 bg-white/40 dark:bg-white/5 border-b border-stone-200/50 dark:border-white/5 z-10 sticky top-0">
         <div className="flex items-center gap-3">
           {icon ? (
-            <div className="w-8 h-8 rounded-xl bg-white dark:bg-slate-700 shadow-sm border border-stone-100 dark:border-slate-600 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-xl bg-white dark:bg-[#1a1a1e] shadow-sm border border-stone-100 dark:border-white/10 flex items-center justify-center p-1.5">
               {icon}
             </div>
           ) : img ? (
-            <div className="w-8 h-8 rounded-xl bg-white dark:bg-slate-700 shadow-sm border border-stone-100 dark:border-slate-600 flex items-center justify-center p-1.5">
+            <div className="w-8 h-8 rounded-xl bg-white dark:bg-[#1a1a1e] shadow-sm border border-stone-100 dark:border-white/10 flex items-center justify-center p-1.5 p-1.5">
               <img
                 className="w-full h-full object-contain"
                 src={img}
@@ -88,16 +88,16 @@ const TaskColumn = ({
               />
             </div>
           ) : (
-            <div className="w-8 h-8 rounded-xl bg-white dark:bg-slate-700 shadow-sm border border-stone-100 dark:border-slate-600 flex items-center justify-center text-purple-600 dark:text-purple-400">
+            <div className="w-8 h-8 rounded-xl bg-white dark:bg-[#1a1a1e] shadow-sm border border-stone-100 dark:border-white/10 flex items-center justify-center p-1.5 text-purple-600 dark:text-purple-400">
               <Grid className="w-4 h-4" />
             </div>
           )}
           <h3 className="font-bold text-lg text-stone-800 tracking-tight dark:text-gray-100">
             {title}
           </h3>
-          <span className="flex items-center justify-center w-6 h-6 text-xs font-bold rounded-full bg-stone-200/80 text-stone-600 dark:bg-slate-700 dark:text-slate-300 shadow-inner">
+          <span className="flex items-center justify-center w-6 h-6 text-xs font-bold rounded-full bg-stone-200/80 text-stone-600 dark:bg-white/5 dark:text-slate-300 shadow-inner">
             {isLoading ? (
-              <span className="inline-block w-3.5 h-3 rounded bg-stone-300/80 dark:bg-slate-600/60 animate-pulse" />
+              <span className="inline-block w-3.5 h-3 rounded bg-stone-300/80 dark:bg-white/10 animate-pulse" />
             ) : (
               filteredTasks?.length || 0
             )}
@@ -115,8 +115,8 @@ const TaskColumn = ({
               }}
               className={`flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold rounded-lg transition-all ${
                 assigneeFilter !== "all"
-                  ? "bg-indigo-100 text-indigo-700 ring-1 ring-indigo-200 dark:bg-indigo-900/40 dark:text-indigo-300 dark:ring-indigo-800/50 shadow-sm"
-                  : "bg-white text-stone-500 hover:bg-stone-50 hover:text-stone-700 shadow-sm border border-stone-200 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200"
+                  ? "bg-purple-100 text-purple-700 ring-1 ring-purple-200 dark:bg-purple-900/40 dark:text-purple-300 dark:ring-purple-800/50 shadow-sm"
+                  : "bg-white text-stone-500 hover:bg-stone-50 hover:text-stone-700 shadow-sm border border-stone-200 dark:bg-white/5 dark:border-white/5 dark:text-slate-400 dark:hover:bg-white/10 dark:hover:text-slate-200"
               }`}
               title="Filter by Assignee"
             >
@@ -129,7 +129,7 @@ const TaskColumn = ({
                   className="fixed inset-0 z-20"
                   onClick={() => setShowAssigneeFilter(false)}
                 />
-                <div className="absolute right-0 top-full mt-2 w-48 z-30 rounded-xl shadow-xl border overflow-hidden bg-white border-stone-100 dark:bg-slate-800 dark:border-slate-700">
+                <div className="absolute right-0 top-full mt-2 w-48 z-30 rounded-xl shadow-xl border overflow-hidden bg-white border-stone-100 dark:bg-[#111114] dark:border-white/5">
                   <div className="p-1 max-h-48 overflow-y-auto custom-scrollbar">
                     {assigneeOptions.map((option) => (
                       <button
@@ -140,8 +140,8 @@ const TaskColumn = ({
                         }}
                         className={`w-full text-left px-3 py-2 text-xs font-medium rounded-lg transition-colors flex items-center justify-between ${
                           assigneeFilter === option.value
-                            ? "bg-indigo-50 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300"
-                            : "text-stone-600 hover:bg-stone-50 dark:text-slate-300 dark:hover:bg-slate-700/50"
+                            ? "bg-purple-50 text-purple-700 dark:bg-purple-900/50 dark:text-purple-300"
+                            : "text-stone-600 hover:bg-stone-50 dark:text-slate-300 dark:hover:bg-white/5"
                         }`}
                       >
                         <span className="truncate">{option.label}</span>
@@ -166,7 +166,7 @@ const TaskColumn = ({
               className={`flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold rounded-lg transition-all ${
                 priorityFilter !== "all"
                   ? "bg-purple-100 text-purple-700 ring-1 ring-purple-200 dark:bg-purple-900/40 dark:text-purple-300 dark:ring-purple-800/50 shadow-sm"
-                  : "bg-white text-stone-500 hover:bg-stone-50 hover:text-stone-700 shadow-sm border border-stone-200 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200"
+                  : "bg-white text-stone-500 hover:bg-stone-50 hover:text-stone-700 shadow-sm border border-stone-200 dark:bg-white/5 dark:border-white/5 dark:text-slate-400 dark:hover:bg-white/10 dark:hover:text-slate-200"
               }`}
               title="Filter by Priority"
             >
@@ -179,7 +179,7 @@ const TaskColumn = ({
                   className="fixed inset-0 z-20"
                   onClick={() => setShowPriorityFilter(false)}
                 />
-                <div className="absolute right-0 top-full mt-2 w-36 z-30 rounded-xl shadow-xl border overflow-hidden bg-white border-stone-100 dark:bg-slate-800 dark:border-slate-700">
+                <div className="absolute right-0 top-full mt-2 w-36 z-30 rounded-xl shadow-xl border overflow-hidden bg-white border-stone-100 dark:bg-[#111114] dark:border-white/5">
                   <div className="p-1">
                     {priorityOptions.map((option) => (
                       <button
@@ -191,7 +191,7 @@ const TaskColumn = ({
                         className={`w-full text-left px-3 py-2 text-xs font-medium rounded-lg transition-colors flex items-center justify-between ${
                           priorityFilter === option.value
                             ? "bg-purple-50 text-purple-700 dark:bg-purple-900/50 dark:text-purple-300"
-                            : "text-stone-600 hover:bg-stone-50 dark:text-slate-300 dark:hover:bg-slate-700/50"
+                            : "text-stone-600 hover:bg-stone-50 dark:text-slate-300 dark:hover:bg-white/5"
                         }`}
                       >
                         {option.label}
@@ -242,7 +242,7 @@ const TaskColumn = ({
                   />
                 ))
               ) : (
-                <div className="flex flex-col items-center justify-center py-10 mt-4 text-stone-400 dark:text-slate-500 border-2 border-dashed border-stone-200 dark:border-slate-700 rounded-2xl bg-white/40 dark:bg-slate-800/20">
+                <div className="flex flex-col items-center justify-center py-10 mt-4 text-stone-400 dark:text-slate-500 border-2 border-dashed border-stone-200 dark:border-white/5 rounded-2xl bg-white/40 dark:bg-white/5">
                   <Inbox className="w-10 h-10 mb-2 opacity-40" />
                   <p className="text-sm font-medium">
                     {priorityFilter !== "all" || assigneeFilter !== "all"

@@ -51,13 +51,13 @@ const ActivityPage = ({ selectedProject, onToggleSidebar }) => {
     useEffect(() => { load(); }, [load]);
 
     return (
-        <div className="flex-1 overflow-y-auto bg-stone-50/30 dark:bg-slate-950/30 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto bg-stone-50/30 dark:bg-[#0c0c0e] custom-scrollbar">
             {/* Page Header */}
-            <div className="sticky top-0 z-10 px-4 md:px-10 h-[72px] flex items-center justify-between bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-stone-200/60 dark:border-slate-800">
+            <div className="sticky top-0 z-10 px-4 md:px-10 h-[72px] flex items-center justify-between bg-white/80 dark:bg-[#0c0c0e]/80 backdrop-blur-md border-b border-stone-200/60 dark:border-white/5">
                 <div className="flex items-center gap-3 min-w-0">
                     <button
                         onClick={onToggleSidebar}
-                        className="md:hidden p-2 -ml-2 rounded-xl text-stone-600 hover:bg-stone-100 dark:text-slate-300 dark:hover:bg-slate-800 transition-colors"
+                        className="md:hidden p-2 -ml-2 rounded-xl text-stone-600 hover:bg-stone-100 dark:text-slate-300 dark:hover:bg-white/5 transition-colors"
                         title="Menu"
                     >
                         <Menu className="w-5 h-5" />
@@ -69,7 +69,7 @@ const ActivityPage = ({ selectedProject, onToggleSidebar }) => {
                 </div>
                 <button
                     onClick={toggleTheme}
-                    className="w-10 h-10 flex items-center justify-center rounded-xl transition-colors text-stone-500 hover:bg-stone-100 dark:text-amber-400 dark:hover:bg-slate-800"
+                    className="w-10 h-10 flex items-center justify-center rounded-xl transition-colors text-stone-500 hover:bg-stone-100 dark:text-amber-400 dark:hover:bg-white/5"
                     title="Toggle theme"
                 >
                     {isDark ? <Sun className="w-5 h-5 text-amber-500" /> : <Moon className="w-5 h-5" />}
@@ -81,10 +81,10 @@ const ActivityPage = ({ selectedProject, onToggleSidebar }) => {
                     <div className="space-y-4">
                         {[...Array(6)].map((_, i) => (
                             <div key={i} className="flex gap-4 animate-pulse">
-                                <div className="w-2.5 h-2.5 rounded-full bg-stone-200 dark:bg-slate-700 mt-2 shrink-0" />
-                                <div className="flex-1 bg-white dark:bg-slate-800/60 rounded-2xl p-4 border border-stone-200/50 dark:border-slate-700/50">
-                                    <div className="h-3.5 bg-stone-100 dark:bg-slate-700 rounded w-2/3 mb-2" />
-                                    <div className="h-3 bg-stone-100 dark:bg-slate-700 rounded w-1/3" />
+                                <div className="w-2.5 h-2.5 rounded-full bg-stone-200 dark:bg-white/10 mt-2 shrink-0" />
+                                <div className="flex-1 bg-white dark:bg-[#111114] rounded-2xl p-4 border border-stone-200/50 dark:border-white/5">
+                                    <div className="h-3.5 bg-stone-100 dark:bg-white/5 rounded w-2/3 mb-2" />
+                                    <div className="h-3 bg-stone-100 dark:bg-white/5 rounded w-1/3" />
                                 </div>
                             </div>
                         ))}
@@ -101,7 +101,7 @@ const ActivityPage = ({ selectedProject, onToggleSidebar }) => {
                     </div>
                 ) : logs.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-24 text-center">
-                        <div className="w-16 h-16 rounded-2xl bg-stone-100 dark:bg-slate-800 flex items-center justify-center mb-4 shadow-sm">
+                        <div className="w-16 h-16 rounded-2xl bg-stone-100 dark:bg-[#111114] flex items-center justify-center mb-4 shadow-sm">
                             <i className="bi bi-activity text-3xl text-stone-400 dark:text-slate-500" />
                         </div>
                         <p className="text-lg font-bold text-stone-600 dark:text-slate-300">No activity yet</p>
@@ -112,7 +112,7 @@ const ActivityPage = ({ selectedProject, onToggleSidebar }) => {
                 ) : (
                     <div className="relative">
                         {/* Timeline line */}
-                        <div className="absolute left-[4px] top-2 bottom-2 w-px bg-stone-200 dark:bg-slate-700/60" />
+                        <div className="absolute left-[4px] top-2 bottom-2 w-px bg-stone-200 dark:bg-white/10" />
 
                         <div className="space-y-3 pl-6">
                             {logs.map((log, i) => {
@@ -121,10 +121,10 @@ const ActivityPage = ({ selectedProject, onToggleSidebar }) => {
                                     <div key={log._id || i} className="relative group">
                                         {/* Timeline dot */}
                                         <div
-                                            className={`absolute -left-6 top-4 w-2.5 h-2.5 rounded-full ${style.bg} shadow-sm ring-2 ring-white dark:ring-slate-950 transition-transform group-hover:scale-125`}
+                                            className={`absolute -left-6 top-4 w-2.5 h-2.5 rounded-full ${style.bg} shadow-sm ring-2 ring-white dark:ring-[#0c0c0e] transition-transform group-hover:scale-125`}
                                         />
 
-                                        <div className="bg-white dark:bg-slate-800/60 rounded-2xl border border-stone-200/60 dark:border-slate-700/40 px-4 py-3.5 hover:border-stone-300 dark:hover:border-slate-600 hover:shadow-sm transition-all">
+                                        <div className="bg-white dark:bg-[#111114] rounded-2xl border border-stone-200/60 dark:border-white/5 px-4 py-3.5 hover:border-stone-300 dark:hover:border-white/10 hover:shadow-sm transition-all">
                                             <div className="flex items-start justify-between gap-3">
                                                 <div className="flex-1 min-w-0">
                                                     <div className="flex items-center gap-2 flex-wrap">

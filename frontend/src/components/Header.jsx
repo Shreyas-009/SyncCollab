@@ -18,12 +18,12 @@ const Header = ({ onOpen, onSearch, selectedProject, onToggleSidebar, currentPag
     };
 
     return (
-        <header className="flex items-center justify-between px-4 md:px-6 py-4 border-b bg-white border-stone-200/60 shadow-sm dark:bg-slate-900 dark:border-slate-800 z-30 h-[72px] shrink-0">
+        <header className="flex items-center justify-between px-4 md:px-6 py-4 border-b bg-white border-stone-200/60 shadow-sm dark:bg-[#0c0c0e] dark:border-white/5 z-30 h-[72px] shrink-0">
             {/* Left: Mobile Toggle & Title */}
             <div className="flex items-center gap-3">
                 <button
                     onClick={onToggleSidebar}
-                    className="p-2 -ml-2 rounded-xl text-stone-600 hover:bg-stone-100 dark:text-slate-300 dark:hover:bg-slate-800 transition-colors md:hidden"
+                    className="p-2 -ml-2 rounded-xl text-stone-600 hover:bg-stone-100 dark:text-slate-300 dark:hover:bg-white/5 transition-colors md:hidden"
                     title="Menu"
                 >
                     <Menu className="w-5 h-5" />
@@ -53,7 +53,7 @@ const Header = ({ onOpen, onSearch, selectedProject, onToggleSidebar, currentPag
                     <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 group-focus-within:text-purple-500 transition-colors" />
                     <input
                         type="text"
-                        className="w-full pl-10 pr-10 py-2 text-sm font-medium rounded-xl border focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500 transition-all bg-stone-50 text-stone-800 border-stone-200/80 placeholder-stone-400 dark:bg-slate-900/50 dark:text-gray-100 dark:border-slate-700 dark:placeholder-slate-500 dark:focus:ring-purple-500/30 shadow-sm shadow-stone-200/20 dark:shadow-none"
+                        className="w-full pl-10 pr-10 py-2 text-sm font-medium rounded-xl border focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500 transition-all bg-stone-50 text-stone-800 border-stone-200/80 placeholder-stone-400 dark:bg-white/5 dark:text-gray-100 dark:border-white/5 dark:placeholder-slate-500 dark:focus:ring-purple-500/30 shadow-sm shadow-stone-200/20 dark:shadow-none"
                         placeholder='Search tasks...'
                         value={searchQuery}
                         onChange={handleSearchChange}
@@ -63,7 +63,7 @@ const Header = ({ onOpen, onSearch, selectedProject, onToggleSidebar, currentPag
                         <button
                             type="button"
                             onClick={handleClearSearch}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center rounded-full transition-colors text-stone-400 hover:text-stone-600 hover:bg-stone-200 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-700"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center rounded-full transition-colors text-stone-400 hover:text-stone-600 hover:bg-stone-200 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-white/10"
                         >
                             <XCircle className="w-4 h-4" />
                         </button>
@@ -76,7 +76,7 @@ const Header = ({ onOpen, onSearch, selectedProject, onToggleSidebar, currentPag
                 {/* Theme Toggle */}
                 <button
                     onClick={toggleTheme}
-                    className="w-10 h-10 flex items-center justify-center rounded-xl transition-colors text-stone-500 hover:bg-stone-100 dark:text-amber-400 dark:hover:bg-slate-800"
+                    className="w-10 h-10 flex items-center justify-center rounded-xl transition-colors text-stone-500 hover:bg-stone-100 dark:text-amber-400 dark:hover:bg-white/5"
                     title="Toggle theme"
                 >
                     {isDark ? <Sun className="w-5 h-5 text-amber-500" /> : <Moon className="w-5 h-5" />}

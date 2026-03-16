@@ -331,7 +331,7 @@ const HomePage = () => {
 
   return (
     <>
-      <div className="flex h-screen transition-colors duration-300 bg-stone-50 dark:bg-slate-900 font-sans overflow-hidden">
+      <div className="flex h-screen transition-colors duration-300 bg-stone-50 dark:bg-[#0c0c0e] font-sans overflow-hidden">
         {/* Project Sidebar */}
         <ProjectSidebar
           projects={projects}
@@ -354,7 +354,7 @@ const HomePage = () => {
               className="absolute inset-0 bg-stone-900/40 backdrop-blur-sm"
               onClick={() => setShowRequests(false)}
             />
-            <div className="relative w-80 h-full border-l border-stone-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xl animate-in slide-in-from-right duration-300">
+            <div className="relative w-80 h-full border-l border-stone-200 dark:border-white/5 bg-white dark:bg-[#0c0c0e] shadow-2xl animate-in slide-in-from-right duration-300">
               <RequestsPage
                 onClose={() => setShowRequests(false)}
                 onInviteAccepted={handleInviteAccepted}
@@ -376,7 +376,7 @@ const HomePage = () => {
               currentPage={currentPage}
             />
           ) : !selectedProject ? (
-            <div className="flex items-center justify-between px-4 md:px-6 py-4 border-b bg-white border-stone-200/60 shadow-sm dark:bg-slate-900 dark:border-slate-800 z-30 h-[72px] shrink-0">
+            <div className="flex items-center justify-between px-4 md:px-6 py-4 border-b bg-white border-stone-200/60 shadow-sm dark:bg-[#0c0c0e] dark:border-white/5 z-30 h-[72px] shrink-0">
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -421,7 +421,7 @@ const HomePage = () => {
           ) : showBoard ? (
             <PageTransition pageKey={`board-${selectedProject._id}`}>
               <DragDropContext onDragEnd={handleDragEnd}>
-                <main className="flex-1 flex py-6 px-[2%] gap-5 overflow-x-auto custom-scrollbar bg-stone-50/10 dark:bg-slate-950/10">
+                <main className="flex-1 flex py-6 px-[2%] gap-5 overflow-x-auto custom-scrollbar bg-stone-50/10 dark:bg-[#0c0c0e]">
                   <div className="flex gap-5 h-full pb-4">
                     <TaskColumn
                       title="Pending"

@@ -3,23 +3,22 @@ import { useUser, useClerk } from '@clerk/clerk-react';
 import { useTheme } from '../context/useTheme';
 import { getPendingInvites } from '../utils/api';
 import { Settings, Monitor, LogOut, Sun, Moon, ChevronRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
-const NavItem = ({ icon, label, active, onClick, badge, variant = 'default' }) => (
+const NavItem = ({ icon, label, active, onClick, badge }) => (
     <button
         onClick={onClick}
         className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
             active
-                ? variant === 'special' 
-                    ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md shadow-indigo-600/20' 
-                    : 'bg-purple-600 text-white shadow-md shadow-purple-600/20'
-                : 'text-stone-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800/80 hover:shadow-sm border border-transparent hover:border-stone-200/50 dark:hover:border-slate-700'
+                ? 'bg-purple-600 text-white shadow-md shadow-purple-600/20'
+                : 'text-stone-600 dark:text-slate-300 hover:bg-white dark:hover:bg-white/5 hover:shadow-sm border border-transparent hover:border-stone-200/50 dark:hover:border-white/5'
         }`}
     >
         <i className={`bi ${icon} text-base leading-none`} />
         <span className="flex-1 text-left truncate">{label}</span>
         {badge && (
             <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
-                active ? 'bg-white/20 text-white' : 'bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400'
+                active ? 'bg-white/20 text-white' : 'bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400'
             }`}>
                 {badge}
             </span>
@@ -47,6 +46,7 @@ const ProjectSidebar = ({
     const [accountMenuOpen, setAccountMenuOpen] = useState(false);
     const [displayMenuOpen, setDisplayMenuOpen] = useState(false);
     const accountMenuRef = useRef(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         loadPendingCount();
@@ -79,7 +79,7 @@ const ProjectSidebar = ({
             <aside className="hidden md:flex w-16 h-full flex-col items-center pt-4 border-r bg-[#f8f9fa] dark:bg-[#0c0c0e] border-stone-200 dark:border-white/5 z-50 transition-colors">
                 <button
                     onClick={onToggle}
-                    className="p-2 px-3 rounded-xl mb-6 hover:bg-stone-200/50 text-stone-500 dark:hover:bg-slate-800 dark:text-slate-400"
+                    className="p-2 px-3 rounded-xl mb-6 hover:bg-stone-200/50 text-stone-500 dark:hover:bg-white/5 dark:text-slate-400"
                     title="Expand"
                 >
                     <i className="bi bi-layout-sidebar text-lg " size={24} />
@@ -90,7 +90,7 @@ const ProjectSidebar = ({
                         <>
                             <button
                                 onClick={() => { onSelectProject(null); onNavigate('hub'); }}
-                                className="w-10 h-10 flex items-center justify-center rounded-xl transition-all text-stone-500 hover:bg-stone-200/50 dark:text-slate-400 dark:hover:bg-slate-800 mb-2 shrink-0 group"
+                                className="w-10 h-10 flex items-center justify-center rounded-xl transition-all text-stone-500 hover:bg-stone-200/50 dark:text-slate-400 dark:hover:bg-white/5 mb-2 shrink-0 group"
                                 title="All Projects"
                             >
                                 <i className="bi bi-chevron-left text-lg transition-transform" />
@@ -108,45 +108,45 @@ const ProjectSidebar = ({
 
                             <button
                                 onClick={() => onNavigate('board')}
-                                className={`w-10 h-10 flex items-center justify-center rounded-xl transition-all shrink-0 ${currentPage === 'board' ? 'bg-purple-600 text-white shadow-md shadow-purple-600/20' : 'text-stone-500 hover:bg-stone-200/50 dark:text-slate-400 dark:hover:bg-slate-800'}`}
+                                className={`w-10 h-10 flex items-center justify-center rounded-xl transition-all shrink-0 ${currentPage === 'board' ? 'bg-purple-600 text-white shadow-md shadow-purple-600/20' : 'text-stone-500 hover:bg-stone-200/50 dark:text-slate-400 dark:hover:bg-white/5'}`}
                                 title="Board"
                             >
                                 <i className="bi bi-kanban text-lg" />
                             </button>
                             <button
                                 onClick={() => onNavigate('activity')}
-                                className={`w-10 h-10 flex items-center justify-center rounded-xl transition-all shrink-0 ${currentPage === 'activity' ? 'bg-purple-600 text-white shadow-md shadow-purple-600/20' : 'text-stone-500 hover:bg-stone-200/50 dark:text-slate-400 dark:hover:bg-slate-800'}`}
+                                className={`w-10 h-10 flex items-center justify-center rounded-xl transition-all shrink-0 ${currentPage === 'activity' ? 'bg-purple-600 text-white shadow-md shadow-purple-600/20' : 'text-stone-500 hover:bg-stone-200/50 dark:text-slate-400 dark:hover:bg-white/5'}`}
                                 title="Activity"
                             >
                                 <i className="bi bi-activity text-lg" />
                             </button>
                             <button
                                 onClick={() => onNavigate('members')}
-                                className={`w-10 h-10 flex items-center justify-center rounded-xl transition-all shrink-0 ${currentPage === 'members' ? 'bg-purple-600 text-white shadow-md shadow-purple-600/20' : 'text-stone-500 hover:bg-stone-200/50 dark:text-slate-400 dark:hover:bg-slate-800'}`}
+                                className={`w-10 h-10 flex items-center justify-center rounded-xl transition-all shrink-0 ${currentPage === 'members' ? 'bg-purple-600 text-white shadow-md shadow-purple-600/20' : 'text-stone-500 hover:bg-stone-200/50 dark:text-slate-400 dark:hover:bg-white/5'}`}
                                 title="Members"
                             >
                                 <i className="bi bi-people text-lg" />
                             </button>
                             <button
                                 onClick={() => onNavigate('nexus')}
-                                className={`w-10 h-10 flex items-center justify-center rounded-xl transition-all shrink-0 ${currentPage === 'nexus' ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md shadow-indigo-600/20' : 'text-stone-500 hover:bg-stone-200/50 dark:text-slate-400 dark:hover:bg-slate-800'}`}
+                                className={`w-10 h-10 flex items-center justify-center rounded-xl transition-all shrink-0 ${currentPage === 'nexus' ? 'bg-purple-600 text-white shadow-md shadow-purple-600/20' : 'text-stone-500 hover:bg-stone-200/50 dark:text-slate-400 dark:hover:bg-white/5'}`}
                                 title="Nexus AI"
                             >
                                 <i className="bi bi-lightning-charge-fill text-lg" />
                             </button>
                             
-                            <div className="w-6 h-px bg-stone-200 dark:bg-slate-800/80 my-2 shrink-0" />
+                            <div className="w-6 h-px bg-stone-200 dark:bg-white/5 my-2 shrink-0" />
                             
                             <button
                                 onClick={onShowInvite}
-                                className="w-10 h-10 flex items-center justify-center rounded-xl transition-all shrink-0 text-stone-500 hover:bg-stone-200/50 dark:text-slate-400 dark:hover:bg-slate-800"
+                                className="w-10 h-10 flex items-center justify-center rounded-xl transition-all shrink-0 text-stone-500 hover:bg-stone-200/50 dark:text-slate-400 dark:hover:bg-white/5"
                                 title="Invite People"
                             >
                                 <i className="bi bi-person-plus text-lg" />
                             </button>
                             <button
                                 onClick={onShowSettings}
-                                className="w-10 h-10 flex items-center justify-center rounded-xl transition-all shrink-0 text-stone-500 hover:bg-stone-200/50 dark:text-slate-400 dark:hover:bg-slate-800"
+                                className="w-10 h-10 flex items-center justify-center rounded-xl transition-all shrink-0 text-stone-500 hover:bg-stone-200/50 dark:text-slate-400 dark:hover:bg-white/5"
                                 title="Project Settings"
                             >
                                 <i className="bi bi-gear text-lg" />
@@ -156,7 +156,7 @@ const ProjectSidebar = ({
                         <>
                             <button
                                 onClick={onShowRequests}
-                                className={`w-10 h-10 flex items-center justify-center rounded-xl transition-all relative shrink-0 ${pendingCount > 0 ? 'text-stone-500 hover:bg-stone-200/50 dark:text-slate-400 dark:hover:bg-slate-800' : 'text-stone-500 hover:bg-stone-200/50 dark:text-slate-400 dark:hover:bg-slate-800'}`}
+                                className={`w-10 h-10 flex items-center justify-center rounded-xl transition-all relative shrink-0 ${pendingCount > 0 ? 'text-stone-500 hover:bg-stone-200/50 dark:text-slate-400 dark:hover:bg-white/5' : 'text-stone-500 hover:bg-stone-200/50 dark:text-slate-400 dark:hover:bg-white/5'}`}
                                 title="Requests"
                             >
                                 <i className="bi bi-inbox-fill text-lg" />
@@ -171,7 +171,7 @@ const ProjectSidebar = ({
                 <div className="mt-auto p-2 relative" ref={accountMenuRef}>
                     <button 
                         onClick={() => setAccountMenuOpen(!accountMenuOpen)}
-                        className={`w-10 h-10 rounded-xl overflow-hidden shadow-sm transition-all border ${accountMenuOpen ? 'border-stone-300 dark:border-slate-600 ring-2 ring-purple-500/20' : 'border-transparent'}`}
+                        className={`w-10 h-10 rounded-xl overflow-hidden shadow-sm transition-all border ${accountMenuOpen ? 'border-purple-500 dark:border-purple-600 ring-2 ring-purple-500/20' : 'border-transparent'}`}
                         title={user?.fullName || 'User Profile'}
                     >
                         {user?.imageUrl ? (
@@ -183,30 +183,30 @@ const ProjectSidebar = ({
                         )}
                     </button>
                     {accountMenuOpen && (
-                        <div className="absolute left-full bottom-4 ml-3 w-56 rounded-2xl border border-stone-200 dark:border-slate-700 bg-white dark:bg-[#1a1b1e] shadow-xl py-2 px-1.5 z-[60] flex flex-col gap-0.5">
-                            <button
+                        <div className="absolute left-full bottom-4 ml-3 w-56 rounded-xl border border-stone-200 dark:border-white/5 bg-white dark:bg-[#111114] shadow-xl py-2 px-1.5 z-[60] flex flex-col gap-0.5 animate-in fade-in zoom-in duration-200">
+                                <button
                                 onClick={() => { setAccountMenuOpen(false); openUserProfile(); }}
-                                className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-xl hover:bg-stone-100 dark:hover:bg-white/5 text-stone-700 dark:text-slate-200 transition-colors"
+                                className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg hover:bg-stone-100 dark:hover:bg-white/10 text-stone-700 dark:text-slate-200 transition-colors"
                             >
                                 <Settings className="w-4 h-4 shrink-0" /> Settings
                             </button>
                             <div className="relative">
                                 <button
                                     onClick={(e) => { e.stopPropagation(); setDisplayMenuOpen(!displayMenuOpen); }}
-                                    className="w-full flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-xl hover:bg-stone-100 dark:hover:bg-white/5 text-stone-700 dark:text-slate-200 transition-colors"
+                                    className="w-full flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-lg hover:bg-stone-100 dark:hover:bg-white/10 text-stone-700 dark:text-slate-200 transition-colors"
                                 >
                                     <div className="flex items-center gap-3"><Monitor className="w-4 h-4 shrink-0" /> Display</div>
-                                    <ChevronRight className={`w-4 h-4 transition-transform ${displayMenuOpen ? 'text-stone-500' : 'text-stone-400'}`} />
+                                    <ChevronRight className={`w-4 h-4 transition-transform ${displayMenuOpen ? 'rotate-90 text-stone-500' : 'text-stone-400'}`} />
                                 </button>
                                 {displayMenuOpen && (
-                                    <div className="absolute left-full top-0 ml-3 w-32 rounded-2xl border border-stone-200 dark:border-slate-700 bg-white dark:bg-[#1a1b1e] shadow-xl py-2 px-1.5 z-[70] flex flex-col gap-0.5">
-                                        <button onClick={() => { if(isDark) toggleTheme(); setDisplayMenuOpen(false); setAccountMenuOpen(false); }} className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-xl transition-colors ${!isDark ? 'bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-400' : 'hover:bg-stone-100 dark:hover:bg-white/5 text-stone-700 dark:text-slate-200'}`}><Sun className="w-4 h-4 shrink-0" /> Light</button>
-                                        <button onClick={() => { if(!isDark) toggleTheme(); setDisplayMenuOpen(false); setAccountMenuOpen(false); }} className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-xl transition-colors ${isDark ? 'bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-400' : 'hover:bg-stone-100 dark:hover:bg-white/5 text-stone-700 dark:text-slate-200'}`}><Moon className="w-4 h-4 shrink-0" /> Dark</button>
+                                    <div className="absolute left-full top-0 ml-3 w-32 rounded-xl border border-stone-200 dark:border-white/5 bg-white dark:bg-[#111114] shadow-xl py-2 px-1.5 z-[70] flex flex-col gap-0.5 animate-in fade-in zoom-in duration-200">
+                                        <button onClick={() => { if(isDark) toggleTheme(); setDisplayMenuOpen(false); setAccountMenuOpen(false); }} className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-colors ${!isDark ? 'bg-purple-50 dark:bg-purple-900/40 text-purple-700 dark:text-purple-400' : 'hover:bg-stone-100 dark:hover:bg-white/10 text-stone-700 dark:text-slate-200'}`}><Sun className="w-4 h-4 shrink-0" /> Light</button>
+                                        <button onClick={() => { if(!isDark) toggleTheme(); setDisplayMenuOpen(false); setAccountMenuOpen(false); }} className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-colors ${isDark ? 'bg-purple-50 dark:bg-purple-900/40 text-purple-700 dark:text-purple-400' : 'hover:bg-stone-100 dark:hover:bg-white/10 text-stone-700 dark:text-slate-200'}`}><Moon className="w-4 h-4 shrink-0" /> Dark</button>
                                     </div>
                                 )}
                             </div>
-                            <div className="h-px bg-stone-200 dark:bg-slate-700/50 my-1 mx-2" />
-                            <button onClick={() => { setAccountMenuOpen(false); signOut(); }} className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-xl hover:bg-stone-100 dark:hover:bg-white/5 text-stone-700 dark:text-slate-200 transition-colors group">
+                            <div className="h-px bg-stone-200 dark:bg-white/5 my-1 mx-2" />
+                             <button onClick={() => { setAccountMenuOpen(false); signOut(); }} className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg hover:bg-stone-100 dark:hover:bg-white/10 text-stone-700 dark:text-slate-200 transition-colors group">
                                 <LogOut className="w-4 h-4 shrink-0 group-hover:text-stone-900 dark:group-hover:text-white" /> Log Out
                             </button>
                         </div>
@@ -229,22 +229,25 @@ const ProjectSidebar = ({
 
                 {/* ── Header ── */}
                 <div className="flex items-center justify-between px-5 py-4 h-[72px] border-b border-stone-200/50 dark:border-white/5 shrink-0">
-                    <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-600 text-white flex items-center justify-center font-bold shadow-lg shadow-purple-600/20 shrink-0">
+                    <button 
+                        onClick={() => navigate('/')}
+                        className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+                    >
+                        <div className="w-9 h-9 rounded-xl bg-purple-600 text-white flex items-center justify-center font-bold shadow-lg shadow-purple-600/20 shrink-0">
                             S
                         </div>
-                        <h2 className="text-xl font-bold tracking-tight text-stone-800 dark:text-slate-100">SyncCollab</h2>
-                    </div>
+                        <h2 className="text-xl font-bold tracking-tight text-stone-800 dark:text-white">SyncCollab</h2>
+                    </button>
                     <button
                         onClick={onToggle}
-                        className="py-2 px-3 rounded-xl hover:bg-stone-200/50 text-stone-500 dark:hover:bg-slate-800 dark:text-slate-400 transition-colors md:flex hidden"
+                        className="py-2 px-3 rounded-xl hover:bg-stone-200/50 text-stone-500 dark:hover:bg-white/5 dark:text-white/50 transition-colors md:flex hidden"
                         title="Collapse"
                     >
                         <i className="bi bi-layout-sidebar-inset text-lg" />
                     </button>
                     <button
                         onClick={onToggle}
-                        className="p-1.5 rounded-xl hover:bg-stone-200/50 text-stone-500 dark:hover:bg-slate-800 dark:text-slate-400 transition-colors md:hidden"
+                        className="p-1.5 rounded-xl hover:bg-stone-200/50 text-stone-500 dark:hover:bg-white/5 dark:text-slate-400 transition-colors md:hidden"
                     >
                         <i className="bi bi-x-lg text-lg" />
                     </button>
@@ -263,7 +266,7 @@ const ProjectSidebar = ({
                                 ALL PROJECTS
                             </button>
 
-                            <div className="px-3 py-3 mb-4 rounded-2xl bg-white dark:bg-slate-900/50 border border-stone-200/60 dark:border-white/5 shadow-sm">
+                            <div className="px-3 py-3 mb-4 rounded-2xl bg-white dark:bg-white/5 border border-stone-200/60 dark:border-white/5 shadow-sm">
                                 <div className="flex items-center gap-3">
                                     <div
                                         className="w-10 h-10 rounded-xl flex items-center justify-center text-white text-base font-bold shadow-md"
@@ -284,7 +287,7 @@ const ProjectSidebar = ({
                             <NavItem icon="bi-kanban" label="Board" active={currentPage === 'board'} onClick={() => { onNavigate('board'); if (window.innerWidth < 768) onToggle(); }} />
                             <NavItem icon="bi-activity" label="Activity" active={currentPage === 'activity'} onClick={() => { onNavigate('activity'); if (window.innerWidth < 768) onToggle(); }} />
                             <NavItem icon="bi-people" label="Members" active={currentPage === 'members'} onClick={() => { onNavigate('members'); if (window.innerWidth < 768) onToggle(); }} />
-                            <NavItem icon="bi-lightning-charge-fill" label="Nexus AI" active={currentPage === 'nexus'} onClick={() => { onNavigate('nexus'); if (window.innerWidth < 768) onToggle(); }} variant="special" />
+                             <NavItem icon="bi-lightning-charge-fill" label="Nexus AI" active={currentPage === 'nexus'} onClick={() => { onNavigate('nexus'); if (window.innerWidth < 768) onToggle(); }} />
                             
                             <div className="h-4" />
                             <p className="text-[10px] font-bold uppercase tracking-widest text-stone-400 dark:text-slate-600 px-3 mb-2">Management</p>
@@ -304,7 +307,7 @@ const ProjectSidebar = ({
                     <div className="relative" ref={accountMenuRef}>
                         <button 
                             onClick={() => setAccountMenuOpen(!accountMenuOpen)}
-                            className={`w-full flex items-center gap-3 p-2.5 rounded-2xl border transition-all group ${accountMenuOpen ? 'bg-stone-200/50 dark:bg-slate-800 border-stone-200/50 dark:border-white/5' : 'border-transparent hover:bg-stone-200/50 dark:hover:bg-slate-800 hover:border-stone-200/50 dark:hover:border-white/5'}`}
+                            className={`w-full flex items-center gap-3 p-2.5 rounded-xl transition-all group ${accountMenuOpen ? 'bg-stone-200/50 dark:bg-white/5' : 'hover:bg-stone-200/50 dark:hover:bg-white/5'}`}
                         >
                             {user?.imageUrl ? (
                                 <img src={user.imageUrl} className="w-10 h-10 rounded-xl shadow-sm object-cover group-hover:scale-105 transition-transform shrink-0" alt="" />
@@ -324,61 +327,61 @@ const ProjectSidebar = ({
                         </button>
 
                         {accountMenuOpen && (
-                            <div className="absolute left-0 bottom-[calc(100%+8px)] w-full rounded-2xl border border-stone-200 dark:border-slate-700 bg-white dark:bg-[#1a1b1e] shadow-xl py-2 px-1.5 z-50 flex flex-col gap-0.5">
+                            <div className="absolute left-0 bottom-[calc(100%+8px)] w-full rounded-xl border border-stone-200 dark:border-white/5 bg-white dark:bg-[#111114] shadow-xl py-2 px-1.5 z-50 flex flex-col gap-0.5 animate-in fade-in slide-in-from-bottom-2 duration-200">
                                 <button
                                     onClick={() => {
                                         setAccountMenuOpen(false);
                                         openUserProfile();
                                     }}
-                                    className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-xl hover:bg-stone-100 dark:hover:bg-white/5 text-stone-700 dark:text-slate-200 transition-colors"
+                                    className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg hover:bg-stone-100 dark:hover:bg-white/10 text-stone-700 dark:text-slate-200 transition-colors"
                                 >
                                     <Settings className="w-4 h-4 shrink-0" />
                                     Settings
                                 </button>
                                 
                                 <div className="relative">
-                                    <button
+                                         <button
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             setDisplayMenuOpen(!displayMenuOpen);
                                         }}
-                                        className="w-full flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-xl hover:bg-stone-100 dark:hover:bg-white/5 text-stone-700 dark:text-slate-200 transition-colors"
+                                        className="w-full flex items-center justify-between px-3 py-2.5 text-sm font-medium rounded-lg hover:bg-stone-100 dark:hover:bg-white/10 text-stone-700 dark:text-slate-200 transition-colors"
                                     >
                                         <div className="flex items-center gap-3">
                                             <Monitor className="w-4 h-4 shrink-0" />
                                             Display
                                         </div>
-                                        <ChevronRight className={`w-4 h-4 transition-transform ${displayMenuOpen ? 'text-stone-500' : 'text-stone-400'}`} />
+                                        <ChevronRight className={`w-4 h-4 transition-transform ${displayMenuOpen ? 'rotate-90 text-stone-500' : 'text-stone-400'}`} />
                                     </button>
 
-                                    {displayMenuOpen && (
-                                        <div className="absolute left-full top-0 ml-3 w-26 sm:w-32 rounded-2xl border border-stone-200 dark:border-slate-700 bg-white dark:bg-[#1a1b1e] shadow-xl py-2 px-1.5 z-[60] flex flex-col gap-0.5 animate-in fade-in slide-in-from-left-2 duration-200">
+                                     {displayMenuOpen && (
+                                        <div className="absolute left-full bottom-0 ml-3 w-26 sm:w-32 rounded-xl border border-stone-200 dark:border-white/5 bg-white dark:bg-[#111114] shadow-xl py-2 px-1.5 z-[60] flex flex-col gap-0.5 animate-in fade-in slide-in-from-left-2 duration-200">
                                             <button
                                                 onClick={() => { if(isDark) toggleTheme(); setDisplayMenuOpen(false); setAccountMenuOpen(false); }}
-                                                className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-xl transition-colors ${!isDark ? 'bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-400' : 'hover:bg-stone-100 dark:hover:bg-white/5 text-stone-700 dark:text-slate-200'}`}
+                                                className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-colors ${!isDark ? 'bg-purple-50 dark:bg-purple-900/40 text-purple-700 dark:text-purple-400' : 'hover:bg-stone-100 dark:hover:bg-white/10 text-stone-700 dark:text-slate-200'}`}
                                             >
                                                 <Sun className="w-4 h-4 shrink-0" />
                                                 Light
                                             </button>
                                             <button
                                                 onClick={() => { if(!isDark) toggleTheme(); setDisplayMenuOpen(false); setAccountMenuOpen(false); }}
-                                                className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-xl transition-colors ${isDark ? 'bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-400' : 'hover:bg-stone-100 dark:hover:bg-white/5 text-stone-700 dark:text-slate-200'}`}
+                                                className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-colors ${isDark ? 'bg-purple-50 dark:bg-purple-900/40 text-purple-700 dark:text-purple-400' : 'hover:bg-stone-100 dark:hover:bg-white/10 text-stone-700 dark:text-slate-200'}`}
                                             >
-                                                <Moon className="w-4 h-4 shrink-0" />
+                                                <Sun className="w-4 h-4 shrink-0" />
                                                 Dark
                                             </button>
                                         </div>
                                     )}
                                 </div>
 
-                                <div className="h-px bg-stone-200 dark:bg-slate-700/50 my-1 mx-2" />
+                                <div className="h-px bg-stone-200 dark:bg-white/5 my-1 mx-2" />
                                 
-                                <button
+                                 <button
                                     onClick={() => {
                                         setAccountMenuOpen(false);
                                         signOut();
                                     }}
-                                    className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-xl hover:bg-stone-100 dark:hover:bg-white/5 text-stone-700 dark:text-slate-200 transition-colors group"
+                                    className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg hover:bg-stone-100 dark:hover:bg-white/10 text-stone-700 dark:text-slate-200 transition-colors group"
                                 >
                                     <LogOut className="w-4 h-4 shrink-0 group-hover:text-stone-900 dark:group-hover:text-white" />
                                     Log Out

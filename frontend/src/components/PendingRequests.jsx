@@ -59,8 +59,8 @@ const PendingRequests = ({ onRequestHandled }) => {
     if (requests.length === 0) return null;
 
     return (
-        <div className="fixed top-20 right-6 w-80 rounded-2xl shadow-xl overflow-hidden z-40 bg-white border border-stone-200 dark:bg-slate-800 dark:border dark:border-slate-700">
-            <div className="px-4 py-3 border-b flex items-center gap-2 border-stone-100 bg-stone-50 dark:border-slate-700 dark:bg-slate-800">
+        <div className="fixed top-20 right-6 w-80 rounded-2xl shadow-xl overflow-hidden z-40 bg-white border border-stone-200 dark:bg-[#0c0c0e] dark:border-white/5">
+            <div className="px-4 py-3 border-b flex items-center gap-2 border-stone-100 bg-stone-50 dark:border-white/5 dark:bg-white/5">
                 <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
                 <h3 className="text-sm font-semibold text-stone-800 dark:text-gray-100">
                     Collaboration Requests ({requests.length})
@@ -76,13 +76,13 @@ const PendingRequests = ({ onRequestHandled }) => {
                     return (
                     <div
                         key={request._id}
-                        className="p-4 border-b last:border-b-0 border-stone-100 dark:border-slate-700"
+                        className="p-4 border-b last:border-b-0 border-stone-100 dark:border-white/5"
                     >
                         <div className="flex items-start gap-3 mb-3">
                             {request.fromUserImage ? (
                                 <img src={request.fromUserImage} alt="" className="w-10 h-10 rounded-full" />
                             ) : (
-                                <div className="w-10 h-10 rounded-full flex items-center justify-center bg-stone-200 dark:bg-slate-600">
+                                <div className="w-10 h-10 rounded-full flex items-center justify-center bg-stone-200 dark:bg-white/10">
                                     <span className="text-sm font-medium">
                                         {request.fromUserName?.[0] || request.fromUserEmail?.[0]?.toUpperCase() || '?'}
                                     </span>
@@ -105,7 +105,7 @@ const PendingRequests = ({ onRequestHandled }) => {
                             <button
                                 onClick={() => handleDecline(request._id)}
                                 disabled={isProcessing}
-                                className="flex-1 py-2 text-xs font-medium rounded-lg transition-colors disabled:opacity-50 bg-stone-100 text-stone-600 hover:bg-stone-200 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600"
+                                className="flex-1 py-2 text-xs font-medium rounded-lg transition-colors disabled:opacity-50 bg-stone-100 text-stone-600 hover:bg-stone-200 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10"
                             >
                                 {isDeclining ? 'Declining...' : 'Decline'}
                             </button>

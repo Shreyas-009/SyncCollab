@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { DragDropContext } from '@hello-pangea/dnd';
 import TaskColumn from './TaskColumnPreview';
 
+
+import Todo from "../../assets/todo.png";
+import completed from "../../assets/completed.png";
 // Mock assignees to populate the user filter
 const MOCK_ASSIGNEES = [
   { id: 'u1', name: 'Alex R.' },
@@ -95,7 +98,7 @@ export const KanbanPreview = () => {
   };
 
   return (
-    <div className="kanban-preview w-full h-[550px] overflow-hidden bg-stone-50 dark:bg-slate-900 rounded-2xl border border-stone-200 dark:border-slate-800 shadow-xl p-2 md:p-6 flex items-start justify-center">
+    <div className="kanban-preview w-full h-[550px] overflow-hidden bg-stone-50 dark:bg-[#0c0c0e] rounded-2xl border border-stone-200 dark:border-white/5 shadow-xl p-2 md:p-6 flex items-start justify-center">
         <style dangerouslySetInnerHTML={{__html: `
             .kanban-preview *::-webkit-scrollbar { display: none; }
             .kanban-preview * { -ms-overflow-style: none; scrollbar-width: none; }
@@ -106,6 +109,7 @@ export const KanbanPreview = () => {
                     <TaskColumn
                         title="Pending"
                         statusId="pending"
+                        icon={<img src={Todo} alt="Todo" className="w-4 h-4 text-amber-500" />}
                         tasks={columns.pending}
                         projectAssignees={MOCK_ASSIGNEES}
                         isTaskBusy={() => false}
@@ -120,6 +124,7 @@ export const KanbanPreview = () => {
                     <TaskColumn
                         title="Completed"
                         statusId="completed"
+                        icon={<img src={completed} alt="Completed" className="w-4 h-4 text-green-500" />}
                         tasks={columns.completed}
                         projectAssignees={MOCK_ASSIGNEES}
                         isTaskBusy={() => false}

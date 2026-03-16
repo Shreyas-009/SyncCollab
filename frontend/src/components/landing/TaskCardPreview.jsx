@@ -19,7 +19,7 @@ const TASK_TYPE_BADGE = {
     'refactor':      { bg: 'bg-amber-100 dark:bg-amber-900/30',   text: 'text-amber-700 dark:text-amber-300' },
     'testing':       { bg: 'bg-emerald-100 dark:bg-emerald-900/30', text: 'text-emerald-700 dark:text-emerald-300' },
     'documentation': { bg: 'bg-sky-100 dark:bg-sky-900/30',       text: 'text-sky-700 dark:text-sky-300' },
-    'other':         { bg: 'bg-stone-100 dark:bg-slate-700',      text: 'text-stone-500 dark:text-slate-400' },
+    'other':         { bg: 'bg-stone-100 dark:bg-white/5',           text: 'text-stone-500 dark:text-slate-400' },
 };
 
 const TaskCard = ({ task, index, onDelete, onEdit, onView, onComments, isBusy = false }) => {
@@ -46,8 +46,8 @@ const TaskCard = ({ task, index, onDelete, onEdit, onView, onComments, isBusy = 
           style={{ ...provided.draggableProps.style }}
           className={`w-full flex flex-col justify-between min-h-[90px] border rounded-xl p-3 my-2 mx-0 overflow-hidden shadow-sm transition-all duration-[0ms] group
             ${snapshot.isDragging
-              ? 'bg-white border-purple-500 ring-2 ring-purple-500/20 dark:bg-slate-800 dark:border-purple-500 scale-[1.05] shadow-2xl z-[9999]'
-              : 'bg-white border-stone-200 hover:border-stone-300 dark:bg-gray-800/80 dark:border-gray-700 dark:hover:border-gray-600'
+              ? 'bg-white border-purple-500 ring-2 ring-purple-500/20 dark:bg-[#16161a] dark:border-purple-500 scale-[1.05] shadow-2xl z-[9999]'
+              : 'bg-white border-stone-200 hover:border-stone-300 dark:bg-[#16161a] dark:border-white/5 dark:hover:border-white/10'
             }`}
         >
           {/* Header Row */}
@@ -89,7 +89,7 @@ const TaskCard = ({ task, index, onDelete, onEdit, onView, onComments, isBusy = 
           )}
 
           {/* Divider */}
-          <div className="h-[1px] w-full bg-stone-100 dark:bg-gray-700/50 my-2.5"></div>
+          <div className="h-[1px] w-full bg-stone-100 dark:bg-white/5 my-2.5"></div>
 
           {/* Chips Row */}
           <div className="flex flex-wrap items-center gap-2 mb-2.5">
@@ -105,7 +105,7 @@ const TaskCard = ({ task, index, onDelete, onEdit, onView, onComments, isBusy = 
                   <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
                       isOverdue
                         ? 'bg-red-100 text-red-600 dark:bg-red-900/40 dark:text-red-300'
-                        : 'bg-stone-100 text-stone-500 dark:bg-slate-700 dark:text-slate-400'
+                        : 'bg-stone-100 text-stone-500 dark:bg-white/5 dark:text-slate-400'
                   }`}>
                       {dueDateLabel} {isOverdue && '(Overdue)'}
                   </span>
@@ -118,7 +118,7 @@ const TaskCard = ({ task, index, onDelete, onEdit, onView, onComments, isBusy = 
             <button
                 onClick={(e) => { e.stopPropagation(); onView(task); }}
                 disabled={isBusy}
-                className="text-xs font-semibold px-2.5 py-1.5 rounded-lg bg-stone-100 text-stone-600 hover:bg-purple-100 hover:text-purple-700 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-purple-900/50 dark:hover:text-purple-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="text-xs font-semibold px-2.5 py-1.5 rounded-lg bg-stone-100 text-stone-600 hover:bg-purple-100 hover:text-purple-700 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-purple-900/50 dark:hover:text-purple-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
                 View details
             </button>
@@ -154,10 +154,10 @@ const TaskCard = ({ task, index, onDelete, onEdit, onView, onComments, isBusy = 
                 {task.assignedTo && (
                     <div className="flex -space-x-1 overflow-hidden" title={`Assigned to ${task.assignedToName || 'Unknown'}`}>
                         {task.assignedToImage ? (
-                            <img src={task.assignedToImage} alt={task.assignedToName} className="inline-block h-6 w-6 rounded-full ring-2 ring-white dark:ring-slate-800 object-cover" />
+                            <img src={task.assignedToImage} alt={task.assignedToName} className="inline-block h-6 w-6 rounded-full ring-2 ring-white dark:ring-[#16161a] object-cover" />
                         ) : (
-                            <div className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-indigo-100 ring-2 ring-white dark:ring-slate-800 dark:bg-indigo-900">
-                                <span className="text-[10px] font-medium text-indigo-700 dark:text-indigo-300">
+                            <div className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-purple-100 ring-2 ring-white dark:ring-[#16161a] dark:bg-purple-900/40">
+                                <span className="text-[10px] font-medium text-purple-700 dark:text-purple-300">
                                     {task.assignedToName ? task.assignedToName.charAt(0).toUpperCase() : '?'}
                                 </span>
                             </div>

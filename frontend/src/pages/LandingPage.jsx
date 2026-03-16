@@ -11,8 +11,8 @@ import NexusPreview from '../components/landing/NexusPreview';
 import { Sun, Moon, Github, Linkedin } from 'lucide-react';
 
 const Logo = () => (
-    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-500 to-fuchsia-500 flex items-center justify-center shadow-lg shadow-indigo-500/20 relative overflow-hidden group">
-      <div className="absolute inset-0 bg-white/20 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out"></div>
+    <div className="w-10 h-10 rounded-xl bg-purple-600 flex items-center justify-center shadow-lg shadow-purple-600/10 relative overflow-hidden group">
+      <div className="absolute inset-0 bg-white/10 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out"></div>
       <svg className="w-6 h-6 text-white relative z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
         <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
       </svg>
@@ -25,20 +25,20 @@ const LandingPage = () => {
   const { isDark, toggleTheme } = useTheme();
 
   return (
-    <div className="flex flex-col min-h-screen w-full bg-white dark:bg-[#0a0a0c] selection:bg-indigo-500/30">
+    <div className="flex flex-col min-h-screen w-full bg-white dark:bg-[#0c0c0e] selection:bg-indigo-500/30">
       
       {/* Header */}
-      <header className="fixed top-0 z-50 w-full border-b border-stone-200/50 dark:border-white/5 bg-white/70 dark:bg-[#0a0a0c]/70 backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+      <header className="fixed top-0 z-50 w-full border-b border-stone-200/50 dark:border-white/5 bg-white/70 dark:bg-[#0c0c0e]/70 backdrop-blur-xl px-6 py-4">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
             <Logo />
             <span className="text-xl font-black text-stone-900 dark:text-white tracking-tight">SyncCollab</span>
-          </div>
+          </Link>
           
           <div className="flex items-center gap-4">
             <button
               onClick={toggleTheme}
-              className="p-2.5 rounded-xl transition-all text-stone-600 hover:bg-stone-100 dark:text-slate-300 dark:hover:bg-slate-800"
+              className="p-2.5 rounded-xl transition-all text-stone-600 hover:bg-stone-100 dark:text-slate-300 dark:hover:bg-white/5"
             >
               {isDark ? <Sun className="w-5 h-5 text-amber-500" /> : <Moon className="w-5 h-5" />}
             </button>
@@ -46,7 +46,7 @@ const LandingPage = () => {
             {!isLoaded ? (
               <div className="w-24 h-10 rounded-xl animate-pulse bg-stone-100 dark:bg-slate-800" />
             ) : isSignedIn ? (
-              <Link to="/dashboard" className="px-5 py-2.5 rounded-xl font-bold text-sm bg-indigo-600 text-white hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-500/20">
+              <Link to="/dashboard" className="px-5 py-2.5 rounded-xl font-bold text-sm bg-purple-600 text-white hover:bg-purple-700 transition-all shadow-lg shadow-purple-500/10 active:scale-95">
                 Dashboard
               </Link>
             ) : (
@@ -54,7 +54,7 @@ const LandingPage = () => {
                 <Link to="/login" className="px-5 py-2.5 text-sm font-bold text-stone-600 dark:text-slate-300 hover:text-stone-900 dark:hover:text-white transition-colors hidden sm:block">
                   Log in
                 </Link>
-                <Link to="/signup" className="px-5 py-2.5 rounded-xl font-bold text-sm bg-indigo-600 text-white hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-500/20">
+                <Link to="/signup" className="px-5 py-2.5 rounded-xl font-bold text-sm bg-purple-600 text-white hover:bg-purple-700 transition-all shadow-lg shadow-purple-500/10 active:scale-95">
                   Sign up
                 </Link>
               </div>
@@ -66,7 +66,7 @@ const LandingPage = () => {
       <HeroSection />
 
       {/* Actual UI Features Showcase */}
-      <section id="features" className="py-24 px-6 bg-stone-50 dark:bg-slate-900/40 w-full overflow-hidden">
+      <section id="features" className="py-24 px-6 bg-stone-50/50 dark:bg-[#0c0c0e] w-full overflow-hidden">
         <div className="max-w-7xl mx-auto space-y-32">
           
           {/* Feature 1: Kanban */}
@@ -87,14 +87,14 @@ const LandingPage = () => {
                 ))}
               </ul>
             </div>
-            <div className="lg:col-span-7 relative rounded-2xl md:rounded-[3rem] border-4 md:border-8 border-white dark:border-slate-800 shadow-2xl overflow-hidden">
+            <div className="lg:col-span-7 relative rounded-2xl md:rounded-[3rem] border-4 md:border-8 border-white dark:border-white/5 shadow-2xl overflow-hidden">
                <KanbanPreview />
             </div>
           </div>
 
           {/* Feature 2: Nexus AI */}
           <div className="grid lg:grid-cols-12 gap-12 items-center">
-             <div className="lg:col-span-7 order-2 lg:order-1 relative rounded-2xl md:rounded-[3rem] border-4 md:border-8 border-white dark:border-slate-800 shadow-2xl overflow-hidden h-[500px] flex">
+             <div className="lg:col-span-7 order-2 lg:order-1 relative rounded-2xl md:rounded-[3rem] border-4 md:border-8 border-white dark:border-white/5 shadow-2xl overflow-hidden h-[500px] flex">
                <NexusPreview />
             </div>
             <div className="lg:col-span-5 space-y-6 order-1 lg:order-2 pl-0 lg:pl-12">
@@ -133,14 +133,14 @@ const LandingPage = () => {
                 ))}
               </ul>
             </div>
-            <div className="lg:col-span-7 relative rounded-2xl md:rounded-[3rem] border-4 md:border-8 border-white dark:border-slate-800 shadow-2xl overflow-hidden h-[540px] flex">
+            <div className="lg:col-span-7 relative rounded-2xl md:rounded-[3rem] border-4 md:border-8 border-white dark:border-white/5 shadow-2xl overflow-hidden h-[540px] flex">
                <MembersPreview />
             </div>
           </div>
 
           {/* Feature 4: Activity Trails */}
           <div className="grid lg:grid-cols-12 gap-12 items-center">
-             <div className="lg:col-span-7 order-2 lg:order-1 relative rounded-2xl md:rounded-[3rem] border-4 md:border-8 border-white dark:border-slate-800 shadow-2xl overflow-hidden h-[500px] flex hide-scrollbar">
+             <div className="lg:col-span-7 order-2 lg:order-1 relative rounded-2xl md:rounded-[3rem] border-4 md:border-8 border-white dark:border-white/5 shadow-2xl overflow-hidden h-[500px] flex hide-scrollbar">
                <ActivityPreview />
             </div>
             <div className="lg:col-span-5 space-y-6 order-1 lg:order-2 pl-0 lg:pl-12">
@@ -167,7 +167,7 @@ const LandingPage = () => {
       <PricingSection />
 
       {/* Footer */}
-      <footer className="bg-white dark:bg-[#0a0a0c] px-6 py-16 w-full border-t border-stone-200/50 dark:border-white/5">
+      <footer className="bg-white dark:bg-[#0c0c0e] px-6 py-16 w-full border-t border-stone-200/50 dark:border-white/5">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-4 gap-12 mb-12">
             <div className="md:col-span-2">

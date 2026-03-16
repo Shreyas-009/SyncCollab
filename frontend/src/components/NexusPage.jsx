@@ -28,18 +28,18 @@ const NexusPage = ({ selectedProject, onToggleSidebar }) => {
     const mdComponents = useMemo(() => ({
         table: ({ node, ...props }) => (
             <div className="w-full my-3" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', overscrollBehaviorX: 'contain' }}>
-                <div className="min-w-[580px] border border-stone-200 dark:border-slate-600 rounded-lg overflow-hidden">
-                    <table className="w-full text-left border-collapse text-[13px] bg-white dark:bg-slate-800" {...props} />
+                <div className="min-w-[580px] border border-stone-200 dark:border-white/5 rounded-lg overflow-hidden">
+                    <table className="w-full text-left border-collapse text-[13px] bg-white dark:bg-[#111114]" {...props} />
                 </div>
             </div>
         ),
-        thead: ({ node, ...props }) => <thead className="bg-stone-50 dark:bg-slate-700/80 text-stone-700 dark:text-slate-200" {...props} />,
-        th: ({ node, ...props }) => <th className="px-3 py-2.5 font-semibold border-b border-stone-200 dark:border-slate-600 whitespace-nowrap text-xs uppercase tracking-wider" {...props} />,
+        thead: ({ node, ...props }) => <thead className="bg-stone-50 dark:bg-white/5 text-stone-700 dark:text-slate-200" {...props} />,
+        th: ({ node, ...props }) => <th className="px-3 py-2.5 font-semibold border-b border-stone-200 dark:border-white/5 whitespace-nowrap text-xs uppercase tracking-wider" {...props} />,
         td: ({ node, children, ...props }) => {
             const text = typeof children === 'string' ? children : Array.isArray(children) ? children.join('') : '';
             const dateTimeMatch = text.match(/^([A-Za-z]+ \d+),\s+(\d+:\d+ [AP]M)$/);
             return (
-                <td className="px-3 py-2.5 border-b border-stone-100 dark:border-slate-700 last:border-0 align-top" style={{ wordBreak: 'break-word', maxWidth: '200px' }} {...props}>
+                <td className="px-3 py-2.5 border-b border-stone-100 dark:border-white/5 last:border-0 align-top" style={{ wordBreak: 'break-word', maxWidth: '200px' }} {...props}>
                     {dateTimeMatch ? (
                         <span className="text-xs">
                             <span className="block font-medium text-stone-700 dark:text-slate-300">{dateTimeMatch[1]}</span>
@@ -49,8 +49,8 @@ const NexusPage = ({ selectedProject, onToggleSidebar }) => {
                 </td>
             );
         },
-        tbody: ({ node, ...props }) => <tbody className="divide-y divide-stone-100 dark:divide-slate-700" {...props} />,
-        tr: ({ node, ...props }) => <tr className="hover:bg-stone-50 dark:hover:bg-slate-700/30 transition-colors" {...props} />,
+        tbody: ({ node, ...props }) => <tbody className="divide-y divide-stone-100 dark:divide-white/5" {...props} />,
+        tr: ({ node, ...props }) => <tr className="hover:bg-stone-50 dark:hover:bg-white/5 transition-colors" {...props} />,
         p: ({ node, ...props }) => <p className="mb-3 last:mb-0" {...props} />,
         ul: ({ node, ...props }) => <ul className="list-disc pl-5 mb-3 space-y-1" {...props} />,
         ol: ({ node, ...props }) => <ol className="list-decimal pl-5 mb-3 space-y-1" {...props} />,
@@ -59,8 +59,8 @@ const NexusPage = ({ selectedProject, onToggleSidebar }) => {
         code: ({ node, className, children, ...props }) => {
             const match = /language-(\w+)/.exec(className || '');
             return !match
-                ? <code className={`bg-stone-100 dark:bg-slate-900 px-1 py-0.5 rounded text-[13px] text-pink-600 dark:text-pink-400 font-mono ${className || ''}`} {...props}>{children}</code>
-                : <div className="bg-stone-100 dark:bg-slate-900 p-3 rounded-lg overflow-x-auto mb-3 border border-stone-200 dark:border-slate-700"><code className={`text-[13px] font-mono ${className || ''}`} {...props}>{children}</code></div>;
+                ? <code className={`bg-stone-100 dark:bg-[#0c0c0e] px-1 py-0.5 rounded text-[13px] text-pink-600 dark:text-pink-400 font-mono ${className || ''}`} {...props}>{children}</code>
+                : <div className="bg-stone-100 dark:bg-[#0c0c0e] p-3 rounded-lg overflow-x-auto mb-3 border border-stone-200 dark:border-white/5"><code className={`text-[13px] font-mono ${className || ''}`} {...props}>{children}</code></div>;
         },
         h2: ({ node, ...props }) => <h2 className="text-base font-bold text-stone-800 dark:text-slate-100 mt-4 mb-2" {...props} />,
         h3: ({ node, ...props }) => <h3 className="text-sm font-semibold text-stone-700 dark:text-slate-300 mt-3 mb-1.5" {...props} />,
@@ -174,16 +174,16 @@ const NexusPage = ({ selectedProject, onToggleSidebar }) => {
     return (
         <div className="flex-1 flex flex-col overflow-hidden bg-[#fafafa] dark:bg-[#0c0c0e]">
             {/* Page Header */}
-            <div className="shrink-0 h-[72px] flex items-center justify-between px-4 md:px-6 border-b border-stone-200/50 dark:border-white/5 bg-white/60 dark:bg-slate-900/60 backdrop-blur-md">
+            <div className="shrink-0 h-[72px] flex items-center justify-between px-4 md:px-6 border-b border-stone-200/50 dark:border-white/5 bg-white/60 dark:bg-[#0c0c0e]/60 backdrop-blur-md">
                 <div className="flex items-center gap-3">
                     <button
                         onClick={onToggleSidebar}
-                        className="md:hidden p-2 -ml-2 rounded-xl text-stone-600 hover:bg-stone-100 dark:text-slate-300 dark:hover:bg-slate-800 transition-colors"
+                        className="md:hidden p-2 -ml-2 rounded-xl text-stone-600 hover:bg-stone-100 dark:text-slate-300 dark:hover:bg-white/5 transition-colors"
                         title="Menu"
                     >
                         <Menu className="w-5 h-5" />
                     </button>
-                    <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-500 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                    <div className="w-8 h-8 rounded-xl bg-purple-600 flex items-center justify-center shadow-lg shadow-purple-600/10">
                         <svg className="w-4.5 h-4.5 text-white w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                         </svg>
@@ -191,14 +191,14 @@ const NexusPage = ({ selectedProject, onToggleSidebar }) => {
                     <div>
                         <div className="flex items-center gap-2">
                             <h2 className="font-bold text-stone-800 dark:text-slate-100 leading-tight text-base">Nexus</h2>
-                            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-gradient-to-r from-indigo-500 to-purple-600 text-white">AI</span>
+                            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-purple-600 text-white">AI</span>
                         </div>
                         <p className="text-xs text-stone-500 dark:text-slate-400">Project activity analyst</p>
                     </div>
                 </div>
                 <button
                     onClick={toggleTheme}
-                    className="w-10 h-10 flex items-center justify-center rounded-xl transition-colors text-stone-500 hover:bg-stone-100 dark:text-amber-400 dark:hover:bg-slate-800"
+                    className="w-10 h-10 flex items-center justify-center rounded-xl transition-colors text-stone-500 hover:bg-stone-100 dark:text-amber-400 dark:hover:bg-white/5"
                     title="Toggle theme"
                 >
                     {isDark ? <Sun className="w-5 h-5 text-amber-500" /> : <Moon className="w-5 h-5" />}
@@ -210,7 +210,7 @@ const NexusPage = ({ selectedProject, onToggleSidebar }) => {
                 {!hasConversation ? (
                     /* Hero state — no conversation yet */
                     <div className="flex flex-col items-center justify-center min-h-full py-10 px-6 text-center">
-                        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-violet-600 flex items-center justify-center shadow-2xl shadow-indigo-500/30 mb-5">
+                        <div className="w-16 h-16 rounded-2xl bg-purple-600 flex items-center justify-center shadow-xl shadow-purple-600/10 mb-5">
                             <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M13 10V3L4 14h7v7l9-11h-7z" />
                             </svg>
@@ -233,10 +233,10 @@ const NexusPage = ({ selectedProject, onToggleSidebar }) => {
                                 </span>
                                 <div className={`px-4 py-3.5 rounded-2xl text-[14.5px] shadow-sm max-w-full ${
                                     msg.role === 'user'
-                                        ? 'bg-indigo-600 text-white rounded-tr-sm shadow-indigo-500/20'
+                                        ? 'bg-indigo-600 text-white rounded-tr-sm shadow-indigo-500/10'
                                         : msg.role === 'error'
                                             ? 'bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400 rounded-tl-sm border border-red-100 dark:border-red-900/50'
-                                            : 'bg-white dark:bg-slate-800/80 text-stone-800 dark:text-slate-200 rounded-tl-sm border border-stone-200/50 dark:border-white/5 backdrop-blur-sm overflow-x-visible'
+                                            : 'bg-white dark:bg-[#111114] text-stone-800 dark:text-slate-200 rounded-tl-sm border border-stone-200/50 dark:border-white/5 backdrop-blur-sm overflow-x-visible'
                                 }`}>
                                     {msg.role === 'user' ? (
                                         <p className="whitespace-pre-wrap">{msg.content}</p>
@@ -268,7 +268,7 @@ const NexusPage = ({ selectedProject, onToggleSidebar }) => {
                         {isLoading && (
                             <div className="flex flex-col mr-auto items-start max-w-[85%]">
                                 <span className="text-[10px] text-stone-400 dark:text-slate-500 mb-1 px-1 uppercase tracking-wider font-semibold">Nexus</span>
-                                <div className="px-5 py-4 rounded-2xl rounded-tl-sm bg-white dark:bg-slate-800/80 border border-stone-200/50 dark:border-white/5 shadow-sm backdrop-blur-sm flex items-center gap-2">
+                                <div className="px-5 py-4 rounded-2xl rounded-tl-sm bg-white dark:bg-[#111114] border border-stone-200/50 dark:border-white/5 shadow-sm backdrop-blur-sm flex items-center gap-2">
                                     <div className="flex gap-1">
                                         {[0, 300, 600].map(delay => (
                                             <div
@@ -300,7 +300,7 @@ const NexusPage = ({ selectedProject, onToggleSidebar }) => {
                                 key={p.type}
                                 onClick={() => handlePromptClick(p)}
                                 disabled={isLoading || !selectedProject}
-                                className={`flex items-center gap-2 px-3 py-2.5 text-xs font-medium rounded-xl bg-white dark:bg-slate-800/70 border border-stone-200 dark:border-slate-700 text-stone-600 dark:text-slate-300 hover:border-indigo-400 dark:hover:border-indigo-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50/50 dark:hover:bg-indigo-900/10 transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed text-left shrink-0 ${hasConversation ? 'py-1.5 rounded-lg whitespace-nowrap flex-shrink-0' : ''}`}
+                                className={`flex items-center gap-2 px-3 py-2.5 text-xs font-medium rounded-xl bg-white dark:bg-[#111114] border border-stone-200 dark:border-white/5 text-stone-600 dark:text-slate-300 hover:border-purple-400 dark:hover:border-purple-500 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-purple-50/50 dark:hover:bg-purple-900/10 transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed text-left shrink-0 ${hasConversation ? 'py-1.5 rounded-lg whitespace-nowrap flex-shrink-0' : ''}`}
                             >
                                 <i className={`bi ${p.icon} text-stone-400 dark:text-slate-500 text-sm shrink-0`} />
                                 <span>{p.text}</span>
@@ -309,7 +309,7 @@ const NexusPage = ({ selectedProject, onToggleSidebar }) => {
                     </div>
 
                     {/* Text input */}
-                    <form onSubmit={handleSend} className="relative flex items-center bg-white dark:bg-slate-900 rounded-2xl border border-stone-200 dark:border-slate-700 shadow-sm overflow-hidden focus-within:ring-2 focus-within:ring-indigo-500/50 focus-within:border-indigo-500 transition-all">
+                    <form onSubmit={handleSend} className="relative flex items-center bg-white dark:bg-[#111114] rounded-2xl border border-stone-200 dark:border-white/5 shadow-sm overflow-hidden focus-within:ring-2 focus-within:ring-indigo-500/50 focus-within:border-indigo-500 transition-all">
                         <input
                             ref={inputRef}
                             type="text"
@@ -322,7 +322,7 @@ const NexusPage = ({ selectedProject, onToggleSidebar }) => {
                         <button
                             type="submit"
                             disabled={!input.trim() || isLoading || !selectedProject}
-                            className="absolute right-2.5 p-2 rounded-xl text-white bg-indigo-600 hover:bg-indigo-700 disabled:bg-stone-200 dark:disabled:bg-slate-800 disabled:text-stone-400 dark:disabled:text-slate-600 transition-all disabled:cursor-not-allowed shadow-sm"
+                            className="absolute right-2.5 p-2 rounded-xl text-white bg-purple-600 hover:bg-purple-700 disabled:bg-stone-200 dark:disabled:bg-white/5 disabled:text-stone-400 dark:disabled:text-slate-600 transition-all disabled:cursor-not-allowed shadow-sm"
                         >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 10l7-7m0 0l7 7m-7-7v18" />

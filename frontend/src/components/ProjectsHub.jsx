@@ -22,7 +22,7 @@ const ProjectCard = ({ project, onClick, onEdit }) => {
     const extraCount = Math.max(0, ((project.collaborators?.length || 0) + 1) - members.length);
 
     return (
-        <div className="group relative bg-white dark:bg-slate-800/70 rounded-2xl border border-stone-200/60 dark:border-slate-700/50 overflow-hidden cursor-pointer hover:shadow-lg hover:shadow-stone-200/60 dark:hover:shadow-slate-900/60 hover:-translate-y-0.5 transition-all duration-200 ">
+        <div className="group relative bg-white dark:bg-[#111114] rounded-2xl border border-stone-200/60 dark:border-white/5 overflow-hidden cursor-pointer hover:shadow-xl hover:shadow-stone-200/60 dark:hover:shadow-black/60 hover:-translate-y-1 transition-all duration-300">
             <div className="h-1.5 w-full" style={{ backgroundColor: project.color || '#8B5CF6' }} />
             <div className="p-5" onClick={onClick}>
                 <div className="flex items-start gap-3 mb-4">
@@ -33,7 +33,7 @@ const ProjectCard = ({ project, onClick, onEdit }) => {
                         {project.name?.[0]?.toUpperCase()}
                     </div>
                     <div className="flex-1 min-w-0">
-                        <h3 className="font-bold text-stone-800 dark:text-slate-100 truncate text-base leading-tight">{project.name}</h3>
+                        <h3 className="font-bold text-stone-800 dark:text-gray-100 truncate text-base leading-tight">{project.name}</h3>
                         {project.description && (
                             <p className="text-xs text-stone-500 dark:text-slate-400 mt-0.5 line-clamp-1">{project.description}</p>
                         )}
@@ -43,7 +43,7 @@ const ProjectCard = ({ project, onClick, onEdit }) => {
                     <div className="flex items-center gap-2">
                         <div className="flex -space-x-2">
                             {members.map((m, i) => (
-                                <div key={i} className="w-6 h-6 rounded-full border-2 border-white dark:border-slate-800 overflow-hidden shadow-sm" style={{ zIndex: members.length - i }}>
+                                <div key={i} className="w-6 h-6 rounded-full border-2 border-white dark:border-[#111114] overflow-hidden shadow-sm" style={{ zIndex: members.length - i }}>
                                     {m.image ? (
                                         <img src={m.image} alt="" className="w-full h-full object-cover" />
                                     ) : (
@@ -54,7 +54,7 @@ const ProjectCard = ({ project, onClick, onEdit }) => {
                                 </div>
                             ))}
                             {extraCount > 0 && (
-                                <div className="w-6 h-6 rounded-full border-2 border-white dark:border-slate-800 bg-stone-100 dark:bg-slate-700 flex items-center justify-center text-[9px] font-bold text-stone-500 dark:text-slate-300">
+                                <div className="w-6 h-6 rounded-full border-2 border-white dark:border-[#111114] bg-stone-100 dark:bg-white/10 flex items-center justify-center text-[9px] font-bold text-stone-500 dark:text-slate-300">
                                     +{extraCount}
                                 </div>
                             )}
@@ -70,7 +70,7 @@ const ProjectCard = ({ project, onClick, onEdit }) => {
             </div>
             <button
                 onClick={(e) => { e.stopPropagation(); onEdit(project); }}
-                className="absolute top-3 right-3 md:opacity-0 opacity-100 group-hover:opacity-100 p-1.5 rounded-lg bg-white/80 dark:bg-slate-700/80 backdrop-blur-sm text-stone-500 dark:text-slate-400 hover:text-stone-700 dark:hover:text-slate-200 hover:bg-white dark:hover:bg-slate-700 transition-all shadow-sm border border-stone-200/60 dark:border-slate-600/50"
+                className="absolute top-3 right-3 md:opacity-0 opacity-100 group-hover:opacity-100 p-1.5 rounded-lg bg-white/80 dark:bg-white/5 backdrop-blur-sm text-stone-500 dark:text-slate-400 hover:text-stone-700 dark:hover:text-slate-200 hover:bg-white dark:hover:bg-white/10 transition-all shadow-sm border border-stone-200/60 dark:border-white/5"
                 title="Edit project"
             >
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -98,7 +98,7 @@ const CreateCard = ({ onCreateProject, isCreatingProject = false }) => {
 
     if (showForm) {
         return (
-            <div className="bg-white dark:bg-slate-800/70 rounded-2xl border-2 border-purple-300 dark:border-purple-700/60 p-5 shadow-sm">
+            <div className="bg-white dark:bg-[#0c0c0e] rounded-2xl border-2 border-purple-300 dark:border-purple-600/50 p-5 shadow-sm">
                 <h3 className="font-bold text-stone-800 dark:text-slate-100 mb-4 text-sm">New Project</h3>
                 <input
                     type="text"
@@ -107,7 +107,7 @@ const CreateCard = ({ onCreateProject, isCreatingProject = false }) => {
                     onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
                     placeholder="Project name..."
                     autoFocus
-                    className="w-full px-3 py-2.5 text-sm rounded-xl border border-stone-200 dark:border-slate-600 bg-stone-50 dark:bg-slate-900/60 text-stone-800 dark:text-slate-100 placeholder-stone-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500 mb-3 transition-all"
+                    className="w-full px-3 py-2.5 text-sm rounded-xl border border-stone-200 dark:border-white/5 bg-stone-50 dark:bg-white/5 text-stone-800 dark:text-gray-100 placeholder-stone-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500 mb-3 transition-all"
                 />
                 <div className="flex gap-2.5 mb-4">
                     {COLORS.map(c => (
@@ -120,7 +120,7 @@ const CreateCard = ({ onCreateProject, isCreatingProject = false }) => {
                     ))}
                 </div>
                 <div className="flex gap-2">
-                    <button onClick={() => { setShowForm(false); setName(''); }} disabled={isCreatingProject} className="flex-1 py-2 text-xs font-semibold rounded-xl bg-stone-100 dark:bg-slate-700 text-stone-600 dark:text-slate-300 hover:bg-stone-200 dark:hover:bg-slate-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                    <button onClick={() => { setShowForm(false); setName(''); }} disabled={isCreatingProject} className="flex-1 py-2 text-xs font-semibold rounded-xl bg-stone-100 dark:bg-white/5 text-stone-600 dark:text-slate-300 hover:bg-stone-200 dark:hover:bg-white/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                         Cancel
                     </button>
                     <button onClick={handleCreate} disabled={!name.trim() || isCreatingProject} className="flex-1 py-2 text-xs font-semibold rounded-xl bg-purple-600 text-white hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm shadow-purple-600/20">
@@ -134,9 +134,9 @@ const CreateCard = ({ onCreateProject, isCreatingProject = false }) => {
     return (
         <button
             onClick={() => setShowForm(true)}
-            className="group bg-stone-50 dark:bg-slate-800/30 rounded-2xl border-2 border-dashed border-stone-200 dark:border-slate-700 p-5 flex flex-col items-center justify-center gap-3 hover:border-purple-400 dark:hover:border-purple-600 hover:bg-purple-50/50 dark:hover:bg-purple-900/10 transition-all duration-200 min-h-[120px]"
+            className="group bg-stone-50 dark:bg-[#111114] rounded-2xl border-2 border-dashed border-stone-200 dark:border-white/5 p-5 flex flex-col items-center justify-center gap-3 hover:border-purple-400 dark:hover:border-purple-600 hover:bg-purple-50/50 dark:hover:bg-purple-900/10 transition-all duration-200 min-h-[120px]"
         >
-            <div className="w-10 h-10 rounded-xl bg-stone-100 dark:bg-slate-700 group-hover:bg-purple-100 dark:group-hover:bg-purple-900/30 flex items-center justify-center transition-colors">
+            <div className="w-10 h-10 rounded-xl bg-stone-100 dark:bg-white/5 group-hover:bg-purple-100 dark:group-hover:bg-purple-900/30 flex items-center justify-center transition-colors">
                 <svg className="w-5 h-5 text-stone-400 group-hover:text-purple-500 dark:group-hover:text-purple-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
@@ -161,7 +161,7 @@ const ProjectsHub = ({ projects, onSelectProject, onCreateProject, onProjectsUpd
     };
 
     return (
-        <div className="flex-1 overflow-y-auto bg-stone-50/30 dark:bg-slate-950/30 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto bg-stone-50/30 dark:bg-[#0c0c0e] custom-scrollbar">
             {/* Hero Banner */}
             <div className="px-6 md:px-12 pt-10 pb-8">
                 <div className="max-w-4xl mx-auto">
@@ -171,7 +171,7 @@ const ProjectsHub = ({ projects, onSelectProject, onCreateProject, onProjectsUpd
                         )}
                         <div>
                             <p className="text-sm text-stone-500 dark:text-slate-400 font-medium">{greeting()},</p>
-                            <h1 className="text-2xl font-bold text-stone-800 dark:text-slate-100 tracking-tight leading-tight">
+                            <h1 className="text-2xl font-bold text-stone-800 dark:text-gray-100 tracking-tight leading-tight">
                                 {user?.firstName || 'User'}
                             </h1>
                         </div>
@@ -190,7 +190,7 @@ const ProjectsHub = ({ projects, onSelectProject, onCreateProject, onProjectsUpd
                             Your Projects
                         </h2>
                         {projects.length > 0 && (
-                            <span className="text-xs font-semibold text-stone-400 dark:text-slate-500 bg-stone-100 dark:bg-slate-800 px-2.5 py-1 rounded-full">
+                            <span className="text-xs font-semibold text-stone-400 dark:text-slate-500 bg-stone-100 dark:bg-white/5 px-2.5 py-1 rounded-full">
                                 {projects.length}
                             </span>
                         )}
@@ -199,17 +199,17 @@ const ProjectsHub = ({ projects, onSelectProject, onCreateProject, onProjectsUpd
                     {loading ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                             {[...Array(3)].map((_, i) => (
-                                <div key={i} className="bg-white dark:bg-slate-800/60 rounded-2xl border border-stone-200/60 dark:border-slate-700/50 overflow-hidden animate-pulse">
-                                    <div className="h-1.5 bg-stone-200 dark:bg-slate-700" />
+                                <div key={i} className="bg-white dark:bg-[#111114] rounded-2xl border border-stone-200/60 dark:border-white/5 overflow-hidden animate-pulse">
+                                    <div className="h-1.5 bg-stone-200 dark:bg-white/10" />
                                     <div className="p-5">
                                         <div className="flex gap-3 mb-4">
-                                            <div className="w-10 h-10 bg-stone-100 dark:bg-slate-700 rounded-xl" />
+                                            <div className="w-10 h-10 bg-stone-100 dark:bg-white/5 rounded-xl" />
                                             <div className="flex-1">
-                                                <div className="h-4 bg-stone-100 dark:bg-slate-700 rounded w-2/3 mb-1.5" />
-                                                <div className="h-3 bg-stone-100 dark:bg-slate-700 rounded w-1/2" />
+                                                <div className="h-4 bg-stone-100 dark:bg-white/5 rounded w-2/3 mb-1.5" />
+                                                <div className="h-3 bg-stone-100 dark:bg-white/5 rounded w-1/2" />
                                             </div>
                                         </div>
-                                        <div className="h-3 bg-stone-100 dark:bg-slate-700 rounded w-1/3" />
+                                        <div className="h-3 bg-stone-100 dark:bg-white/5 rounded w-1/3" />
                                     </div>
                                 </div>
                             ))}

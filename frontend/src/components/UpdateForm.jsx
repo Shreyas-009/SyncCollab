@@ -1,6 +1,7 @@
 import React, { useEffect, useId, useState } from 'react'
 import { X } from 'lucide-react'
 import { TASK_TYPES } from './TaskForm'
+import CustomDropdown from './CustomDropdown'
 
 const UpdateForm = ({ show, onClose, task, onUpdate, project, isSubmitting = false }) => {
     const [title, setTitle] = useState(task?.title || '');
@@ -56,9 +57,31 @@ const UpdateForm = ({ show, onClose, task, onUpdate, project, isSubmitting = fal
         await onUpdate(task._id, updatedData);
     }
 
-    const inputCls = "w-full px-4 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all bg-stone-50 text-stone-800 border-stone-200 placeholder-stone-400 dark:bg-slate-900 dark:text-gray-100 dark:border-slate-600 dark:placeholder-slate-500 dark:[color-scheme:dark]";
-    const selectCls = "w-full px-4 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all cursor-pointer bg-stone-50 text-stone-700 border-stone-200 dark:bg-slate-900 dark:text-gray-100 dark:border-slate-600";
-    const labelCls = "block text-sm font-medium mb-2 text-stone-700 dark:text-slate-300";
+    const inputCls = "w-full px-4 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent transition-all bg-stone-50 text-stone-800 border-stone-200 placeholder-stone-400 dark:bg-[#111114] dark:text-gray-100 dark:border-white/10 dark:placeholder-slate-500 dark:[color-scheme:dark]";
+    const labelCls = "block text-[11px] font-bold uppercase tracking-wider mb-1.5 text-stone-500 dark:text-slate-400";
+
+    const TASK_TYPE_OPTIONS = [
+        { value: '', label: 'No Type' },
+        ...TASK_TYPES.map(t => ({ value: t.value, label: t.label }))
+    ];
+
+    const ASSIGNEE_OPTIONS = [
+        { value: '', label: 'Unassigned' },
+        ...assignees.map(a => ({ value: a.id, label: `${a.name} (${a.role})` }))
+    ];
+
+    const PRIORITY_OPTIONS = [
+        { value: 'low', label: 'Low' },
+        { value: 'medium', label: 'Medium' },
+        { value: 'high', label: 'High' }
+    ];
+
+    const STATUS_OPTIONS = [
+        { value: 'pending', label: 'Pending' },
+        { value: 'in progress', label: 'In Progress' },
+        { value: 'testing', label: 'Testing' },
+        { value: 'completed', label: 'Completed' }
+    ];
 
     return (
         <div
@@ -66,16 +89,16 @@ const UpdateForm = ({ show, onClose, task, onUpdate, project, isSubmitting = fal
             onClick={isSubmitting ? undefined : onClose}
         >
             <div
-                className="flex flex-col w-[90%] max-w-md rounded-2xl shadow-xl overflow-hidden transition-colors bg-white border border-stone-200 dark:bg-slate-800 dark:border dark:border-slate-700"
+                className="flex flex-col w-[90%] max-w-md rounded-2xl shadow-xl overflow-hidden transition-colors bg-white border border-stone-200 dark:bg-[#0c0c0e] dark:border-white/5"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}
-                <div className="flex justify-between items-center px-6 py-4 border-b border-stone-100 bg-stone-50 dark:border-slate-700 dark:bg-slate-800">
+                <div className="flex justify-between items-center px-6 py-4 border-b border-stone-100 bg-stone-50 dark:border-white/5 dark:bg-[#0c0c0e]">
                     <h2 className="text-xl font-semibold text-stone-800 dark:text-gray-100">Edit Task</h2>
                     <button
                         onClick={onClose}
                         disabled={isSubmitting}
-                        className="p-2 rounded-lg transition-colors text-stone-400 hover:text-stone-600 hover:bg-stone-100 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-700"
+                        className="p-2 rounded-lg transition-colors text-stone-400 hover:text-stone-600 hover:bg-stone-100 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-white/10"
                     >
                         <X className="w-5 h-5" />
                     </button>
@@ -85,7 +108,7 @@ const UpdateForm = ({ show, onClose, task, onUpdate, project, isSubmitting = fal
                 <form
                     id={formId}
                     onSubmit={handleSubmit}
-                    className="px-6 py-5 space-y-4 max-h-[70vh] overflow-y-auto bg-white custom-scrollbar dark:bg-slate-900"
+                    className="px-6 py-5 space-y-4 max-h-[70vh] overflow-y-auto bg-white custom-scrollbar dark:bg-[#0c0c0e]"
                 >
                     {/* Title */}
                     <div>
@@ -120,43 +143,24 @@ const UpdateForm = ({ show, onClose, task, onUpdate, project, isSubmitting = fal
                     {/* Task Type */}
                     <div>
                         <label className={labelCls}>Task Type</label>
-                        <select className={selectCls} value={taskType} onChange={(e) => setTaskType(e.target.value)} disabled={isSubmitting}>
-                            <option value="">No Type</option>
-                            {TASK_TYPES.map(t => (
-                                <option key={t.value} value={t.value}>{t.label}</option>
-                            ))}
-                        </select>
+                        <CustomDropdown options={TASK_TYPE_OPTIONS} value={taskType} onChange={setTaskType} disabled={isSubmitting} />
                     </div>
 
                     {/* Assign To */}
                     <div>
                         <label className={labelCls}>Assign To</label>
-                        <select className={selectCls} value={assignedTo} onChange={(e) => setAssignedTo(e.target.value)} disabled={isSubmitting}>
-                            <option value="">Unassigned</option>
-                            {assignees.map(a => (
-                                <option key={a.id} value={a.id}>{a.name} ({a.role})</option>
-                            ))}
-                        </select>
+                        <CustomDropdown options={ASSIGNEE_OPTIONS} value={assignedTo} onChange={setAssignedTo} disabled={isSubmitting} />
                     </div>
 
                     {/* Priority + Status */}
                     <div className='grid grid-cols-2 gap-4'>
                         <div>
                             <label className={labelCls}>Priority</label>
-                            <select className={selectCls} value={priority} onChange={(e) => setPriority(e.target.value)} disabled={isSubmitting}>
-                                <option value='low'>Low</option>
-                                <option value='medium'>Medium</option>
-                                <option value='high'>High</option>
-                            </select>
+                            <CustomDropdown options={PRIORITY_OPTIONS} value={priority} onChange={setPriority} disabled={isSubmitting} />
                         </div>
                         <div>
                             <label className={labelCls}>Status</label>
-                            <select className={selectCls} value={status} onChange={(e) => setStatus(e.target.value)} disabled={isSubmitting}>
-                                <option value='pending'>Pending</option>
-                                <option value='in progress'>In Progress</option>
-                                <option value='testing'>Testing</option>
-                                <option value='completed'>Completed</option>
-                            </select>
+                            <CustomDropdown options={STATUS_OPTIONS} value={status} onChange={setStatus} disabled={isSubmitting} />
                         </div>
                     </div>
 
@@ -186,12 +190,12 @@ const UpdateForm = ({ show, onClose, task, onUpdate, project, isSubmitting = fal
                 </form>
 
                 {/* Footer */}
-                <div className="px-6 py-4 border-t flex justify-end gap-3 bg-stone-50 border-stone-100 dark:bg-slate-900/50 dark:border-slate-700">
+                <div className="px-6 py-4 border-t flex justify-end gap-3 bg-stone-50 border-stone-100 dark:bg-[#0c0c0e] dark:border-white/5">
                     <button
                         type='button'
                         onClick={onClose}
                         disabled={isSubmitting}
-                        className="px-4 py-2 text-sm font-medium border rounded-xl transition-colors text-stone-600 bg-white border-stone-200 hover:bg-stone-50 dark:text-slate-300 dark:bg-slate-800 dark:border-slate-600 dark:hover:bg-slate-700"
+                        className="px-4 py-2 text-sm font-medium border rounded-xl transition-colors text-stone-600 bg-white border-stone-200 hover:bg-stone-50 dark:text-slate-300 dark:bg-white/5 dark:border-white/5 dark:hover:bg-white/10"
                     >
                         Cancel
                     </button>

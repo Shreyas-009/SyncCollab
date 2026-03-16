@@ -37,9 +37,9 @@ const ActivityPreview = () => {
     const { isDark } = useTheme();
 
     return (
-        <div className="flex-1 overflow-y-auto bg-stone-50/30 dark:bg-slate-950/30 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto bg-stone-50/30 dark:bg-[#0c0c0e]/30 custom-scrollbar">
             {/* Page Header */}
-            <div className="sticky top-0 z-10 px-4 md:px-10 h-[72px] flex items-center justify-between bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-stone-200/60 dark:border-slate-800">
+            <div className="sticky top-0 z-10 px-4 md:px-10 h-[72px] flex items-center justify-between bg-white/80 dark:bg-[#0c0c0e]/80 backdrop-blur-md border-b border-stone-200/60 dark:border-white/5">
                 <div className="flex items-center gap-3 min-w-0">
                     <button
                         disabled
@@ -65,7 +65,7 @@ const ActivityPreview = () => {
             <div className="max-w-3xl mx-auto px-4 md:px-10 py-8">
                 <div className="relative">
                     {/* Timeline line */}
-                    <div className="absolute left-[4px] top-2 bottom-2 w-px bg-stone-200 dark:bg-slate-700/60" />
+                    <div className="absolute left-[4px] top-2 bottom-2 w-px bg-stone-200 dark:bg-white/10" />
 
                     <div className="space-y-3 pl-6">
                         {MOCK_LOGS.map((log) => {
@@ -74,10 +74,10 @@ const ActivityPreview = () => {
                                 <div key={log._id} className="relative group">
                                     {/* Timeline dot */}
                                     <div
-                                        className={`absolute -left-6 top-4 w-2.5 h-2.5 rounded-full ${style.bg} shadow-sm ring-2 ring-white dark:ring-slate-950 transition-transform group-hover:scale-125`}
+                                        className={`absolute -left-6 top-4 w-2.5 h-2.5 rounded-full ${style.bg} shadow-sm ring-2 ring-white dark:ring-[#0c0c0e] transition-transform group-hover:scale-125`}
                                     />
 
-                                    <div className="bg-white dark:bg-slate-800/60 rounded-2xl border border-stone-200/60 dark:border-slate-700/40 px-4 py-3.5 hover:border-stone-300 dark:hover:border-slate-600 hover:shadow-sm transition-all">
+                                    <div className="bg-white dark:bg-[#111114] border border-stone-200/60 dark:border-white/5 px-4 py-3.5 hover:border-stone-300 dark:hover:border-white/10 hover:shadow-sm transition-all rounded-xl">
                                         <div className="flex items-start justify-between gap-3">
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-center gap-2 flex-wrap">

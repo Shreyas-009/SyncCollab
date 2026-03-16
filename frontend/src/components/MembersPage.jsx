@@ -9,15 +9,15 @@ import { useTheme } from '../context/useTheme';
 const ROLES = ['Team Lead', 'Frontend Developer', 'Backend Developer', 'Tester', 'Designer', 'Member'];
 
 const MemberCardSkeleton = () => (
-    <div className="bg-white dark:bg-slate-800/80 border border-stone-200/60 dark:border-white/5 rounded-2xl p-4 flex items-center gap-4 animate-pulse">
-        <div className="w-12 h-12 rounded-xl bg-stone-100 dark:bg-slate-700" />
+    <div className="bg-white dark:bg-[#111114] border border-stone-200/60 dark:border-white/5 rounded-2xl p-4 flex items-center gap-4 animate-pulse">
+        <div className="w-12 h-12 rounded-xl bg-stone-100 dark:bg-white/5" />
         <div className="flex-1 min-w-0">
-            <div className="h-4 bg-stone-100 dark:bg-slate-700 rounded w-2/3 mb-2" />
-            <div className="h-3 bg-stone-100 dark:bg-slate-700 rounded w-1/2" />
+            <div className="h-4 bg-stone-100 dark:bg-white/5 rounded w-2/3 mb-2" />
+            <div className="h-3 bg-stone-100 dark:bg-white/5 rounded w-1/2" />
         </div>
         <div className="flex items-center gap-2">
-            <div className="h-6 w-20 bg-stone-100 dark:bg-slate-700 rounded-lg" />
-            <div className="w-8 h-8 rounded-lg bg-stone-100 dark:bg-slate-700" />
+            <div className="h-6 w-20 bg-stone-100 dark:bg-white/5 rounded-lg" />
+            <div className="w-8 h-8 rounded-lg bg-stone-100 dark:bg-white/5" />
         </div>
     </div>
 );
@@ -37,16 +37,16 @@ const MemberCard = ({ member, isOwner, isCurrentUser, onUpdateRole, onRequestRem
     };
 
     return (
-        <div className="bg-white dark:bg-slate-800/80 border border-stone-200/60 dark:border-white/5 rounded-2xl p-4 flex items-center gap-4 group transition-all hover:shadow-md">
+        <div className="bg-white dark:bg-[#111114] border border-stone-200/60 dark:border-white/5 rounded-2xl p-4 flex items-center gap-4 group transition-all hover:shadow-md">
             <div className="relative shrink-0">
                 {member.image ? (
                     <img src={member.image} className="w-12 h-12 rounded-xl object-cover shadow-sm" alt="" />
                 ) : (
-                    <div className="w-12 h-12 rounded-xl bg-stone-100 dark:bg-slate-700 flex items-center justify-center text-lg font-bold text-stone-400 dark:text-slate-500">
+                    <div className="w-12 h-12 rounded-xl bg-stone-100 dark:bg-white/5 flex items-center justify-center text-lg font-bold text-stone-400 dark:text-slate-500">
                         {member.name?.[0]?.toUpperCase() || member.email[0].toUpperCase()}
                     </div>
                 )}
-                <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white dark:border-slate-800 ${member.id ? 'bg-green-500' : 'bg-stone-300'}`} />
+                <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white dark:border-[#0c0c0e] ${member.id ? 'bg-green-500' : 'bg-stone-300'}`} />
             </div>
 
             <div className="flex-1 min-w-0">
@@ -64,32 +64,40 @@ const MemberCard = ({ member, isOwner, isCurrentUser, onUpdateRole, onRequestRem
                     <button
                         onClick={() => isOwner && !isCurrentUser && setShowRoleMenu(!showRoleMenu)}
                         disabled={isBusy || !isOwner || isCurrentUser}
-                        className={`text-[11px] font-bold px-2.5 py-1 rounded-lg transition-all ${
+                        className={`flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1.5 rounded-lg transition-all ${
                             isOwner && !isCurrentUser 
-                                ? 'bg-stone-100 dark:bg-slate-700 hover:bg-stone-200 dark:hover:bg-slate-600 text-stone-600 dark:text-slate-300' 
+                                ? 'bg-stone-100 dark:bg-white/5 hover:bg-stone-200 dark:hover:bg-white/10 text-stone-600 dark:text-slate-300' 
                                 : 'bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400'
                         }`}
                     >
-                        {member.role || 'Member'}
-                        {isOwner && !isCurrentUser && <i className="bi bi-chevron-down ml-1.5 text-[8px]" />}
+                        <span className="line-clamp-1 max-w-[80px]">{member.role || 'Member'}</span>
+                        {isOwner && !isCurrentUser && <i className="bi bi-chevron-down text-[8px]" />}
                     </button>
                     {isUpdatingRole && (
-                        <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full border-2 border-purple-200 dark:border-purple-900/50 border-t-purple-600 dark:border-t-purple-400 animate-spin bg-white dark:bg-slate-800" />
+                        <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full border-2 border-purple-200 dark:border-purple-900/50 border-t-purple-600 dark:border-t-purple-400 animate-spin bg-white dark:bg-[#111114]" />
                     )}
 
                     {showRoleMenu && (
-                        <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 border border-stone-200 dark:border-slate-700 shadow-xl rounded-xl z-50 p-1 animate-in fade-in zoom-in duration-200">
-                            {ROLES.map(role => (
-                                <button
-                                    key={role}
-                                    onClick={() => handleRoleUpdate(role)}
-                                    disabled={isBusy}
-                                    className={`w-full text-left px-3 py-2 text-xs font-semibold rounded-lg hover:bg-stone-50 dark:hover:bg-slate-700 transition-colors ${member.role === role ? 'text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/10' : 'text-stone-600 dark:text-slate-300'}`}
-                                >
-                                    {role}
-                                </button>
-                            ))}
-                        </div>
+                        <>
+                            <div 
+                                className="fixed inset-0 z-40" 
+                                onClick={() => setShowRoleMenu(false)} 
+                            />
+                            <div className="absolute right-0 mt-2 w-44 bg-white dark:bg-[#111114] border border-stone-200 dark:border-white/10 shadow-xl rounded-xl z-50 p-1 animate-in fade-in zoom-in duration-200">
+                                <div className="max-h-[120px] overflow-y-auto custom-scrollbar">
+                                    {ROLES.map(role => (
+                                        <button
+                                            key={role}
+                                            onClick={() => handleRoleUpdate(role)}
+                                            disabled={isBusy}
+                                            className={`w-full text-left px-3 py-2 text-xs font-semibold rounded-lg hover:bg-stone-50 dark:hover:bg-white/5 transition-colors ${member.role === role ? 'text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/10' : 'text-stone-600 dark:text-slate-300'}`}
+                                        >
+                                            {role}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        </>
                     )}
                 </div>
 
@@ -113,11 +121,11 @@ const MemberCard = ({ member, isOwner, isCurrentUser, onUpdateRole, onRequestRem
 };
 
 const OwnerCardSkeleton = () => (
-    <div className="bg-white/70 dark:bg-slate-800/60 border border-stone-200/60 dark:border-white/5 rounded-2xl p-5 flex items-center gap-4 mb-6 animate-pulse">
-        <div className="w-14 h-14 rounded-2xl bg-stone-100 dark:bg-slate-700" />
+    <div className="bg-white/70 dark:bg-[#111114] border border-stone-200/60 dark:border-white/5 rounded-2xl p-5 flex items-center gap-4 mb-6 animate-pulse">
+        <div className="w-14 h-14 rounded-2xl bg-stone-100 dark:bg-white/5" />
         <div className="flex-1 min-w-0">
-            <div className="h-4 bg-stone-100 dark:bg-slate-700 rounded w-40 mb-2" />
-            <div className="h-3 bg-stone-100 dark:bg-slate-700 rounded w-56" />
+            <div className="h-4 bg-stone-100 dark:bg-white/5 rounded w-40 mb-2" />
+            <div className="h-3 bg-stone-100 dark:bg-white/5 rounded w-56" />
         </div>
     </div>
 );
@@ -132,7 +140,7 @@ const OwnerCard = ({ project, isCurrentUser }) => (
                     {project.ownerName?.[0]?.toUpperCase() || 'P'}
                 </div>
             )}
-            <div className="absolute -bottom-1 -right-1 p-1 bg-white dark:bg-slate-900 rounded-full shadow-sm">
+            <div className="absolute -bottom-1 -right-1 p-1 bg-white dark:bg-[#0c0c0e] rounded-full shadow-sm">
                 <div className="w-3 h-3 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.5)]" title="Project Owner" />
             </div>
         </div>
@@ -188,12 +196,12 @@ const MembersPage = ({ selectedProject, onProjectUpdated, onShowInvite, onToggle
     return (
       <div className="flex-1 flex flex-col h-full bg-[#fafafa] dark:bg-[#0c0c0e] overflow-hidden">
         {/* Header Area */}
-        <div className="shrink-0 px-4 md:px-10 py-3 md:py-0 min-h-[72px] md:h-[72px] flex items-center border-b border-stone-200/50 dark:border-white/5 bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl">
+        <div className="shrink-0 px-4 md:px-10 py-3 md:py-0 min-h-[72px] md:h-[72px] flex items-center border-b border-stone-200/50 dark:border-white/5 bg-white/60 dark:bg-[#0c0c0e]/60 backdrop-blur-xl">
           <div className="flex flex-row md:items-center justify-between gap-3 md:gap-4 w-full">
             <div className="flex items-center md:items-center gap-3 min-w-0 flex-1 ">
               <button
                 onClick={onToggleSidebar}
-                className="md:hidden p-2 -ml-2 rounded-xl text-stone-600 hover:bg-stone-100 dark:text-slate-300 dark:hover:bg-slate-800 transition-colors"
+                className="md:hidden p-2 -ml-2 rounded-xl text-stone-600 hover:bg-stone-100 dark:text-slate-300 dark:hover:bg-white/5 transition-colors"
                 title="Menu"
               >
                 <Menu className="w-5 h-5" />
@@ -210,7 +218,7 @@ const MembersPage = ({ selectedProject, onProjectUpdated, onShowInvite, onToggle
             <div className="flex items-center gap-2 ">
               <button
                 onClick={toggleTheme}
-                className="w-10 h-10 flex items-center justify-center rounded-xl transition-colors text-stone-500 hover:bg-stone-100 dark:text-amber-400 dark:hover:bg-slate-800"
+                className="w-10 h-10 flex items-center justify-center rounded-xl transition-colors text-stone-500 hover:bg-stone-100 dark:text-amber-400 dark:hover:bg-white/5"
                 title="Toggle theme"
               >
                 {isDark ? (
@@ -251,12 +259,12 @@ const MembersPage = ({ selectedProject, onProjectUpdated, onShowInvite, onToggle
                 Team Members
               </h3>
               {showSkeletons ? (
-                <span className="text-[10px] font-bold text-stone-400 dark:text-slate-500 bg-stone-100 dark:bg-slate-800 px-2 py-0.5 rounded-full">
-                  <span className="inline-block w-6 h-3 rounded bg-stone-200/80 dark:bg-slate-600/70 animate-pulse" />
+                <span className="text-[10px] font-bold text-stone-400 dark:text-slate-500 bg-stone-100 dark:bg-white/5 px-2 py-0.5 rounded-full">
+                  <span className="inline-block w-6 h-3 rounded bg-stone-200/80 dark:bg-white/10 animate-pulse" />
                 </span>
               ) : (
                 selectedProject.collaborators?.length > 0 && (
-                  <span className="text-[10px] font-bold text-stone-400 dark:text-slate-500 bg-stone-100 dark:bg-slate-800 px-2 py-0.5 rounded-full">
+                  <span className="text-[10px] font-bold text-stone-400 dark:text-slate-500 bg-stone-100 dark:bg-white/5 px-2 py-0.5 rounded-full">
                     {selectedProject.collaborators.length} Total
                   </span>
                 )
@@ -284,8 +292,8 @@ const MembersPage = ({ selectedProject, onProjectUpdated, onShowInvite, onToggle
                   />
                 ))
               ) : (
-                <div className="col-span-full py-12 flex flex-col items-center justify-center bg-white dark:bg-slate-800/40 border border-dashed border-stone-200 dark:border-slate-700 rounded-2xl text-center">
-                  <div className="w-12 h-12 bg-stone-50 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4">
+                <div className="col-span-full py-12 flex flex-col items-center justify-center bg-white dark:bg-[#111114]/40 border border-dashed border-stone-200 dark:border-white/5 rounded-2xl text-center">
+                  <div className="w-12 h-12 bg-stone-50 dark:bg-[#111114] rounded-full flex items-center justify-center mb-4">
                     <i className="bi bi-people text-stone-300 dark:text-slate-600 text-2xl" />
                   </div>
                   <h4 className="text-sm font-bold text-stone-600 dark:text-slate-400 mb-1">
