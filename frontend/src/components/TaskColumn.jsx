@@ -71,7 +71,7 @@ const TaskColumn = ({
   });
 
   return (
-    <section className="flex flex-col flex-1 min-w-[300px] max-w-sm rounded-[24px] bg-stone-100/50 border border-stone-200/60 shadow-sm dark:bg-[#111114] dark:border-white/5 overflow-hidden">
+    <section className="flex flex-col flex-1 w-full md:min-w-[300px] md:max-w-sm rounded-[24px] bg-stone-100/50 border border-stone-200/60 shadow-sm dark:bg-[#111114] dark:border-white/5 overflow-hidden">
       {/* Column Header */}
       <div className="flex items-center justify-between p-5 bg-white/40 dark:bg-[#16161a]/80 border-b border-stone-200/50 dark:border-white/5 z-10 sticky top-0">
         <div className="flex items-center gap-3">

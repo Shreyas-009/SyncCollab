@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useAuth, useUser } from "@clerk/clerk-react";
 import { DragDropContext } from "@hello-pangea/dnd";
+import { CircleDashed, Loader, FlaskConical, CheckCircle2 } from "lucide-react";
 
 import TaskColumn from "../components/TaskColumn";
 import ProjectSidebar from "../components/ProjectSidebar";
@@ -21,16 +22,13 @@ import ProjectSettingsModal from "../components/ProjectSettingsModal";
 import CommentModal from "../features/comments/CommentModal";
 import useMutationLocks from "../hooks/useMutationLocks";
 
-import Todo from "../assets/todo.png";
-import doing from "../assets/doing.png";
-import completed from "../assets/completed.png";
-
 import {
   fetchTasks,
   addTask,
   deleteTask,
   searchTasks,
   updateTask,
+  reorderTask,
   setAuthFunctions,
   fetchProjects,
   createProject,
@@ -63,14 +61,27 @@ const HomePage = () => {
   // Tasks State
   const [tasks, setTasks] = useState([]);
   const [tasksLoading, setTasksLoading] = useState(false);
+  const [activeMobileColumn, setActiveMobileColumn] = useState("pending");
 
   // Global Modals State
   const [selectedTaskForEdit, setSelectedTaskForEdit] = useState(null);
   const [selectedTaskForDelete, setSelectedTaskForDelete] = useState(null);
   const [selectedTaskForView, setSelectedTaskForView] = useState(null);
   const [selectedTaskForComments, setSelectedTaskForComments] = useState(null);
-  const [pendingDragAction, setPendingDragAction] = useState(null);
   const [membersLoading, setMembersLoading] = useState(false);
+
+  // Drag Confirmation State
+  const [pendingDragAction, setPendingDragAction] = useState(null);
+
+  const confirmDrag = () => {
+    // If we were deferring the action, we would execute logic here.
+    // For now, since handleDragEnd updates state directly, this might be unused or for future feature.
+    setPendingDragAction(null);
+  };
+
+  const cancelDrag = () => {
+    setPendingDragAction(null);
+  };
 
   const { user } = useUser();
   const { getToken } = useAuth();
@@ -246,50 +257,97 @@ const HomePage = () => {
   };
 
   // Drag and Drop Logic
-  const handleDragEnd = (result) => {
+  const handleDragEnd = async (result) => {
     const { source, destination, draggableId } = result;
+
     if (!destination) return;
     if (
       source.droppableId === destination.droppableId &&
       source.index === destination.index
     )
       return;
+
     const task = tasks.find((t) => t._id === draggableId);
     if (!task) return;
     if (isTaskBusy(task._id)) return;
-    if (source.droppableId !== destination.droppableId) {
-      setPendingDragAction({
-        task,
-        source,
-        destination,
-        newStatus: destination.droppableId,
+
+    // Create new tasks array copy
+    let newTasks = [...tasks];
+
+    // Helper to get sorted tasks for a status from the copy
+    const getSortedTasks = (status) =>
+      newTasks
+        .filter((t) => t.status === status)
+        .sort((a, b) => (a.order || 0) - (b.order || 0));
+
+    const sourceStatus = source.droppableId;
+    const destStatus = destination.droppableId;
+
+    if (sourceStatus === destStatus) {
+      const columnTasks = getSortedTasks(sourceStatus);
+      const movedTask = columnTasks[source.index];
+
+      // Remove
+      columnTasks.splice(source.index, 1);
+      // Insert
+      columnTasks.splice(destination.index, 0, movedTask);
+
+      // Update orders in main array
+      columnTasks.forEach((t, i) => {
+        const originalIndex = newTasks.findIndex((nt) => nt._id === t._id);
+        if (originalIndex !== -1) {
+          newTasks[originalIndex] = { ...newTasks[originalIndex], order: i };
+        }
+      });
+    } else {
+      const sourceColumnTasks = getSortedTasks(sourceStatus);
+      const destColumnTasks = getSortedTasks(destStatus);
+      const movedTask = sourceColumnTasks[source.index];
+
+      // Remove from source
+      sourceColumnTasks.splice(source.index, 1);
+
+      // Insert into dest
+      destColumnTasks.splice(destination.index, 0, movedTask);
+
+      // Update source orders
+      sourceColumnTasks.forEach((t, i) => {
+        const originalIndex = newTasks.findIndex((nt) => nt._id === t._id);
+        if (originalIndex !== -1) {
+          newTasks[originalIndex] = { ...newTasks[originalIndex], order: i };
+        }
+      });
+
+      // Update dest orders & status
+      destColumnTasks.forEach((t, i) => {
+        const originalIndex = newTasks.findIndex((nt) => nt._id === t._id);
+        if (originalIndex !== -1) {
+          newTasks[originalIndex] = {
+            ...newTasks[originalIndex],
+            order: i,
+            status: destStatus,
+          };
+        }
       });
     }
-  };
 
-  const confirmDrag = async () => {
-    if (!pendingDragAction) return;
-    const { task, newStatus } = pendingDragAction;
+    setTasks(newTasks);
+
+    // Run in background / optimistic
     try {
-      const { executed } = await runLocked(taskMoveKey(task._id), async () => {
-        setTasks((currentTasks) =>
-          currentTasks.map((t) =>
-            t._id === task._id ? { ...t, status: newStatus } : t,
-          ),
-        );
-        await updateTask(task._id, { status: newStatus });
-        await loadTasks();
+      await reorderTask({
+        taskId: draggableId,
+        sourceIndex: source.index,
+        destinationIndex: destination.index,
+        sourceStatus,
+        destinationStatus: destStatus,
+        projectId: selectedProject._id,
       });
-      if (!executed) return;
-      setPendingDragAction(null);
-    } catch {
-      alert("Error moving task");
+    } catch (err) {
+      console.error("Reorder failed", err);
       await loadTasks();
-      setPendingDragAction(null);
     }
   };
-
-  const cancelDrag = () => setPendingDragAction(null);
 
   const isTaskBusy = useCallback(
     (taskId) =>
@@ -300,10 +358,16 @@ const HomePage = () => {
   );
 
   // Derived states
-  const pendingTasks = tasks.filter((t) => t.status === "pending");
-  const inProgressTasks = tasks.filter((t) => t.status === "in progress");
-  const testingTasks = tasks.filter((t) => t.status === "testing");
-  const completedTasks = tasks.filter((t) => t.status === "completed");
+  const sortTasks = (taskList) =>
+    taskList.sort((a, b) => (a.order || 0) - (b.order || 0));
+  const pendingTasks = sortTasks(tasks.filter((t) => t.status === "pending"));
+  const inProgressTasks = sortTasks(
+    tasks.filter((t) => t.status === "in progress"),
+  );
+  const testingTasks = sortTasks(tasks.filter((t) => t.status === "testing"));
+  const completedTasks = sortTasks(
+    tasks.filter((t) => t.status === "completed"),
+  );
   const showTaskSkeletons = tasksLoading && tasks.length === 0;
 
   const projectAssignees = selectedProject
@@ -421,60 +485,108 @@ const HomePage = () => {
           ) : showBoard ? (
             <PageTransition pageKey={`board-${selectedProject._id}`}>
               <DragDropContext onDragEnd={handleDragEnd}>
-                <main className="flex-1 flex py-6 px-[2%] gap-5 overflow-x-auto custom-scrollbar bg-stone-50/10 dark:bg-[#0c0c0e]">
-                  <div className="flex gap-5 h-full pb-4">
-                    <TaskColumn
-                      title="Pending"
-                      statusId="pending"
-                      img={Todo}
-                      tasks={pendingTasks}
-                      onDelete={setSelectedTaskForDelete}
-                      onEdit={setSelectedTaskForEdit}
-                      onView={setSelectedTaskForView}
-                      onComments={setSelectedTaskForComments}
-                      projectAssignees={projectAssignees}
-                      isTaskBusy={isTaskBusy}
-                      isLoading={showTaskSkeletons}
-                    />
-                    <TaskColumn
-                      title="In Progress"
-                      statusId="in progress"
-                      img={doing}
-                      tasks={inProgressTasks}
-                      onDelete={setSelectedTaskForDelete}
-                      onEdit={setSelectedTaskForEdit}
-                      onView={setSelectedTaskForView}
-                      onComments={setSelectedTaskForComments}
-                      projectAssignees={projectAssignees}
-                      isTaskBusy={isTaskBusy}
-                      isLoading={showTaskSkeletons}
-                    />
-                    <TaskColumn
-                      title="Testing"
-                      statusId="testing"
-                      img={null}
-                      tasks={testingTasks}
-                      onDelete={setSelectedTaskForDelete}
-                      onEdit={setSelectedTaskForEdit}
-                      onView={setSelectedTaskForView}
-                      onComments={setSelectedTaskForComments}
-                      projectAssignees={projectAssignees}
-                      isTaskBusy={isTaskBusy}
-                      isLoading={showTaskSkeletons}
-                    />
-                    <TaskColumn
-                      title="Completed"
-                      statusId="completed"
-                      img={completed}
-                      tasks={completedTasks}
-                      onDelete={setSelectedTaskForDelete}
-                      onEdit={setSelectedTaskForEdit}
-                      onView={setSelectedTaskForView}
-                      onComments={setSelectedTaskForComments}
-                      projectAssignees={projectAssignees}
-                      isTaskBusy={isTaskBusy}
-                      isLoading={showTaskSkeletons}
-                    />
+                <main className="flex-1 flex flex-col md:flex-row py-6 px-[2%] gap-5 overflow-hidden md:overflow-x-auto custom-scrollbar bg-stone-50/10 dark:bg-[#0c0c0e]">
+                  {/* Mobile Status Tabs */}
+                  <div className="flex md:hidden w-full overflow-x-auto gap-2 px-2 pb-2 mb-2 scrollbar-hide shrink-0">
+                    {["pending", "in progress", "testing", "completed"].map(
+                      (status) => (
+                        <button
+                          key={status}
+                          onClick={() => setActiveMobileColumn(status)}
+                          className={`flex-shrink-0 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+                            activeMobileColumn === status
+                              ? "bg-stone-800 text-white dark:bg-white dark:text-black shadow-md"
+                              : "bg-white text-stone-600 border border-stone-200 dark:bg-[#111114] dark:border-white/10 dark:text-stone-400"
+                          }`}
+                        >
+                          {status === "in progress"
+                            ? "In Progress"
+                            : status.charAt(0).toUpperCase() + status.slice(1)}
+                        </button>
+                      ),
+                    )}
+                  </div>
+
+                  <div className="flex-1 flex gap-5 h-full pb-0 md:pb-4 md:w-auto justify-center md:justify-start overflow-hidden md:overflow-visible">
+                    <div
+                      className={`${activeMobileColumn === "pending" ? "flex" : "hidden"} md:flex flex-col w-full md:w-[350px] shrink-0 h-full`}
+                    >
+                      <TaskColumn
+                        title="Pending"
+                        statusId="pending"
+                        icon={
+                          <CircleDashed className="w-5 h-5 text-amber-500" />
+                        }
+                        tasks={pendingTasks}
+                        onDelete={setSelectedTaskForDelete}
+                        onEdit={setSelectedTaskForEdit}
+                        onView={setSelectedTaskForView}
+                        onComments={setSelectedTaskForComments}
+                        projectAssignees={projectAssignees}
+                        isTaskBusy={isTaskBusy}
+                        isLoading={showTaskSkeletons}
+                      />
+                    </div>
+
+                    <div
+                      className={`${activeMobileColumn === "in progress" ? "flex" : "hidden"} md:flex flex-col w-full md:w-[350px] shrink-0 h-full`}
+                    >
+                      <TaskColumn
+                        title="In Progress"
+                        statusId="in progress"
+                        icon={
+                          <Loader className="w-5 h-5 text-blue-500 animate-spin" />
+                        }
+                        tasks={inProgressTasks}
+                        onDelete={setSelectedTaskForDelete}
+                        onEdit={setSelectedTaskForEdit}
+                        onView={setSelectedTaskForView}
+                        onComments={setSelectedTaskForComments}
+                        projectAssignees={projectAssignees}
+                        isTaskBusy={isTaskBusy}
+                        isLoading={showTaskSkeletons}
+                      />
+                    </div>
+
+                    <div
+                      className={`${activeMobileColumn === "testing" ? "flex" : "hidden"} md:flex flex-col w-full md:w-[350px] shrink-0 h-full`}
+                    >
+                      <TaskColumn
+                        title="Testing"
+                        statusId="testing"
+                        icon={
+                          <FlaskConical className="w-5 h-5 text-purple-500" />
+                        }
+                        tasks={testingTasks}
+                        onDelete={setSelectedTaskForDelete}
+                        onEdit={setSelectedTaskForEdit}
+                        onView={setSelectedTaskForView}
+                        onComments={setSelectedTaskForComments}
+                        projectAssignees={projectAssignees}
+                        isTaskBusy={isTaskBusy}
+                        isLoading={showTaskSkeletons}
+                      />
+                    </div>
+
+                    <div
+                      className={`${activeMobileColumn === "completed" ? "flex" : "hidden"} md:flex flex-col w-full md:w-[350px] shrink-0 h-full`}
+                    >
+                      <TaskColumn
+                        title="Completed"
+                        statusId="completed"
+                        icon={
+                          <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                        }
+                        tasks={completedTasks}
+                        onDelete={setSelectedTaskForDelete}
+                        onEdit={setSelectedTaskForEdit}
+                        onView={setSelectedTaskForView}
+                        onComments={setSelectedTaskForComments}
+                        projectAssignees={projectAssignees}
+                        isTaskBusy={isTaskBusy}
+                        isLoading={showTaskSkeletons}
+                      />
+                    </div>
                   </div>
                 </main>
               </DragDropContext>

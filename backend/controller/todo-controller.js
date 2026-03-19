@@ -142,7 +142,10 @@ export const getAllTasks = async (req, res) => {
         .json({ message: "You do not have access to this project" });
     }
 
-    const tasks = await Todo.find({ projectId }).sort({ createdAt: -1 });
+    const tasks = await Todo.find({ projectId }).sort({
+      order: 1,
+      createdAt: -1,
+    });
     const hydratedTasks = await hydrateTasksWithProfiles(tasks, project);
 
     return res.status(200).json({
@@ -271,10 +274,20 @@ export const addTask = async (req, res) => {
         .json({ message: "Assignee must be a member of this project" });
     }
 
+    // Get max order for valid positioning
+    const maxOrderTask = await Todo.findOne({
+      projectId,
+      status: status || "pending",
+    })
+      .sort({ order: -1 })
+      .select("order");
+    const newOrder = maxOrderTask ? maxOrderTask.order + 1 : 0;
+
     const newTask = await Todo.create({
       title,
       description: description || "",
       status: status || "pending",
+      order: newOrder,
       priority: priority || "medium",
       taskType: taskType || "feature",
       startDate: startDate || null,
@@ -486,6 +499,119 @@ export const getTasksBySearch = async (req, res) => {
       success: true,
       data: hydratedTasks,
     });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+// Reorder tasks
+export const reorderTask = async (req, res) => {
+  try {
+    const {
+      taskId,
+      sourceIndex,
+      destinationIndex,
+      sourceStatus,
+      destinationStatus,
+      projectId,
+    } = req.body;
+    const userId = req.userId;
+
+    if (!taskId || !projectId) {
+      return res
+        .status(400)
+        .json({ message: "Task ID and Project ID are required" });
+    }
+
+    // Check access
+    const project = await checkProjectAccess(projectId, userId);
+    if (!project) {
+      return res
+        .status(403)
+        .json({ message: "You do not have access to this project" });
+    }
+
+    const task = await Todo.findById(taskId);
+    if (!task) return res.status(404).json({ message: "Task not found" });
+
+    // Helper to get fresh sorted lists
+    const getSortedTasks = (status) =>
+      Todo.find({ projectId, status }).sort({ order: 1 });
+
+    if (sourceStatus === destinationStatus) {
+      // Same column reorder
+      let tasks = await getSortedTasks(sourceStatus);
+
+      // Remove task from list
+      let taskList = tasks.filter((t) => t._id.toString() !== taskId);
+
+      // Insert at new position
+      const insertIndex = Math.min(destinationIndex, taskList.length);
+      taskList.splice(insertIndex, 0, task);
+
+      // Update all orders
+      const bulkOps = taskList.map((t, index) => ({
+        updateOne: {
+          filter: { _id: t._id },
+          update: { $set: { order: index } },
+        },
+      }));
+
+      if (bulkOps.length > 0) await Todo.bulkWrite(bulkOps);
+    } else {
+      // Different columns
+      const sourceTasks = await getSortedTasks(sourceStatus);
+      const destTasks = await getSortedTasks(destinationStatus);
+
+      // Remove from source
+      const newSourceList = sourceTasks.filter(
+        (t) => t._id.toString() !== taskId,
+      );
+
+      // Add to destination
+      let newDestList = [...destTasks];
+      const insertIndex = Math.min(destinationIndex, newDestList.length);
+
+      newDestList.splice(insertIndex, 0, task);
+
+      // Update source column orders
+      const sourceOps = newSourceList.map((t, index) => ({
+        updateOne: {
+          filter: { _id: t._id },
+          update: { $set: { order: index } },
+        },
+      }));
+
+      // Update destination column orders (and status for the moved task)
+      const destOps = newDestList.map((t, index) => {
+        const update = { order: index };
+        if (t._id.toString() === taskId) {
+          update.status = destinationStatus;
+        }
+        return {
+          updateOne: {
+            filter: { _id: t._id },
+            update: { $set: update },
+          },
+        };
+      });
+
+      const allOps = [...sourceOps, ...destOps];
+      if (allOps.length > 0) await Todo.bulkWrite(allOps);
+
+      // Log activity
+      await ActivityLog.create({
+        projectId,
+        userId,
+        action: "UPDATED_STATUS",
+        taskSnapshot: `Task "${task.title}" moved from ${sourceStatus} to ${destinationStatus}.`,
+      });
+    }
+
+    return res
+      .status(200)
+      .json({ success: true, message: "Task reordered successfully" });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: error.message });

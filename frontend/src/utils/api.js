@@ -202,6 +202,16 @@ export const searchTasks = async (query, projectId) => {
   }
 };
 
+export const reorderTask = async (data) => {
+  try {
+    const response = await apiClient.post("/todos/reorder", data);
+    return response.data;
+  } catch (error) {
+    console.error("Error reordering task:", error);
+    throw error;
+  }
+};
+
 // ============ USER API ============
 
 export const sendInvitation = async (email, options = {}) => {

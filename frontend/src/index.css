@@ -80,7 +80,7 @@ body {
 
 .dark .custom-scrollbar::-webkit-scrollbar-thumb,
 .dark ::-webkit-scrollbar-thumb {
-    background: transparent;
+    background: #475569;
     border-radius: 3px;
 }
 
@@ -109,7 +109,7 @@ body {
 
 .custom-scrollbar::-webkit-scrollbar-thumb,
 ::-webkit-scrollbar-thumb {
-    background: transparent;
+    background: #cbd5e1;
     border-radius: 3px;
 }
 
@@ -149,6 +149,11 @@ body {
 
 /* Custom Animations */
 @keyframes progress {
-    0% { width: 0%; }
-    100% { width: 100%; }
+    0% {
+        width: 0%;
+    }
+
+    100% {
+        width: 100%;
+    }
 }
