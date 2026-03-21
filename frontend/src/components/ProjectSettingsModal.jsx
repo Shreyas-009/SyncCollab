@@ -203,7 +203,8 @@ const ProjectSettingsModal = ({ show, onClose, project, onProjectUpdated }) => {
                                             type="text"
                                             value={name}
                                             onChange={(e) => setName(e.target.value)}
-                                            className="w-full px-4 py-2.5 rounded-xl border border-stone-200 dark:border-white/5 bg-stone-50 dark:bg-white/5 text-stone-800 dark:text-gray-100 placeholder-stone-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all"
+                                            disabled={!isOwner}
+                                            className="w-full px-4 py-2.5 rounded-xl border border-stone-200 dark:border-white/5 bg-stone-50 dark:bg-white/5 text-stone-800 dark:text-gray-100 placeholder-stone-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                                             placeholder="Enter project name"
                                         />
                                     </div>
@@ -212,7 +213,8 @@ const ProjectSettingsModal = ({ show, onClose, project, onProjectUpdated }) => {
                                         <textarea
                                             value={description}
                                             onChange={(e) => setDescription(e.target.value)}
-                                            className="w-full px-4 py-2.5 rounded-xl border border-stone-200 dark:border-white/5 bg-stone-50 dark:bg-white/5 text-stone-800 dark:text-gray-100 placeholder-stone-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all min-h-[100px] resize-none"
+                                            disabled={!isOwner}
+                                            className="w-full px-4 py-2.5 rounded-xl border border-stone-200 dark:border-white/5 bg-stone-50 dark:bg-white/5 text-stone-800 dark:text-gray-100 placeholder-stone-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all min-h-[100px] resize-none disabled:opacity-50 disabled:cursor-not-allowed"
                                             placeholder="Project description (optional)"
                                         />
                                     </div>
@@ -223,7 +225,8 @@ const ProjectSettingsModal = ({ show, onClose, project, onProjectUpdated }) => {
                                                 <button
                                                     key={c}
                                                     onClick={() => setColor(c)}
-                                                    className={`w-8 h-8 rounded-xl transition-all ${color === c ? 'scale-110 ring-2 ring-purple-500 ring-offset-2 dark:ring-offset-[#0c0c0e]' : 'hover:scale-105'}`}
+                                                    disabled={!isOwner}
+                                                    className={`w-8 h-8 rounded-xl transition-all ${color === c ? 'scale-110 ring-2 ring-purple-500 ring-offset-2 dark:ring-offset-[#0c0c0e]' : 'hover:scale-105'} disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100`}
                                                     style={{ backgroundColor: c }}
                                                 />
                                             ))}
@@ -239,10 +242,11 @@ const ProjectSettingsModal = ({ show, onClose, project, onProjectUpdated }) => {
                                                     key={opt.value}
                                                     type="button"
                                                     onClick={() => setActivityRetentionDays(opt.value)}
+                                                    disabled={!isOwner}
                                                     className={`py-2 rounded-xl text-[10px] font-bold transition-all ${activityRetentionDays === opt.value
                                                             ? 'bg-purple-600 text-white shadow-sm'
                                                             : 'bg-stone-100 dark:bg-white/5 text-stone-500 dark:text-slate-400 hover:bg-stone-200 dark:hover:bg-white/10'
-                                                        }`}
+                                                        } disabled:opacity-50 disabled:cursor-not-allowed`}
                                                 >
                                                     {opt.label}
                                                 </button>
@@ -429,7 +433,7 @@ const ProjectSettingsModal = ({ show, onClose, project, onProjectUpdated }) => {
                     >
                         Close
                     </button>
-                    {activeTab === 'general' && (
+                    {activeTab === 'general' && isOwner && (
                         <button
                             onClick={handleGeneralUpdate}
                             disabled={isUpdating || (
